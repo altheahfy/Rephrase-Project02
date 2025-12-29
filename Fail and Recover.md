@@ -5,6 +5,158 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2025-12-29] Test-1成功：親スロット＋サブスロット組み合わせによる正確な識別
+
+### 発生した問題
+- Test-1が3回のランダマイズで「80/47種類」「47/47種類」など不可能な結果を返していた
+- サブスロット種別を単独（`sub-s`など）でカウントしていたため、親スロットのコンテキストが欠落
+- コンテナのラベル（`S`, `AUX`など）をコンテンツとして誤検出していた
+
+### Root Cause（根本原因）
+**サブスロットの識別には「親スロット＋サブスロット種別」の組み合わせが必須**
+
+#### DBの構造理解
+```
+make/ex007:
+  - Slot: S → SubslotID: sub-s, sub-aux, sub-m2, sub-v, sub-o1
+  
+know/ex001:
+  - Slot: S → SubslotID: sub-s, sub-v, sub-c1
+```
+
+同じ`sub-s`でも、`s-sub-s`（Sの中のsub-s）と`o1-sub-s`（O1の中のsub-s）は**別物**。
+
+#### 誤ったアプローチ
+```typescript
+// ❌ 親スロットのコンテキストなし
+dbSubslotTypes.add(row.SubslotID); // "sub-s"のみ
+```
+
+#### 正しいアプローチ
+```typescript
+// ✅ 親スロット＋サブスロット種別の組み合わせ
+allDbCombinations.add(`${parentSlot}-${subslotId}`); // "s-sub-s"
+```
+
+### Design Rationale（設計判断）
+**なぜ組み合わせが必要か**:
+1. DBは各例文ごとに異なる親スロットでサブスロットを定義
+2. 例：`make`系はSにサブスロット、`think`系はO1にサブスロット
+3. 「全サブスロットが表示されるか」のテストは、**各親スロットのサブスロット構造全体**の検証
+
+**コンテンツ検出の改善**:
+- `.slot-phrase`または`.slot-text`の**実際のテキスト**を確認
+- コンテナ自体の`textContent`はラベルを含むため不正確
+
+### 解決策
+
+#### コード修正（tests/rephrase-proxy-test.spec.ts）
+
+**修正前**（誤った識別）:
+```typescript
+for (const row of dbData) {
+  if (row.SubslotID) {
+    dbSubslotTypes.add(row.SubslotID); // 親スロットなし
+  }
+}
+
+// コンテンツ判定
+const containerText = await container.textContent();
+const hasContent = containerText?.trim(); // ラベルも含む
+```
+
+**修正後**（正確な識別）:
+```typescript
+// 1. DB構造をマップ化
+const exampleStructure = new Map<string, Map<string, Set<string>>>();
+for (const row of dbData) {
+  if (row.SubslotID && row.Slot && row.V_group_key && row.例文ID) {
+    const exampleKey = `${row.V_group_key}/${row.例文ID}`;
+    const parentSlot = row.Slot.toLowerCase();
+    // 親スロットごとにサブスロット種別を記録
+    example.get(parentSlot)!.add(row.SubslotID);
+  }
+}
+
+// 2. 全組み合わせを集計
+exampleStructure.forEach((parentMap, exampleKey) => {
+  parentMap.forEach((subslots, parentSlot) => {
+    subslots.forEach(subslotId => {
+      allDbCombinations.add(`${parentSlot}-${subslotId}`);
+    });
+  });
+});
+
+// 3. 実際のコンテンツを確認
+const slotPhrase = container.querySelector('.slot-phrase');
+const slotText = container.querySelector('.slot-text');
+const hasContent = (slotPhrase?.textContent?.trim() !== '') ||
+                   (slotText?.textContent?.trim() !== '');
+```
+
+### テスト結果
+```
+📋 DB内の例文数: 11
+📊 DB内の全サブスロット組み合わせ: 47種類
+   c1-sub-aux, c1-sub-o1, c1-sub-s, c1-sub-v, c2-sub-m3, ...
+
+━━━ 1回目のランダマイズ ━━━
+  ✅ s-sub-s を発見
+  ✅ s-sub-aux を発見
+  ...
+
+✅ 16回のランダマイズで全サブスロット組み合わせが出現
+
+📊 最終結果:
+   DB内の全組み合わせ: 47種類
+   UI出現: 47種類
+
+🎉 DB内の全サブスロット種別が静的スロットDOMに正しく表示される
+✓ PASSED (2.3m)
+```
+
+### 精度改善・タイムスタンプ
+- **改善前**: 3回ランダマイズで80/47（不可能な結果）
+- **改善後**: **16回ランダマイズで47/47種類（100%正確）**
+- **タイムスタンプ**: 2025-12-29
+- **所要時間**: 約2.3分
+
+### Git Diff（主要変更）
+```diff
+- for (const row of dbData) {
+-   if (row.SubslotID) {
+-     dbSubslotTypes.add(row.SubslotID);
+-   }
+- }
++ const exampleStructure = new Map<string, Map<string, Set<string>>>();
++ for (const row of dbData) {
++   if (row.SubslotID && row.Slot && row.V_group_key && row.例文ID) {
++     const exampleKey = `${row.V_group_key}/${row.例文ID}`;
++     const parentSlot = row.Slot.toLowerCase();
++     example.get(parentSlot)!.add(row.SubslotID);
++   }
++ }
++ 
++ allDbCombinations.add(`${parentSlot}-${subslotId}`);
+```
+
+### 今後の注意点
+1. **サブスロット識別は必ず親スロット＋種別の組み合わせ**
+   - 形式: `${parentSlot}-${subslotId}`（例：`s-sub-s`, `o1-sub-v`）
+2. **コンテンツ検出は`.slot-phrase`/`.slot-text`の実テキスト**
+   - コンテナ自体の`textContent`はラベルを含むため使用しない
+3. **DB構造はV_group_key→例文ID→親スロット→サブスロットの階層**
+
+### 関連ファイル
+- `tests/rephrase-proxy-test.spec.ts` (Test-1: Line 510-660)
+- `training/data/slot_order_data.json` (DB構造)
+- `設計仕様書/Playwright_Test.md` (テスト仕様)
+
+### 類似ケース検索キーワード
+- `サブスロット`, `親スロット`, `組み合わせ`, `識別`, `V_group_key`, `例文ID`, `Test-1`
+
+---
+
 ## [2025-12-28] Playwrightテスト実装：サブスロットDOM構造の発見
 
 ### 発生した問題
@@ -131,5 +283,5 @@ const textContent = await container.textContent();
 ### 類似ケース検索キーワード
 - `サブスロット`, `DOM構造`, `.slot-container`, `.subslot-container`, `textContent空`, `Playwright`, `セレクタ`
 
----
+---test-results\rephrase-proxy-test-Rephra-2bbc8-ンダマイズ後もサブスロットhidden状態が保持される-chromium\video.webm
 

@@ -448,6 +448,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📋 利用可能なデバッグコマンド:');
         console.log('  - window.showDebugLogs() : デバッグログを表示');
         console.log('  - window.clearDebugLogs() : デバッグログをクリア');
+        
+        // テスト環境フラグをグローバルに設定（他のスクリプトから参照可能）
+        window.REPHRASE_TEST_MODE = true;
+        
         return;
     }
     
@@ -475,7 +479,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    waitForAuth();
+    // テスト環境ではwaitForAuth()を実行しない
+    if (!isTestEnvironment && !SKIP_AUTH_FOR_DEVELOPMENT) {
+        waitForAuth();
+    }
 });
 
 // ログアウト処理
