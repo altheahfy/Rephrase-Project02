@@ -1177,7 +1177,7 @@ function syncSubslotsFromJson(data) {
       // 親コンテナに追加
       parentContainer.appendChild(slotElement);
       
-      // 🎯 DOM追加後にlocalStorage設定に基づいてCSSクラスを適用
+      // 🎯 DOM追加後にlocalStorage設定に基づいてCSSクラスとインラインスタイルを適用
       try {
         const saved = localStorage.getItem('rephrase_subslot_visibility_state');
         if (saved) {
@@ -1188,7 +1188,10 @@ function syncSubslotsFromJson(data) {
             // 英語例文テキストの表示制御
             if (subslotVisibilityState[fullSlotId]['text'] === false) {
               slotElement.classList.add('hidden-subslot-text');
-              console.log(`🙈 ${fullSlotId} に hidden-subslot-text クラスを追加（英語例文テキスト非表示）`);
+              // 🆕 インラインスタイルも設定（visibility_control.jsと統一）
+              phraseElement.style.opacity = '0';
+              phraseElement.style.visibility = 'hidden';
+              console.log(`🙈 ${fullSlotId} に hidden-subslot-text クラスとインラインスタイルを追加（英語例文テキスト非表示）`);
             }
             // 日本語補助テキストの表示制御
             if (subslotVisibilityState[fullSlotId]['auxtext'] === false) {

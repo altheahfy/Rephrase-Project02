@@ -68,23 +68,37 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
     
     // サブスロットも同様に制御
     const subSlots = document.querySelectorAll(`[id^="slot-${slotKey}-sub-"]`);
+    console.log(`🔍 DEBUG: ${slotKey}のサブスロット検索結果: ${subSlots.length}個`);
     subSlots.forEach(subSlot => {
+      console.log(`🔍 DEBUG: サブスロット処理中: ${subSlot.id}, isVisible=${isVisible}`);
       if (isVisible) {
         subSlot.classList.remove(className);
+        // 🆕 syncSubslotsFromJsonが追加するクラスも除去
+        subSlot.classList.remove('hidden-subslot-text');
+        subSlot.classList.remove('hidden-subslot-auxtext');
       } else {
         subSlot.classList.add(className);
+        // 🆕 syncSubslotsFromJsonと同じクラスも追加
+        if (elementType === 'text') {
+          subSlot.classList.add('hidden-subslot-text');
+        } else if (elementType === 'auxtext') {
+          subSlot.classList.add('hidden-subslot-auxtext');
+        }
       }
       
       // 🆕 サブスロットの英語例文（text要素）も直接制御
       if (elementType === 'text') {
         const subTextElement = subSlot.querySelector('.slot-phrase');
+        console.log(`🔍 DEBUG: サブスロット ${subSlot.id} の .slot-phrase 要素: ${subTextElement ? '存在' : '不存在'}`);
         if (subTextElement) {
           if (isVisible) {
             subTextElement.style.opacity = '1';
             subTextElement.style.visibility = 'visible';
+            console.log(`✅ ${subSlot.id} の英語例文を表示しました (opacity=1, visibility=visible)`);
           } else {
             subTextElement.style.opacity = '0';
             subTextElement.style.visibility = 'hidden';
+            console.log(`🙈 ${subSlot.id} の英語例文を非表示にしました (opacity=0, visibility=hidden)`);
           }
         }
       }
@@ -647,9 +661,11 @@ function hideAllEnglishText() {
 // 🆕 全英文表示関数（トグル用）
 function showAllEnglishText() {
   console.log("👁️ 全英文例文を表示します");
+  console.log(`🔍 DEBUG: 現在のDOM状態チェック - 全サブスロット数: ${document.querySelectorAll('[id*="-sub-"]').length}個`);
   
   // 全スロットの英文例文（text要素）を表示にする
   ALL_SLOTS.forEach(slot => {
+    console.log(`🔍 DEBUG: showAllEnglishText - ${slot}スロットの処理開始`);
     toggleSlotElementVisibility(slot, 'text', true);
   });
   

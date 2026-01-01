@@ -746,3 +746,322 @@ if (typeof window.updateSubslotImages === "function") {
 
 ---
 
+## [2026-01-01] サブスロット非表示時の個別ランダマイズ後、英語が表示されない問題（重要）
+
+### 発生した問題
+**症状**:
+- サブスロットを開き、英語OFF/ONボタンで何度も切り替え → 正常動作
+- **非表示状態で個別ランダマイズを実行すると、その後英語ONにしても表示されない**
+- 不思議なことに、**表示状態でランダマイズすると正常に表示される**
+
+**再現手順**:
+1. サブスロットを開く
+2. 英語OFFにする（非表示）
+3. 個別ランダマイズを押す
+4. 英語ONを押す → **英語が表示されない！何度押しても非表示のまま**
+5. （逆に）表示状態でランダマイズすると正常に表示される
+
+**影響範囲**:
+- 全サブスロット（S, M1, M2, C1, O1, O2, C2, M3）の表示制御
+
+### 根本原因
+**CSSクラス名の不一致による二重管理**:
+
+```javascript
+// ❌ 問題のあるコード（修正前）
+
+// 1. syncSubslotsFromJson (insert_test_data_clean.js Line 1198)
+if (subslotVisibilityState[fullSlotId]['text'] === false) {
+  slotElement.classList.add('hidden-subslot-text');  // ← このクラスを追加
+  phraseElement.style.opacity = '0';
+  phraseElement.style.visibility = 'hidden';
+}
+
+// 2. toggleSlotElementVisibility (visibility_control.js Line 55-60)
+subSlots.forEach(subSlot => {
+  if (isVisible) {
+    subSlot.classList.remove(className);  // ← 'hidden-text' を除去しようとする
+  } else {
+    subSlot.classList.add(className);     // ← 'hidden-text' を追加
+  }
+  
+  // インラインスタイルも設定
+  subTextElement.style.opacity = '1';  // ← でも効かない！
+});
+```
+
+**問題の本質**:
+1. `syncSubslotsFromJson` → `hidden-subslot-text` クラスを追加
+2. `toggleSlotElementVisibility` → `hidden-text` クラスを除去しようとする
+3. **クラス名が異なるため除去できず、`hidden-subslot-text` が残る**
+4. CSSで `color: transparent !important;` が設定されているため、インラインスタイル(`opacity=1`)より優先される
+5. 結果：英語ONにしても `hidden-subslot-text` クラスが残り続け、表示されない
+
+**なぜ表示状態でランダマイズすると正常なのか**:
+- 表示状態（英語ON）では、localStorageに `text: true` が保存されている
+- `syncSubslotsFromJson` は `hidden-subslot-text` クラスを追加しない
+- インラインスタイルだけで制御され、正常に表示される
+
+### デバッグの過程
+
+#### Console Logによる検証
+```javascript
+// visibility_control.js に追加したConsole Log
+console.log(`🔍 DEBUG: ${slotKey}のサブスロット検索結果: ${subSlots.length}個`);
+console.log(`🔍 DEBUG: サブスロット処理中: ${subSlot.id}, isVisible=${isVisible}`);
+console.log(`🔍 DEBUG: サブスロット ${subSlot.id} の .slot-phrase 要素: ${subTextElement ? '存在' : '不存在'}`);
+console.log(`✅ ${subSlot.id} の英語例文を表示しました (opacity=1, visibility=visible)`);
+```
+
+**発見事項**:
+- サブスロットは正しく検出されている（10個）
+- `.slot-phrase` 要素も存在する
+- インラインスタイル `opacity=1, visibility=visible` も正しく設定されている
+- **しかし表示されない** → CSSクラスが原因と推測
+
+**決定的な証拠**:
+- ブラウザのDevToolsでDOM検査
+- `hidden-subslot-text` クラスが残っていることを確認
+- `hidden-text` クラスの除去は成功しているが、`hidden-subslot-text` は除去されていない
+
+### 解決策の実装
+
+**修正箇所**: `training/js/visibility_control.js` (toggleSlotElementVisibility関数)
+
+**修正内容**:
+```javascript
+// ✅ 修正後のコード
+
+subSlots.forEach(subSlot => {
+  if (isVisible) {
+    subSlot.classList.remove(className);
+    // 🆕 syncSubslotsFromJsonが追加するクラスも除去
+    subSlot.classList.remove('hidden-subslot-text');
+    subSlot.classList.remove('hidden-subslot-auxtext');
+  } else {
+    subSlot.classList.add(className);
+    // 🆕 syncSubslotsFromJsonと同じクラスも追加
+    if (elementType === 'text') {
+      subSlot.classList.add('hidden-subslot-text');
+    } else if (elementType === 'auxtext') {
+      subSlot.classList.add('hidden-subslot-auxtext');
+    }
+  }
+  
+  // インラインスタイルも設定（既存のまま）
+  if (elementType === 'text') {
+    const subTextElement = subSlot.querySelector('.slot-phrase');
+    if (subTextElement) {
+      if (isVisible) {
+        subTextElement.style.opacity = '1';
+        subTextElement.style.visibility = 'visible';
+      } else {
+        subTextElement.style.opacity = '0';
+        subTextElement.style.visibility = 'hidden';
+      }
+    }
+  }
+});
+```
+
+### 設計判断の理由
+
+1. **両方のクラスを操作する理由**
+   - `syncSubslotsFromJson` と `toggleSlotElementVisibility` の両方が使われる
+   - どちらか一方だけでは、もう一方が追加したクラスが残る
+   - **統一的なクラス管理**により、どの経路でも正しく動作
+
+2. **インラインスタイルも維持する理由**
+   - CSSクラスだけでは、`!important` ルールとの競合リスクがある
+   - インラインスタイルとCSSクラスの**二重制御**で確実性を担保
+   - 既存の動作との互換性を維持
+
+3. **表示時にも両方のクラスを除去する理由**
+   - 過去の操作で残ったクラスをクリーンアップ
+   - どの状態から開始しても正しく動作するように
+
+### デバッグのコツ
+
+1. **Console Logで処理フローを追跡する**
+   - 「サブスロット検出」「要素存在確認」「スタイル適用確認」を段階的にログ出力
+   - 問題がどの段階で発生しているか特定できる
+
+2. **ブラウザDevToolsのElements検査が必須**
+   - Console Logだけでは分からない
+   - 実際のDOM状態（クラス名、インラインスタイル）を直接確認
+   - **「インラインスタイルは正しいのに表示されない」→ CSSクラスを疑う**
+
+3. **「逆パターン」をテストする**
+   - 非表示状態でランダマイズ → NG
+   - **表示状態でランダマイズ → OK**
+   - → 違いは何か？ localStorageの状態 → CSSクラスの有無
+
+4. **CSS優先順位を理解する**
+   ```css
+   /* 優先順位（高い順） */
+   1. !important
+   2. インラインスタイル
+   3. IDセレクタ
+   4. クラスセレクタ
+   ```
+   - `hidden-subslot-text { color: transparent !important; }` → 最優先
+   - インラインスタイル `opacity=1` では勝てない
+
+### 今後の注意点
+
+1. **CSSクラス名の統一**
+   - 同じ目的のクラスは同じ名前にする
+   - `hidden-text` と `hidden-subslot-text` の使い分けが混乱の元
+   - 可能なら統一を検討（ただし後方互換性に注意）
+
+2. **二重管理の回避**
+   - 複数の箇所で同じDOM要素を操作する場合は、**統一的な管理関数**を用意
+   - 今回のように「両方のクラスを明示的に操作」するのは過渡的対応
+   - 理想は、visibility制御を一元化する
+
+3. **!important の使用は慎重に**
+   - CSSで `!important` を使うと、後からJavaScriptで制御しにくくなる
+   - 今回は `color: transparent !important` が原因で、インラインスタイルが効かなかった
+   - やむを得ない場合のみ使用し、JavaScriptからの制御も考慮
+
+4. **Console Log とDevTools の組み合わせ**
+   - Console Log：処理フローの確認
+   - DevTools Elements：実際のDOM状態の確認
+   - **両方を使って初めて全体像が見える**
+
+### 関連ファイル
+- `training/js/visibility_control.js` (toggleSlotElementVisibility関数、Line 54-98)
+- `training/js/insert_test_data_clean.js` (syncSubslotsFromJson、Line 1195-1203)
+- `training/style.css` (Line 146-150: hidden-subslot-text クラス定義)
+
+### 類似ケース検索キーワード
+- `CSSクラス名不一致`, `hidden-subslot-text`, `hidden-text`, `個別ランダマイズ`, `英語表示されない`, `!important`, `インラインスタイル`, `クラス二重管理`, `toggleSlotElementVisibility`, `syncSubslotsFromJson`, `visibility制御`
+
+---
+
+## 🏗️ RephraseUI全体の構造的問題（2025-01-01記録）
+
+### 背景
+
+本日（2025-01-01）、「サブスロット画像消失」と「サブスロット非表示後の表示不具合」という2つの重大バグを解決しました。これらの問題を解決する過程で、**根本原因が個別のコーディングミスではなく、RephraseUIのアーキテクチャ全体が抱える構造的問題にある**ことが明らかになりました。
+
+### 根本原因の分析
+
+#### 1. K-MAD以前の開発による制約
+
+RephraseUIは**例文DB自動作成システム（K-MAD方式）以前に開発された**ため、以下のアーキテクチャ原則が欠如しています：
+
+**欠如している原則**:
+- **情報統一システム**: クラス名、タイミング、状態管理が統一されていない
+- **職務分掌（Capabilities）**: 複数のファイル・関数が同じ責務を重複して持つ
+- **構造化ロギング**: デバッグ時の原因特定に時間がかかる（Console Logに頼る）
+- **動的基準システム**: マジックナンバー（250ms, 100ms）がハードコード
+
+#### 2. 具体的な構造的問題
+
+##### **問題A: CSSクラス名の二重管理**（本日の2番目のバグの原因）
+
+**現象**:
+```javascript
+// insert_test_data_clean.js
+slotElement.classList.add('hidden-subslot-text');  // ← こちらのクラス名
+
+// visibility_control.js
+subSlot.classList.remove('hidden-text');  // ← 違うクラス名を削除
+```
+
+**K-MAD方式なら**:
+```javascript
+// 情報統一システムで全体で1つのクラス名定義を参照
+const VISIBILITY_CLASSES = {
+  SUBSLOT_TEXT: 'hidden-subslot-text',
+  SUBSLOT_AUX: 'hidden-subslot-auxtext',
+  // ...
+};
+```
+
+##### **問題B: タイミングの暗黙的依存**（本日の1番目のバグの原因）
+
+**現象**:
+```javascript
+// randomizer_individual.js
+setTimeout(() => { restoreSubslotLabels(); }, 100);  // ← 100ms
+setTimeout(() => { updateSubslotImages(); }, 250);   // ← 250ms（手動調整）
+```
+
+**K-MAD方式なら**:
+```python
+# 構造化ロギング + 動的基準システム
+@log_method_entry_exit()
+def restore_subslot_labels():
+    # 処理
+    return result
+
+@log_method_entry_exit()
+def update_subslot_images():
+    # 自動的に前処理の完了を待つ
+```
+
+##### **問題C: 状態管理の分散**
+
+**現象**:
+```javascript
+// localStorage（永続化）
+localStorage.getItem('rephrase_subslot_visibility_state');
+
+// CSS classes（スタイル）
+slotElement.classList.add('hidden-subslot-text');
+
+// inline styles（直接操作）
+phraseElement.style.opacity = '0';
+```
+
+**K-MAD方式なら**:
+```python
+# 情報統一システムで1箇所に集約
+class StateManager:
+    def get_visibility_state(self, slot_id: str) -> VisibilityState:
+        # 統一された形式で状態を返す
+```
+
+### 将来の対応方針
+
+#### 短期的対応（現在）
+- ✅ 個別の不具合は発生の都度対処（本日の2件のバグ解決）
+- ⚠️ 根本的な構造改善は行わない（公開リリース優先）
+
+#### 長期的対応（リファクタリング）
+
+**目標**: **K-MAD完全導入リファクタリング**
+
+**適用すべきK-MAD原則**:
+1. **情報統一システム** → クラス名、API、状態管理の統一
+2. **職務分掌** → 各ファイル・関数の責務を明確に分離
+3. **構造化ロギング** → デバッグ時間を劇的に短縮（35-90分 → 5分）
+4. **動的基準システム** → マジックナンバーを排除
+5. **AST Linter** → 統一ルールの自動検証
+6. **Golden Test** → UI退化の自動検出
+
+**期待される効果**:
+- 🐛 **バグ発生率**: 70-80%削減（情報統一 + 職務分掌）
+- ⚡ **デバッグ時間**: 7-18倍高速化（構造化ロギング）
+- 🛡️ **退化防止**: 自動検出（Golden Test + AST Linter）
+
+### 教訓
+
+> **「混沌とした状態で作っているから」** — 2025-01-01 ユーザー洞察
+
+今日の2つのバグは、個別の修正で対処しましたが、**根本原因は設計思想の欠如**です。K-MAD方式を適用すれば、このようなバグは設計段階で防止できます。
+
+**記録日時**: 2025-01-01 23:45（JST）
+
+---
+
+## 🚀 次のステップ
+
+1. **プロダクション展開前の総合テスト**
+2. **パフォーマンス最適化**（音声読み上げ、描画速度）
+3. **UI/UX改善**（制御パネル、スロット配置の最終調整）
+4. **商用展開準備**（エラーログ監視、バックアップ体制構築）
+5. **将来課題**: K-MAD完全導入リファクタリング（時間的余裕ができ次第）
+
