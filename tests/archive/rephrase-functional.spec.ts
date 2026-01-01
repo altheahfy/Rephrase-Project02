@@ -292,7 +292,89 @@ test.describe('RephraseUI 機能テスト', () => {
   });
 
   /**
-   * Test-8: 【任意】音声ボタンが存在する
+   * Test-8: 【必須】「英語OFF/ON」ボタンがトグル動作し、状態が保持される
+   * 
+   * 目的: 全体制御ボタンが正しく動作し、ランダマイズ後も状態が保持されることを検証
+   */
+  test('[必須] 「英語OFF/ON」ボタンがトグル動作し状態が保持される', async ({ page }) => {
+    const toggleBtn = page.locator('#hide-all-english-visibility');
+    await expect(toggleBtn).toHaveCount(1);
+    
+    // 初期状態: 「🙈 英語OFF」（全英文表示中）
+    const initialText = await toggleBtn.textContent();
+    console.log('初期ボタンテキスト:', initialText?.trim());
+    expect(initialText).toContain('英語OFF');
+    
+    // テスト対象スロットを選定（S, V, O1など主要スロット）
+    const testSlots = ['s', 'v', 'o1'];
+    
+    // Step 1: 英語OFFをクリック → 全英文非表示
+    await toggleBtn.click();
+    await page.waitForTimeout(300); // 処理完了を待つ
+    
+    // ボタンテキストが変化したことを確認
+    const afterHideText = await toggleBtn.textContent();
+    console.log('非表示後のボタンテキスト:', afterHideText?.trim());
+    expect(afterHideText).toContain('英語ON');
+    
+    // 実際に英文が非表示になっているか確認
+    for (const slotName of testSlots) {
+      const phraseElement = page.locator(`#slot-${slotName} .slot-phrase`).first();
+      if (await phraseElement.count() > 0) {
+        const isHidden = await phraseElement.evaluate(el => {
+          const style = window.getComputedStyle(el);
+          return style.opacity === '0' || style.visibility === 'hidden' || style.display === 'none';
+        });
+        expect(isHidden).toBe(true);
+        console.log(`✅ ${slotName.toUpperCase()} スロットの英文が非表示`);
+      }
+    }
+    
+    // Step 2: 個別ランダマイズを実行 → 状態が保持されるか
+    const randomizeBtn = page.locator('#randomize-individual-S, button[data-randomize="S"]').first();
+    if (await randomizeBtn.count() > 0) {
+      await randomizeBtn.click();
+      await page.waitForTimeout(500); // ランダマイズ処理完了を待つ
+      
+      // ランダマイズ後も英文が非表示のまま
+      const sPhrase = page.locator('#slot-s .slot-phrase').first();
+      if (await sPhrase.count() > 0) {
+        const stillHidden = await sPhrase.evaluate(el => {
+          const style = window.getComputedStyle(el);
+          return style.opacity === '0' || style.visibility === 'hidden' || style.display === 'none';
+        });
+        expect(stillHidden).toBe(true);
+        console.log('✅ 個別ランダマイズ後も非表示状態が保持');
+      }
+    }
+    
+    // Step 3: 英語ONをクリック → 全英文表示
+    await toggleBtn.click();
+    await page.waitForTimeout(300);
+    
+    // ボタンテキストが元に戻ったことを確認
+    const afterShowText = await toggleBtn.textContent();
+    console.log('表示後のボタンテキスト:', afterShowText?.trim());
+    expect(afterShowText).toContain('英語OFF');
+    
+    // 実際に英文が表示されているか確認
+    for (const slotName of testSlots) {
+      const phraseElement = page.locator(`#slot-${slotName} .slot-phrase`).first();
+      if (await phraseElement.count() > 0) {
+        const isVisible = await phraseElement.evaluate(el => {
+          const style = window.getComputedStyle(el);
+          return style.opacity !== '0' && style.visibility !== 'hidden' && style.display !== 'none';
+        });
+        expect(isVisible).toBe(true);
+        console.log(`✅ ${slotName.toUpperCase()} スロットの英文が表示`);
+      }
+    }
+    
+    console.log('🎉 「英語OFF/ON」ボタンのトグル動作と状態保持を確認');
+  });
+
+  /**
+   * Test-9: 【任意】音声ボタンが存在する
    */
   test('[任意] 音声ボタンが存在する', async ({ page }) => {
     const voiceBtn = page.locator('#play-voice-button, .voice-button, button[data-voice]').first();

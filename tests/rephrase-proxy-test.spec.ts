@@ -789,4 +789,280 @@ test.describe('RephraseUI 私の代行テスト', () => {
     expect(uiFoundCombinations.size).toBeGreaterThanOrEqual(allDbCombinations.size);
     console.log('\n🎉 DB内の全サブスロット種別が静的スロットDOMに正しく表示される');
   });
+
+  /**
+   * Test-5: 【新規】「英語OFF/ON」ボタン経由でのhidden状態保持テスト
+   * 
+   * 目的: 全体制御ボタン（🙈 英語OFF / 👁️ 英語ON）経由で非表示設定した場合も、
+   *       開閉操作とランダマイズで状態が保持されることを保証
+   * 
+   * 従来のTest-3&4との違い:
+   * - Test-3&4: サブスロット制御パネル経由（個別設定）
+   * - Test-5: 英語OFF/ONボタン経由（全体設定）
+   * 
+   * ⚠️ ロジックはTest-3&4と同じ（実証済み）、非表示設定方法のみ変更
+   */
+  test('[新規] 「英語OFF/ON」ボタン経由でのhidden状態保持', async ({ page }) => {
+    test.setTimeout(300000); // 5分
+    
+    // =====================================
+    // 🆕 英語OFF/ONボタンで全英文非表示
+    // =====================================
+    const hideAllEnglishBtn = page.locator('#hide-all-english-visibility');
+    await expect(hideAllEnglishBtn).toHaveCount(1);
+    
+    const initialText = await hideAllEnglishBtn.textContent();
+    console.log(`📋 初期ボタンテキスト: ${initialText?.trim()}`);
+    
+    if (initialText?.includes('英語OFF')) {
+      console.log('🔒 「英語OFF」ボタンをクリック');
+      await hideAllEnglishBtn.click();
+      await page.waitForTimeout(500);
+      
+      const afterText = await hideAllEnglishBtn.textContent();
+      console.log(`✅ ボタン変化確認: ${afterText?.trim()}`);
+      expect(afterText).toContain('英語ON');
+    }
+    
+    console.log('\n🔍 主要スロットの英文非表示を確認...');
+    for (const slotName of ['s', 'v', 'o1']) {
+      const phraseElement = page.locator(`#slot-${slotName} .slot-phrase`).first();
+      if (await phraseElement.count() > 0) {
+        const isHidden = await phraseElement.evaluate(el => {
+          const style = window.getComputedStyle(el);
+          return style.opacity === '0' || style.visibility === 'hidden';
+        });
+        expect(isHidden).toBe(true);
+        console.log(`  ✅ ${slotName.toUpperCase()} スロット英文が非表示`);
+      }
+    }
+    
+    // =====================================
+    // 以降はTest-3&4と全く同じロジック
+    // =====================================
+    
+    // 転写待機ヘルパー（Test-3&4からコピー）
+    async function waitForTransfer(wrapperId: string): Promise<boolean> {
+      const result = await page.waitForFunction((id) => {
+        const wrapper = document.getElementById(id);
+        if (!wrapper || window.getComputedStyle(wrapper).display === 'none') return false;
+        
+        const containers = wrapper.querySelectorAll('.slot-container, .subslot-container');
+        if (containers.length === 0) return false;
+        
+        for (const container of containers) {
+          const slotPhrase = container.querySelector('.slot-phrase');
+          const slotText = container.querySelector('.slot-text');
+          if ((slotPhrase?.textContent?.trim()) || (slotText?.textContent?.trim())) {
+            return true;
+          }
+        }
+        return false;
+      }, wrapperId, { timeout: 10000 }).catch(() => null);
+      
+      return !!result;
+    }
+    
+    // hidden状態検証ヘルパー（Test-3&4からコピー）
+    async function verifyHiddenState(parentSlotName: string, subslotIds: string[], testType: string): Promise<number> {
+      let failCount = 0;
+      
+      for (const subslotId of subslotIds) {
+        const combination = `${parentSlotName}-${subslotId}`;
+        const containerIdPattern = `slot-${parentSlotName}-${subslotId}`;
+        const container = page.locator(`#${containerIdPattern}.slot-container`);
+        
+        if (await container.count() === 0) {
+          console.log(`  ⚠️ ${containerIdPattern} が見つからない`);
+          continue;
+        }
+        
+        const hasTextHiddenClass = await container.evaluate(el => 
+          el.classList.contains('hidden-subslot-text')
+        );
+        
+        if (!hasTextHiddenClass) {
+          console.log(`  ❌ ${combination}: .hidden-subslot-text クラスが失われている [${testType}]`);
+          failCount++;
+        } else {
+          console.log(`  ✅ ${combination}: hidden状態保持 [${testType}]`);
+        }
+      }
+      
+      return failCount;
+    }
+    
+    const testedSubslots = new Set<string>();
+    let totalFailCount = 0;
+    const violations: { combination: string; testType: string; reason: string }[] = [];
+    const MAX_RANDOMIZE = 50;
+    const randomizeBtn = page.locator('#randomize-all');
+    
+    for (let attempt = 0; attempt < MAX_RANDOMIZE && testedSubslots.size < 20; attempt++) {
+      await randomizeBtn.click();
+      await page.waitForTimeout(1000);
+      
+      console.log(`\n━━━ ${attempt + 1}回目のランダマイズ ━━━`);
+      
+      // 動的記載エリアから実際にレンダリングされたサブスロットを解析
+      const renderedSubslots = await page.evaluate(() => {
+        const dynamicArea = document.getElementById('dynamic-slot-area');
+        if (!dynamicArea) return [];
+        
+        const results: Array<{parent: string, subslots: string[]}> = [];
+        const subslotElements = dynamicArea.querySelectorAll('.subslot[id*="-sub-"]');
+        const groupedByParent = new Map<string, Set<string>>();
+        
+        subslotElements.forEach((element) => {
+          const id = element.id;
+          const match = id.match(/^slot-(\w+)-sub-(\w+)$/);
+          if (!match) return;
+          
+          const parent = match[1].toLowerCase();
+          const subslotType = `sub-${match[2]}`;
+          
+          const subElement = element.querySelector('.subslot-element');
+          const subText = element.querySelector('.subslot-text');
+          const hasContent = (subElement?.textContent?.trim() && subElement.textContent.trim() !== '') ||
+                           (subText?.textContent?.trim() && subText.textContent.trim() !== '');
+          
+          if (hasContent) {
+            if (!groupedByParent.has(parent)) groupedByParent.set(parent, new Set());
+            groupedByParent.get(parent)!.add(subslotType);
+          }
+        });
+        
+        groupedByParent.forEach((subslots, parent) => {
+          results.push({ parent, subslots: Array.from(subslots) });
+        });
+        
+        return results;
+      });
+      
+      if (renderedSubslots.length === 0) {
+        console.log(`  ⚠️ 動的記載エリアにサブスロットなし（スキップ）`);
+        continue;
+      }
+      
+      console.log(`  🔍 動的記載エリア解析結果:`);
+      renderedSubslots.forEach(item => {
+        console.log(`    ${item.parent}: ${item.subslots.join(', ')}`);
+      });
+      
+      // 各親スロットをテスト
+      for (const {parent: parentSlotName, subslots: subslotIds} of renderedSubslots) {
+        const toggleBtn = page.locator(`button[data-subslot-toggle="${parentSlotName}"]`);
+        
+        if (await toggleBtn.count() === 0) {
+          console.log(`  ⏩ ${parentSlotName} トグルボタンが見つからない（スキップ）`);
+          continue;
+        }
+        
+        console.log(`\n🔓 ${parentSlotName} サブスロット領域を開きます`);
+        await toggleBtn.scrollIntoViewIfNeeded({ timeout: 3000 }).catch(() => {});
+        
+        try {
+          await toggleBtn.click({ timeout: 5000 });
+          await page.waitForTimeout(500);
+        } catch (e) {
+          console.log(`  ❌ クリックエラー: ${e.message}`);
+          continue;
+        }
+        
+        const actualWrapperId = `slot-${parentSlotName}-sub`;
+        if (!await waitForTransfer(actualWrapperId)) {
+          console.log(`  ⚠️ ${parentSlotName} の転写タイムアウト（スキップ）`);
+          await toggleBtn.click().catch(() => {});
+          await page.waitForTimeout(400);
+          continue;
+        }
+        
+        console.log(`  ✅ ${parentSlotName} の転写完了`);
+        
+        // =====================================
+        // 【テストA】開閉操作テスト
+        // =====================================
+        console.log(`  🔄 【テストA】開閉操作テスト開始...`);
+        
+        // 閉じる
+        await toggleBtn.click();
+        await page.waitForTimeout(400);
+        
+        // 開く
+        await toggleBtn.click();
+        await page.waitForTimeout(800);
+        
+        // 検証
+        const toggleFailCount = await verifyHiddenState(parentSlotName, subslotIds, '開閉テスト');
+        if (toggleFailCount > 0) {
+          totalFailCount += toggleFailCount;
+          violations.push({
+            combination: `${parentSlotName}`,
+            testType: '開閉テスト',
+            reason: `${toggleFailCount}件のhidden状態解除`
+          });
+        }
+        
+        // =====================================
+        // 【テストB】個別ランダマイズテスト
+        // =====================================
+        console.log(`  🎲 【テストB】個別ランダマイズテスト開始...`);
+        
+        const individualRandomizeBtn = page.locator(`button[data-individual-randomize="${parentSlotName}"]`);
+        
+        if (await individualRandomizeBtn.count() > 0) {
+          await individualRandomizeBtn.click();
+          await page.waitForTimeout(1500);
+          
+          if (await waitForTransfer(actualWrapperId)) {
+            const randomizeFailCount = await verifyHiddenState(parentSlotName, subslotIds, '個別ランダマイズ');
+            if (randomizeFailCount > 0) {
+              totalFailCount += randomizeFailCount;
+              violations.push({
+                combination: `${parentSlotName}`,
+                testType: '個別ランダマイズ',
+                reason: `${randomizeFailCount}件のhidden状態解除`
+              });
+            }
+          } else {
+            console.log(`  ⚠️ 個別ランダマイズ後の転写タイムアウト`);
+          }
+        } else {
+          console.log(`  ⚠️ ${parentSlotName} の個別ランダマイズボタンが見つからない（スキップ）`);
+        }
+        
+        // テスト済みサブスロットを記録
+        for (const subslotId of subslotIds) {
+          testedSubslots.add(`${parentSlotName}-${subslotId}`);
+        }
+        
+        // 親スロットを閉じる
+        console.log(`  🔒 ${parentSlotName} サブスロット領域を閉じます`);
+        await toggleBtn.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+        await toggleBtn.click({ timeout: 3000 }).catch(() => {});
+        await page.waitForTimeout(400);
+      }
+      
+      if ((attempt + 1) % 10 === 0) {
+        console.log(`\n📊 ${attempt + 1}回ランダマイズ: ${testedSubslots.size}個のサブスロットをテスト完了`);
+      }
+    }
+    
+    console.log(`\n📊 最終結果:`);
+    console.log(`   テスト完了: ${testedSubslots.size}個のサブスロット`);
+    console.log(`   違反数: ${totalFailCount}`);
+    
+    if (violations.length > 0) {
+      console.log(`\n❌ 違反詳細:`);
+      violations.forEach(v => console.log(`   ${v.combination} [${v.testType}]: ${v.reason}`));
+    }
+    
+    // 少なくとも3個以上はテストできたことを確認
+    expect(testedSubslots.size).toBeGreaterThanOrEqual(3);
+    expect(totalFailCount).toBe(0);
+    
+    if (totalFailCount === 0) {
+      console.log(`\n🎉 「英語OFF/ON」ボタン経由でもhidden状態が正しく保持される（${testedSubslots.size}個テスト）`);
+    }
+  });
 });
