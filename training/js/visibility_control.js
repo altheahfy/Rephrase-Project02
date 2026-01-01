@@ -368,20 +368,42 @@ function setupVisibilityControlUI() {
     });
   }
   
-  // 🆕 全英文非表示ボタン
+  // 🆕 全英文非表示ボタン（トグル方式に変更）
   const hideAllEnglishButton = document.getElementById('hide-all-english-visibility');
   if (hideAllEnglishButton) {
     hideAllEnglishButton.addEventListener('click', function() {
-      console.log("🔒 全英文非表示ボタンがクリックされました");
-      hideAllEnglishText();
+      console.log("🔄 英語表示切替ボタンがクリックされました");
       
-      // UIの英文チェックボックスも全て非チェック状態に戻す
+      // 現在の状態を確認（最初のスロットの状態で判定）
+      const isCurrentlyVisible = visibilityState['s']?.['text'] !== false;
+      
+      if (isCurrentlyVisible) {
+        // 非表示にする
+        console.log("🔒 全英文を非表示にします");
+        hideAllEnglishText();
+        hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+        hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
+      } else {
+        // 表示にする
+        console.log("👁️ 全英文を表示します");
+        showAllEnglishText();
+        hideAllEnglishButton.innerHTML = '🙈 英語OFF';
+        hideAllEnglishButton.style.backgroundColor = '#ff9800'; // オレンジ色
+      }
+      
+      // UIの英文チェックボックスも同期
       const englishCheckboxes = document.querySelectorAll('.visibility-checkbox[data-type="text"]');
       englishCheckboxes.forEach(cb => {
-        cb.checked = false;
-        console.log(`🔒 チェックボックスを非チェックに: ${cb.dataset.slot} - ${cb.dataset.type}`);
+        cb.checked = !isCurrentlyVisible;
       });
     });
+    
+    // 初期状態のボタンラベルを設定
+    const initiallyVisible = visibilityState['s']?.['text'] !== false;
+    if (!initiallyVisible) {
+      hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+      hideAllEnglishButton.style.backgroundColor = '#4CAF50';
+    }
   }
   
   // 折畳みボタン（新しいUIには存在しないのでコメントアウト）
@@ -622,8 +644,59 @@ function hideAllEnglishText() {
   console.log("✅ 全英文例文を非表示にしました");
 }
 
+// 🆕 全英文表示関数（トグル用）
+function showAllEnglishText() {
+  console.log("👁️ 全英文例文を表示します");
+  
+  // 全スロットの英文例文（text要素）を表示にする
+  ALL_SLOTS.forEach(slot => {
+    toggleSlotElementVisibility(slot, 'text', true);
+  });
+  
+  // 疑問詞の英文例文も表示にする
+  if (typeof window.toggleQuestionWordVisibility === 'function') {
+    window.toggleQuestionWordVisibility('text', true);
+    console.log("👁️ 疑問詞の英文例文も表示にしました");
+  }
+  
+  // 🆕 全サブスロットの英文状態もlocalStorageに保存
+  try {
+    const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+    let visibilityState = {};
+    if (saved) {
+      visibilityState = JSON.parse(saved);
+    }
+    
+    // 全親スロットの全サブスロットの英文をtrueに設定
+    const PARENT_SLOTS = ['m1', 's', 'o1', 'o2', 'm2', 'c1', 'c2', 'm3'];
+    const SUBSLOT_TYPES = ['m1', 's', 'aux', 'm2', 'v', 'c1', 'o1', 'o2', 'c2', 'm3'];
+    
+    PARENT_SLOTS.forEach(parentSlot => {
+      SUBSLOT_TYPES.forEach(subslotType => {
+        const subslotId = `slot-${parentSlot.toLowerCase()}-sub-${subslotType.toLowerCase()}`;
+        if (!visibilityState[subslotId]) {
+          visibilityState[subslotId] = {};
+        }
+        visibilityState[subslotId].text = true;
+      });
+    });
+    
+    localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+    console.log("👁️ 全サブスロットの英文状態をlocalStorageに保存しました");
+    
+  } catch (error) {
+    console.error("❌ サブスロット英文状態の保存に失敗:", error);
+  }
+  
+  // 状態を永続化
+  saveVisibilityState();
+  
+  console.log("✅ 全英文例文を表示にしました");
+}
+
 // 🔹 新しい関数もグローバルにエクスポート
 window.hideAllEnglishText = hideAllEnglishText;
+window.showAllEnglishText = showAllEnglishText;
 
 // 🔹 疑問詞機能をグローバルにエクスポート
 window.toggleQuestionWordVisibility = toggleQuestionWordVisibility;
@@ -645,6 +718,20 @@ document.addEventListener('DOMContentLoaded', function() {
   // UI設定は少し遅らせて実行（DOM構築完了を確実にするため）
   setTimeout(() => {
     setupVisibilityControlUI();
+    
+    // 🆕 ボタンラベルを現在の状態に同期
+    const hideAllEnglishButton = document.getElementById('hide-all-english-visibility');
+    if (hideAllEnglishButton && visibilityState['s']) {
+      const isCurrentlyVisible = visibilityState['s']['text'] !== false;
+      if (!isCurrentlyVisible) {
+        hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+        hideAllEnglishButton.style.backgroundColor = '#4CAF50';
+      } else {
+        hideAllEnglishButton.innerHTML = '🙈 英語OFF';
+        hideAllEnglishButton.style.backgroundColor = '#ff9800';
+      }
+      console.log('🔄 ボタンラベルを同期しました:', isCurrentlyVisible ? '表示中' : '非表示');
+    }
   }, 100);
 });
 
