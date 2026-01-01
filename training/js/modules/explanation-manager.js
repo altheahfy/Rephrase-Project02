@@ -411,10 +411,10 @@ class ExplanationManager {
     try {
       console.log('🔧 解説ボタン配置開始');
       
-      // 例文シャッフルボタンを検索
-      const shuffleBtn = document.getElementById('randomize-all');
-      if (!shuffleBtn) {
-        console.log('❓ 例文シャッフルボタンが見つかりません');
+      // 英語ON/OFFボタンを検索（解説ボタンをその後に配置）
+      const hideEnglishBtn = document.getElementById('hide-all-english-visibility');
+      if (!hideEnglishBtn) {
+        console.log('❓ 英語ON/OFFボタンが見つかりません');
         return;
       }
 
@@ -461,13 +461,13 @@ class ExplanationManager {
         this.showContextualExplanation();
       });
 
-      // シャッフルボタンの右横に配置
-      shuffleBtn.insertAdjacentElement('afterend', explanationBtn);
+      // 英語ON/OFFボタンの右横に配置（希望順序: シャッフル → 英語ON/OFF → 解説）
+      hideEnglishBtn.insertAdjacentElement('afterend', explanationBtn);
       
       // 状態に保存
       this.stateManager.setState(this.STATE_PATHS.BUTTON_VISIBLE, true);
       
-      console.log('✅ 例文シャッフルボタンの右横に解説ボタン追加完了');
+      console.log('✅ 英語ON/OFFボタンの右横に解説ボタン追加完了');
       
     } catch (error) {
       console.error('❌ 解説ボタン配置エラー:', error);

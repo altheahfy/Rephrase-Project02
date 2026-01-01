@@ -454,3 +454,295 @@ expect(coveragePercent).toBeGreaterThanOrEqual(MIN_COVERAGE);
 
 ---
 
+## [2026-01-01] 動的ボタン配置順序の制御（例文解説ボタン）
+
+### 発生した問題
+- 上部コントロールバーに3つのボタンを配置：🎲例文シャッフル → 🙈英語ON/OFF → 💡例文解説
+- 希望の順序にならず、画面表示は：シャッフル → 解説 → 英語ON/OFF
+
+### Root Cause（根本原因）
+**解説ボタンはHTMLに静的に記述されておらず、JavaScriptで動的に生成・追加される**
+
+#### 実装構造
+1. **静的ボタン**（`training/index.html` Line 1047-1080）:
+   - `#randomize-all`（シャッフルボタン）
+   - `#hide-all-english-visibility`（英語ON/OFFボタン）
+
+2. **動的ボタン**（`training/js/modules/explanation-manager.js` Line 410-475）:
+   - `#explanation-btn`（解説ボタン）
+   - `addExplanationButtons()`メソッドでDOM構築後に追加
+
+#### 誤った想定
+- 「HTMLの記述順序がボタン順序を決める」→ 間違い
+- 実際は**JavaScriptの`insertAdjacentElement()`**が挿入位置を決定
+
+### Design Rationale（設計判断）
+**なぜ動的生成なのか**:
+1. `ExplanationManager`が解説データ読み込み後に初期化される
+2. ボタンのクリックイベントで文法メタデータとV_group_keyを使用
+3. ボタン表示/非表示を状態管理と連携させる必要がある
+
+**insertAdjacentElement()の仕組み**:
+```javascript
+// afterend: 指定要素の直後に追加
+element.insertAdjacentElement('afterend', newButton);
+
+// 順序例
+<button id="base">基準</button>
+↓ baseBtn.insertAdjacentElement('afterend', newBtn)
+<button id="base">基準</button>
+<button id="new">新規</button> ← 基準の直後に追加
+```
+
+### 解決策
+
+#### 修正前（間違った順序）
+```javascript
+// explanation-manager.js Line 415
+const shuffleBtn = document.getElementById('randomize-all');
+shuffleBtn.insertAdjacentElement('afterend', explanationBtn);
+```
+**結果**: シャッフル → **解説** → 英語ON/OFF
+
+#### 修正後（正しい順序）
+```javascript
+// explanation-manager.js Line 415
+const hideEnglishBtn = document.getElementById('hide-all-english-visibility');
+hideEnglishBtn.insertAdjacentElement('afterend', explanationBtn);
+```
+**結果**: シャッフル → 英語ON/OFF → **解説**
+
+### 具体的な変更内容
+
+**ファイル**: `training/js/modules/explanation-manager.js` Line 410-475
+
+```diff
+  addExplanationButtons() {
+    try {
+      console.log('🔧 解説ボタン配置開始');
+      
+-     // 例文シャッフルボタンを検索
+-     const shuffleBtn = document.getElementById('randomize-all');
+-     if (!shuffleBtn) {
+-       console.log('❓ 例文シャッフルボタンが見つかりません');
++     // 英語ON/OFFボタンを検索（解説ボタンをその後に配置）
++     const hideEnglishBtn = document.getElementById('hide-all-english-visibility');
++     if (!hideEnglishBtn) {
++       console.log('❓ 英語ON/OFFボタンが見つかりません');
+        return;
+      }
+      
+      // ... (ボタン作成コード省略)
+      
+-     // シャッフルボタンの右横に配置
+-     shuffleBtn.insertAdjacentElement('afterend', explanationBtn);
++     // 英語ON/OFFボタンの右横に配置（希望順序: シャッフル → 英語ON/OFF → 解説）
++     hideEnglishBtn.insertAdjacentElement('afterend', explanationBtn);
+      
+-     console.log('✅ 例文シャッフルボタンの右横に解説ボタン追加完了');
++     console.log('✅ 英語ON/OFFボタンの右横に解説ボタン追加完了');
+    }
+  }
+```
+
+### 重要な発見
+1. **動的ボタンの順序は基準ボタンの変更で制御**
+   - HTMLの記述順序ではなく、`insertAdjacentElement()`の第一引数で決まる
+   
+2. **grep検索で見つからない理由**
+   - "例文解説"や"💡"で検索してもHTMLに記述がない
+   - `modules/explanation-manager.js`にクラス定義がある
+   
+3. **ボタンの表示タイミング**
+   - `DOMContentLoaded`後に`ExplanationManager.initialize()`が実行
+   - その中で`addExplanationButtons()`が呼ばれる
+
+### 今後の注意点
+1. **動的ボタンの順序変更は基準要素を変える**
+   - 例：`after(A)`を`after(B)`に変更するだけ
+   
+2. **初期化の順序を確認**
+   - `training/index.html` Line 2640-2670の初期化スクリプトを参照
+   
+3. **デバッグのコツ**
+   - ブラウザの開発者ツールでDOM構造を確認
+   - Console Logで「解説ボタン配置開始」「追加完了」を確認
+
+### 関連ファイル
+- `training/js/modules/explanation-manager.js` (Line 410-475)
+- `training/index.html` (Line 1047-1080: 静的ボタン, Line 2640-2670: 初期化)
+
+### 類似ケース検索キーワード
+- `動的ボタン`, `insertAdjacentElement`, `afterend`, `ボタン順序`, `explanation-manager`, `制御バー`, `DOM挿入位置`
+
+---
+
+## [2026-01-01] 個別ランダマイズ後のサブスロット画像消失問題（重要）
+
+### 発生した問題
+**症状**:
+- 個別ランダマイズボタン押下後、サブスロットのイラストが消えてしまう
+- 「一瞬表示されるのだが、すぐに消えてしまう」
+- トグル開閉（サブスロットの折りたたみ/展開）では正しく表示される
+
+**影響範囲**:
+- 全8スロット（S, M1, M2, C1, O1, O2, C2, M3）の個別ランダマイズ機能
+
+### 根本原因
+**タイミング競合**:
+```javascript
+// syncSubslotsFromJson の処理フロー
+syncSubslotsFromJson() {
+  // DOM同期処理
+  adjustSlotWidths();      // 50ms
+  restoreSubslotLabels();  // 100ms ← ここで画像処理が完了していない
+  // voiceData処理        // 150ms
+}
+```
+
+**問題の本質**:
+1. `syncSubslotsFromJson()`が`restoreSubslotLabels(100ms)`を呼び出す
+2. コメントでは「画像処理はラベル復元内で統合実行」とあるが、実際には不完全
+3. 画像更新処理が完全にコメントアウトされていた → 画像が生成されない、または上書きされる
+
+### 試行錯誤の記録
+
+#### ATTEMPT 1: 遅延時間を増やす（失敗）
+```javascript
+// 150ms → 400ms, 250ms → 500ms, 300ms → 600msに変更
+setTimeout(() => {
+  window.updateSubslotImages('s');
+}, 400);  // ← 遅すぎる
+```
+**結果**: 「一瞬表示されるのだが、すぐに消えてしまう」  
+**原因**: `restoreSubslotLabels(100ms)`が後から画像領域を上書きした可能性
+
+#### ATTEMPT 2: 画像更新を完全にコメントアウト（失敗）
+```javascript
+// if (typeof window.updateSubslotImages === "function") {
+//   setTimeout(() => {
+//     window.updateSubslotImages('s');
+//   }, 400);
+// }
+```
+**結果**: 「今度はチラリとも見えなくなった」  
+**原因**: 画像更新処理が呼ばれないため、画像が生成されない
+
+#### ATTEMPT 3: 250msのタイミングで復元（成功）✅
+```javascript
+// 🖼️ Sサブスロット画像更新（個別ランダム化後）
+// 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
+if (typeof window.updateSubslotImages === "function") {
+  setTimeout(() => {
+    window.updateSubslotImages('s');
+    console.log("🎨 Sサブスロット画像更新完了");
+  }, 250);  // ← 100ms完了後、十分な余裕を持って実行
+}
+```
+**結果**: ✅ 画像が表示され続ける  
+**成功の理由**: 
+1. `restoreSubslotLabels(100ms)`が完全に完了
+2. 250msで`updateSubslotImages()`を実行 → 競合しない
+3. 幅調整や複数画像更新は除外 → 不要な処理を削減
+
+### 解決策の実装
+
+**修正箇所**: `training/js/randomizer_individual.js`  
+**対象関数**: 全8個の個別ランダマイズ関数
+- `randomizeSlotSIndividual()` (Line 161-)
+- `randomizeSlotM1Individual()` (Line 319-)
+- `randomizeSlotM2Individual()` (Line 474-)
+- `randomizeSlotC1Individual()` (Line 627-)
+- `randomizeSlotO1Individual()` (Line 782-)
+- `randomizeSlotO2Individual()` (Line 935-)
+- `randomizeSlotC2Individual()` (Line 1090-)
+- `randomizeSlotM3Individual()` (Line 1247-)
+
+**統一パターン**:
+```javascript
+// 既存のsyncSubslotsFromJson呼び出しの後に追加
+if (typeof window.updateSubslotImages === "function") {
+  setTimeout(() => {
+    window.updateSubslotImages('スロット名');
+    console.log("🎨 [スロット名]サブスロット画像更新完了");
+  }, 250);
+}
+```
+
+### 設計判断の理由
+
+1. **250msというタイミングの根拠**
+   - `restoreSubslotLabels(100ms)`完了後
+   - 150msの余裕（処理完了を確実にするバッファ）
+   - 遅すぎない（ユーザー体感で違和感なし）
+
+2. **他の処理をコメントアウトした理由**
+   ```javascript
+   // ❌ コメントアウト維持
+   // ensureSubslotWidthForMultipleImages() // 幅調整
+   // refreshAllMultipleImages()            // 複数画像更新
+   ```
+   - これらの処理は`syncSubslotsFromJson()`内で実行される
+   - 重複実行すると競合リスクがある
+   - 必要最小限の`updateSubslotImages()`のみで十分
+
+3. **トグル開閉が正しく動作する理由**
+   ```javascript
+   // subslot_toggle.js Line 217-219
+   if (englishText && window.applyImageToSubslot) {
+     window.applyImageToSubslot(subslotId, englishText);
+   }
+   ```
+   - トグルは画像システムを直接呼び出す
+   - タイミング競合がない
+   - 「トグルで表示される」= 画像システム自体は正常
+
+### デバッグのコツ
+
+1. **症状から原因を推測する**
+   - 「一瞬表示される」→ 画像は生成されている、上書きされている
+   - 「全く表示されない」→ 画像生成処理が呼ばれていない
+   - 「トグルでは表示される」→ システム自体は正常、タイミングの問題
+
+2. **処理フローを追跡する**
+   ```
+   個別ランダマイズ
+   → syncSubslotsFromJson (即座)
+     → adjustSlotWidths (50ms)
+     → restoreSubslotLabels (100ms)  ← ここで画像処理？
+     → voiceData (150ms)
+   → updateSubslotImages (250ms)  ← 追加された処理
+   ```
+
+3. **Console Logを活用する**
+   ```javascript
+   console.log("🎨 [スロット名]サブスロット画像更新完了");
+   ```
+   → 250msで確実に実行されているか確認
+
+### 今後の注意点
+
+1. **タイミング依存の処理には注意**
+   - DOM更新とスタイル適用の順序
+   - 非同期処理の完了待ち
+   - setTimeout の適切な遅延時間
+
+2. **コメントと実装の乖離**
+   - 「画像処理はラベル復元内で統合実行」とあるが不完全
+   - コメントを鵜呑みにせず、実際の動作を確認
+
+3. **トグル機能は正常性の検証に使える**
+   - トグルが正常 = システム自体は問題なし
+   - タイミングやフロー制御を疑う
+
+### 関連ファイル
+- `training/js/randomizer_individual.js` (全8個の個別ランダマイズ関数)
+- `training/js/insert_test_data_clean.js` (Line 1215-1245: syncSubslotsFromJson)
+- `training/js/subslot_toggle.js` (Line 217-219: トグル時の画像適用)
+- `training/js/universal_image_system.js` (updateSubslotImages, applyImageToSubslot)
+
+### 類似ケース検索キーワード
+- `サブスロット画像`, `個別ランダマイズ`, `updateSubslotImages`, `restoreSubslotLabels`, `syncSubslotsFromJson`, `タイミング競合`, `setTimeout 250ms`, `画像消失`, `トグル開閉`
+
+---
+

@@ -281,28 +281,33 @@ function randomizeSlotSIndividual() {
   }
   
   // 🖼️ Sサブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('s');
+  //     console.log("🎨 Sサブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('s');
+  //     console.log("📏 Sサブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ Sサブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('s');
       console.log("🎨 Sサブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('s');
-      console.log("📏 Sサブスロット幅調整完了");
     }, 250);
   }
 
-  // 🎨 複数画像システム更新（個別ランダマイズ後）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 S個別ランダマイズ後の複数画像更新完了");
-    }, 300);
-  }  console.log("✅ Sスロット個別ランダマイズ完了");
+  console.log("✅ Sスロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -431,27 +436,30 @@ function randomizeSlotM1Individual() {
   }
   
   // 🖼️ M1サブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('m1');
+  //     console.log("🎨 M1サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('m1');
+  //     console.log("📏 M1サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ M1サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('m1');
       console.log("🎨 M1サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('m1');
-      console.log("📏 M1サブスロット幅調整完了");
     }, 250);
-  }
-
-  // 🎨 複数画像システム更新（個別ランダマイズ後）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 M1個別ランダマイズ後の複数画像更新完了");
-    }, 300);
   }
   
   console.log("✅ M1スロット個別ランダマイズ完了");
@@ -583,28 +591,33 @@ function randomizeSlotM2Individual() {
   }
   
   // 🖼️ M2サブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('m2');
+  //     console.log("🎨 M2サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('m2');
+  //     console.log("📏 M2サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ M2サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('m2');
       console.log("🎨 M2サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('m2');
-      console.log("📏 M2サブスロット幅調整完了");
     }, 250);
   }
 
-  // 🎨 複数画像システム更新（上位スロット用）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 M2複数画像システム更新完了");
-    }, 300);
-  }  console.log("✅ M2スロット個別ランダマイズ完了");
+  console.log("✅ M2スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -733,27 +746,30 @@ function randomizeSlotC1Individual() {
   }
   
   // 🆕 サブスロット画像更新（C1専用）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('c1');
+  //     console.log("🎨 C1サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('c1');
+  //     console.log("📏 C1サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ C1サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('c1');
       console.log("🎨 C1サブスロット画像更新完了");
-    }, 200);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('c1');
-      console.log("📏 C1サブスロット幅調整完了");
-    }, 300);
-  }
-
-  // 🎨 複数画像システム更新（上位スロット用）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 C1複数画像システム更新完了");
-    }, 350);
+    }, 250);
   }
   
   console.log("✅ C1スロット個別ランダマイズ完了");
@@ -885,28 +901,33 @@ function randomizeSlotO1Individual() {
   }
   
   // 🖼️ O1サブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('o1');
+  //     console.log("🎨 O1サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('o1');
+  //     console.log("📏 O1サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ O1サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('o1');
       console.log("🎨 O1サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('o1');
-      console.log("📏 O1サブスロット幅調整完了");
     }, 250);
   }
 
-  // 🎨 複数画像システム更新（個別ランダマイズ後）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 O1個別ランダマイズ後の複数画像更新完了");
-    }, 300);
-  }  console.log("✅ O1スロット個別ランダマイズ完了");
+  console.log("✅ O1スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -1037,28 +1058,33 @@ function randomizeSlotO2Individual() {
   }
   
   // 🖼️ O2サブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('o2');
+  //     console.log("🎨 O2サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('o2');
+  //     console.log("📏 O2サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ O2サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('o2');
       console.log("🎨 O2サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('o2');
-      console.log("📏 O2サブスロット幅調整完了");
     }, 250);
   }
 
-  // 🎨 複数画像システム更新（上位スロット用）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 O2複数画像システム更新完了");
-    }, 300);
-  }  console.log("✅ O2スロット個別ランダマイズ完了");
+  console.log("✅ O2スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開
@@ -1189,27 +1215,30 @@ function randomizeSlotC2Individual() {
   }
   
   // 🖼️ C2サブスロット画像更新（個別ランダム化後）
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('c2');
+  //     console.log("🎨 C2サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('c2');
+  //     console.log("📏 C2サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ C2サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('c2');
       console.log("🎨 C2サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('c2');
-      console.log("📏 C2サブスロット幅調整完了");
     }, 250);
-  }
-
-  // 🎨 複数画像システム更新（上位スロット用）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 C2複数画像システム更新完了");
-    }, 300);
   }
   
   console.log("✅ C2スロット個別ランダマイズ完了");
@@ -1343,28 +1372,33 @@ function randomizeSlotM3Individual() {
   }
 
   // M3サブスロット画像更新
+  // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
+  // if (typeof window.updateSubslotImages === "function") {
+  //   setTimeout(() => {
+  //     window.updateSubslotImages('m3');
+  //     console.log("🎨 M3サブスロット画像更新完了");
+  //   }, 400);
+  // }
+
+  // 🎯 サブスロット幅調整強制実行（複数画像対応）
+  // 🚫 コメントアウト: syncSubslotsFromJson内で処理されるため不要
+  // if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
+  //   setTimeout(() => {
+  //     window.ensureSubslotWidthForMultipleImages('m3');
+  //     console.log("📏 M3サブスロット幅調整完了");
+  //   }, 500);
+  // }
+
+  // 🖼️ M3サブスロット画像更新（個別ランダム化後）
+  // 🔧 タイミング調整: restoreSubslotLabels(100ms)完了後に実行
   if (typeof window.updateSubslotImages === "function") {
     setTimeout(() => {
       window.updateSubslotImages('m3');
       console.log("🎨 M3サブスロット画像更新完了");
-    }, 150);
-  }
-
-  // 🎯 サブスロット幅調整強制実行（複数画像対応）
-  if (typeof window.ensureSubslotWidthForMultipleImages === "function") {
-    setTimeout(() => {
-      window.ensureSubslotWidthForMultipleImages('m3');
-      console.log("📏 M3サブスロット幅調整完了");
     }, 250);
   }
 
-  // 🎨 複数画像システム更新（上位スロット用）
-  if (typeof window.refreshAllMultipleImages === "function") {
-    setTimeout(() => {
-      window.refreshAllMultipleImages();
-      console.log("🎨 M3複数画像システム更新完了");
-    }, 300);
-  }  console.log("✅ M3スロット個別ランダマイズ完了");
+  console.log("✅ M3スロット個別ランダマイズ完了");
 }
 
 // グローバル関数として公開

@@ -1060,7 +1060,7 @@ function handleLogout() {
       🎲 例文シャッフル
      </button>
      
-     <!-- 既存の動作する「全英文非表示」ボタンを移動 -->
+     <!-- 既存の動作する「全英文非表示」ボタンを移動・トグル化 -->
      <button id="hide-all-english-visibility" style="
        background: #ff9800;
        color: white;
@@ -1075,6 +1075,9 @@ function handleLogout() {
      " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
       🙈 英語OFF
      </button>
+     
+     <!-- 💡 例文解説ボタンは explanation-manager.js が hide-all-english-visibility の直後に動的追加 -->
+     <!-- 最終順序: シャッフル → 英語OFF/ON → 解説(JS) -->
    </div>
    
    <h2 style="margin-bottom: 15px; margin-top: 20px;">
