@@ -1156,6 +1156,70 @@ function syncSubslotsFromJson(data) {
         phraseElement.textContent = processedSubslotPhrase;
       }
       
+      // 🆕 個別トグルボタンを作成（英語テキストの左側に配置）
+      const toggleButton = document.createElement('button');
+      toggleButton.className = 'subslot-toggle-btn';
+      toggleButton.dataset.slotId = fullSlotId;
+      toggleButton.innerHTML = '英語<br>OFF';
+      toggleButton.title = '英語表示切替';
+      toggleButton.style.cssText = `
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        padding: 2px 4px;
+        font-size: 9px;
+        cursor: pointer;
+        line-height: 1.1;
+        min-width: 32px;
+        text-align: center;
+      `;
+      
+
+      
+      // ボタンクリックでトグル
+      toggleButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // 親要素へのイベント伝播を防止
+        
+        console.log(`🔄 個別トグルボタンクリック: ${fullSlotId}`);
+        
+        // 現在の状態を取得
+        const saved = localStorage.getItem('rephrase_subslot_visibility_state');
+        let visibilityState = saved ? JSON.parse(saved) : {};
+        
+        if (!visibilityState[fullSlotId]) {
+          visibilityState[fullSlotId] = { text: true, auxtext: true };
+        }
+        
+        // 状態を反転
+        const currentVisible = visibilityState[fullSlotId]['text'] !== false;
+        visibilityState[fullSlotId]['text'] = !currentVisible;
+        
+        // localStorageに保存
+        localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
+        
+        // UIを更新
+        if (!currentVisible) {
+          // 表示する
+          slotElement.classList.remove('hidden-subslot-text');
+          phraseElement.style.opacity = '1';
+          phraseElement.style.visibility = 'visible';
+          toggleButton.innerHTML = '英語<br>OFF';
+          toggleButton.style.backgroundColor = '#4CAF50';
+          toggleButton.title = '英語を非表示';
+          console.log(`✅ ${fullSlotId}: 英語を表示`);
+        } else {
+          // 非表示にする
+          slotElement.classList.add('hidden-subslot-text');
+          phraseElement.style.opacity = '0';
+          phraseElement.style.visibility = 'hidden';
+          toggleButton.innerHTML = '英語<br>ON';
+          toggleButton.style.backgroundColor = '#ff9800';
+          toggleButton.title = '英語を表示';
+          console.log(`🙈 ${fullSlotId}: 英語を非表示`);
+        }
+      });
+      
       // text要素を作成（日本語補助テキスト）
       const textElement = document.createElement('div');
       textElement.className = 'slot-text';
@@ -1169,9 +1233,25 @@ function syncSubslotsFromJson(data) {
         `;
       }
       
+      // 🆕 英語テキスト行のコンテナを作成（ボタン＋英語テキスト）
+      const phraseRow = document.createElement('div');
+      phraseRow.className = 'subslot-phrase-row';
+      phraseRow.style.cssText = `
+        grid-row: 4;
+        grid-column: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+        width: 100%;
+        height: 100%;
+      `;
+      phraseRow.appendChild(toggleButton);
+      phraseRow.appendChild(phraseElement);
+      
       // 要素を組み立て（ラベルを最初に追加）
       slotElement.appendChild(labelElement);
-      slotElement.appendChild(phraseElement);
+      slotElement.appendChild(phraseRow); // 🆕 phraseRowを追加
       slotElement.appendChild(textElement);
       
       // 親コンテナに追加
@@ -1191,7 +1271,16 @@ function syncSubslotsFromJson(data) {
               // 🆕 インラインスタイルも設定（visibility_control.jsと統一）
               phraseElement.style.opacity = '0';
               phraseElement.style.visibility = 'hidden';
+              // 🆕 ボタンの状態も同期
+              toggleButton.innerHTML = '英語<br>ON';
+              toggleButton.style.backgroundColor = '#ff9800';
+              toggleButton.title = '英語を表示';
               console.log(`🙈 ${fullSlotId} に hidden-subslot-text クラスとインラインスタイルを追加（英語例文テキスト非表示）`);
+            } else {
+              // 表示状態の場合
+              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.style.backgroundColor = '#4CAF50';
+              toggleButton.title = '英語を非表示';
             }
             // 日本語補助テキストの表示制御
             if (subslotVisibilityState[fullSlotId]['auxtext'] === false) {
