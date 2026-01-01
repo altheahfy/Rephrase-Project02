@@ -2158,3 +2158,28 @@ h1 {
     text-align: center;
   }
 }
+
+/* 🆕 親スロット個別ボタン用のスタイル */
+.upper-slot-phrase-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-width: 100%; /* Gridセルを強制的に広げる */
+  justify-self: stretch; /* Grid内で横幅を最大限に広げる */
+  grid-row: 4; /* Grid構造に統合 */
+  grid-column: 1;
+}
+
+.upper-slot-phrase-row .slot-phrase {
+  flex: 1 !important;
+  min-width: 0 !important;
+  /* width: auto を削除 → flex: 1が正常に機能 */
+  grid-row: unset !important; /* Gridを無効化 */
+  grid-column: unset !important;
+}
+
+.upper-slot-toggle-btn {
+  flex-shrink: 0;
+}
