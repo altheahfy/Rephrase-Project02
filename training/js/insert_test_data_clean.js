@@ -432,12 +432,33 @@ function syncDynamicToStatic() {
         console.log("phraseDiv:", phraseDiv ? phraseDiv.outerHTML : "未検出");
         const textDiv = container.querySelector(".slot-text");
         console.log("textDiv:", textDiv ? textDiv.outerHTML : "未検出");
+        
         if (phraseDiv) {
+          // 🔍 localStorageで英語テキスト表示設定をチェック
+          const slotKey = item.Slot.toLowerCase();
+          let isTextVisible = true; // デフォルトは表示
+          
+          if (window.visibilityState && window.visibilityState[slotKey]) {
+            isTextVisible = window.visibilityState[slotKey]['text'] !== false;
+          }
+          
           phraseDiv.textContent = item.SlotPhrase || "";
-          console.log(`✅ phrase書き込み成功: ${item.Slot} (parent) | 値: "${item.SlotPhrase}"`);
+          
+          if (!isTextVisible) {
+            // 非表示設定の場合、透明化
+            phraseDiv.style.opacity = '0';
+            phraseDiv.style.visibility = 'hidden';
+            console.log(`🙈 上位スロット phrase非表示: ${item.Slot}`);
+          } else {
+            // 表示設定の場合、通常表示
+            phraseDiv.style.opacity = '1';
+            phraseDiv.style.visibility = 'visible';
+            console.log(`✅ phrase書き込み成功: ${item.Slot} (parent) | 値: "${item.SlotPhrase}"`);
+          }
         } else {
           console.warn(`❌ 上位phraseDiv取得失敗: ${item.Slot}`);
         }
+        
         if (textDiv) {
           textDiv.textContent = item.SlotText || "";
           console.log(`✅ text書き込み成功: ${item.Slot} (parent) | 値: "${item.SlotText}"`);
@@ -489,33 +510,26 @@ function syncDynamicToStatic() {
 
     // 📝 フレーズ要素への書き込み（上位スロットと同じ方式 - ラベル保護）
     if (phraseElement) {
-      // 🔍 localStorageで英語テキスト表示設定をチェック
-      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-      let shouldShowText = true; // デフォルトは表示
+      // 🔍 localStorageで英語テキスト表示設定をチェック（新システム統合）
+      const parentSlotKey = item.Slot.split('-')[0].toLowerCase(); // "m1-sub-s" → "m1"
+      let isTextVisible = true; // デフォルトは表示
       
-      if (saved) {
-        try {
-          const subslotVisibilityState = JSON.parse(saved);
-          const slotId = normalizeSlotId(item.Slot);
-          if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['text'] === false) {
-            shouldShowText = false;
-            console.log(`🚫 サブスロット "${item.Slot}" の英語テキストは非表示設定のためスキップ`);
-          }
-        } catch (e) {
-          console.warn('localStorage解析エラー:', e);
-        }
+      if (window.visibilityState && window.visibilityState[parentSlotKey]) {
+        isTextVisible = window.visibilityState[parentSlotKey]['text'] !== false;
       }
       
-      // 設定に応じてテキストを書き込みまたは非表示
       phraseElement.textContent = item.SlotPhrase || "";
-      if (shouldShowText) {
-        // 通常表示
-        phraseElement.style.color = "";
-        console.log(`✅ サブスロット phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
+      
+      if (!isTextVisible) {
+        // 非表示設定の場合、透明化
+        phraseElement.style.opacity = '0';
+        phraseElement.style.visibility = 'hidden';
+        console.log(`🙈 サブスロット phrase非表示: ${item.Slot}`);
       } else {
-        // 透明化（CSSクラスと同じ効果）
-        phraseElement.style.color = "transparent";
-        console.log(`🙈 サブスロット phrase透明化: ${item.Slot}`);
+        // 表示設定の場合、通常表示
+        phraseElement.style.opacity = '1';
+        phraseElement.style.visibility = 'visible';
+        console.log(`✅ サブスロット phrase書き込み成功: ${item.Slot} | 値: "${item.SlotPhrase}"`);
       }
     } else {
       console.warn(`❌ サブスロット phrase要素取得失敗: ${item.Slot}`);
@@ -523,26 +537,17 @@ function syncDynamicToStatic() {
     
     // 📝 テキスト要素への書き込み（上位スロットと同じ方式 - ラベル保護）
     if (slotTextElement) {
-      // 🔍 localStorageで日本語補助テキスト表示設定をチェック
-      const saved = localStorage.getItem('rephrase_subslot_visibility_state');
-      let shouldShowAuxText = true; // デフォルトは表示
+      // 🔍 localStorageで日本語補助テキスト表示設定をチェック（新システム統合）
+      const parentSlotKey = item.Slot.split('-')[0].toLowerCase(); // "m1-sub-s" → "m1"
+      let isAuxTextVisible = true; // デフォルトは表示
       
-      if (saved) {
-        try {
-          const subslotVisibilityState = JSON.parse(saved);
-          const slotId = normalizeSlotId(item.Slot);
-          if (subslotVisibilityState[slotId] && subslotVisibilityState[slotId]['auxtext'] === false) {
-            shouldShowAuxText = false;
-            console.log(`🚫 サブスロット "${item.Slot}" の日本語補助テキストは非表示設定のためスキップ`);
-          }
-        } catch (e) {
-          console.warn('localStorage解析エラー:', e);
-        }
+      if (window.visibilityState && window.visibilityState[parentSlotKey]) {
+        isAuxTextVisible = window.visibilityState[parentSlotKey]['auxtext'] !== false;
       }
       
       // 設定に応じてテキストを書き込みまたは非表示
       slotTextElement.textContent = item.SlotText || "";
-      if (shouldShowAuxText) {
+      if (isAuxTextVisible) {
         // 通常表示のスタイル確保
         slotTextElement.style.cssText = `
           display: block;
@@ -2021,6 +2026,12 @@ window.setupRandomizerSync = function() {
             // 全体の再同期
             window.safeJsonSync(window.loadedJsonData);
             
+            // 🆕 表示状態を復元（英語ON/OFF状態を保持）
+            if (window.applyVisibilityState) {
+              console.log("🎨 ランダマイズ後の表示状態を復元します");
+              window.applyVisibilityState();
+            }
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);
@@ -2052,6 +2063,13 @@ window.setupRandomizerSync = function() {
             }
             
             window.safeJsonSync(window.loadedJsonData);
+            
+            // 🆕 表示状態を復元（英語ON/OFF状態を保持）
+            if (window.applyVisibilityState) {
+              console.log("🎨 randomizeAllSlots後の表示状態を復元します");
+              window.applyVisibilityState();
+            }
+            
             setTimeout(() => {
               window.DEBUG_SYNC = false; // ログ量を元に戻す
             }, 500);

@@ -34,6 +34,9 @@ function toggleSlotElementVisibility(slotKey, elementType, isVisible) {
   // 状態を更新
   visibilityState[slotKey][elementType] = isVisible;
   
+  // 🆕 グローバル参照も更新（inline_visibility_toggle.jsが参照するため）
+  window.visibilityState = visibilityState;
+  
   // DOM要素を取得
   const slotElement = document.getElementById(`slot-${slotKey}`);
   const className = `hidden-${elementType}`; // CSSクラス名に合わせて修正
@@ -108,6 +111,9 @@ function saveVisibilityState() {
       localStorage.setItem('rephrase_visibility_state', JSON.stringify(visibilityState));
       console.log("💾 表示状態を直接localStorageに保存しました（state-manager未利用）");
     }
+    
+    // 🆕 グローバル参照も更新（inline_visibility_toggle.jsが参照するため）
+    window.visibilityState = visibilityState;
   } catch (error) {
     console.error("❌ 表示状態の保存に失敗:", error);
   }
@@ -140,6 +146,9 @@ function loadVisibilityState() {
     
     // 読み込んだ状態をDOMに適用
     applyVisibilityState();
+    
+    // 🆕 グローバル参照を更新
+    window.visibilityState = visibilityState;
   } catch (error) {
     console.error("❌ 表示状態の読み込みに失敗:", error);
     initializeVisibilityState();
@@ -308,6 +317,7 @@ window.applyVisibilityState = applyVisibilityState;
 window.resetSlotVisibility = resetSlotVisibility;
 window.resetAllVisibility = resetAllVisibility;
 window.getVisibilityState = getVisibilityState;
+window.visibilityState = visibilityState; // 🆕 状態オブジェクトを公開
 window.getSlotVisibilityState = getSlotVisibilityState;
 
 // 🎛️ UI制御パネルとの連携

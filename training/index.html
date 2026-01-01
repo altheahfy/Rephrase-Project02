@@ -337,6 +337,8 @@
   </script>
   <script src="js/visibility_control.js">
   </script>
+  <!-- inline_visibility_toggle.jsは不要（既存の動作するボタンを使用） -->
+  <!-- <script src="js/inline_visibility_toggle.js"></script> -->
   <script src="js/subslot_visibility_control.js">
   </script>
   <!-- ImageAutoHideManager モジュール -->
@@ -854,8 +856,7 @@ function handleLogout() {
         <!-- 全表示ボタン -->
         <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
         
-        <!-- 全英文非表示ボタン -->
-        <button id="hide-all-english-visibility" style="background-color: #f44336; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全英文非表示</button>
+        <!-- 全英文非表示ボタンは上部に移動しました -->
       </div>
     </div>
   </div>
@@ -1043,21 +1044,39 @@ function handleLogout() {
   </div>
   
   <section>
-   <button id="randomize-all" style="
-     background: linear-gradient(135deg, #8e44ad 0%, #e74c3c 100%);
-     color: white;
-     border: none;
-     padding: 12px 20px;
-     border-radius: 5px;
-     cursor: pointer;
-     font-size: 16px;
-     font-weight: bold;
-     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-     transition: all 0.2s ease;
-     margin-bottom: 20px;
-   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    🎲 例文シャッフル
-   </button>
+   <div class="control-bar" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+     <button id="randomize-all" style="
+       background: linear-gradient(135deg, #8e44ad 0%, #e74c3c 100%);
+       color: white;
+       border: none;
+       padding: 12px 20px;
+       border-radius: 5px;
+       cursor: pointer;
+       font-size: 16px;
+       font-weight: bold;
+       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+       transition: all 0.2s ease;
+     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      🎲 例文シャッフル
+     </button>
+     
+     <!-- 既存の動作する「全英文非表示」ボタンを移動 -->
+     <button id="hide-all-english-visibility" style="
+       background: #ff9800;
+       color: white;
+       border: none;
+       padding: 12px 20px;
+       border-radius: 5px;
+       cursor: pointer;
+       font-size: 16px;
+       font-weight: bold;
+       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+       transition: all 0.2s ease;
+     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+      🙈 英語OFF
+     </button>
+   </div>
+   
    <h2 style="margin-bottom: 15px; margin-top: 20px;">
     例文
    </h2>
