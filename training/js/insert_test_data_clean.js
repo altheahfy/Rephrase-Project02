@@ -1933,7 +1933,7 @@ function syncSubslotsFromJson(data) {
       const auxTextToggleButton = document.createElement('button');
       auxTextToggleButton.className = 'subslot-auxtext-toggle-btn';
       auxTextToggleButton.dataset.slotId = fullSlotId;
-      auxTextToggleButton.innerHTML = 'ヒント<br>OFF';
+      auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
       auxTextToggleButton.title = '日本語補助表示切替';
       auxTextToggleButton.style.cssText = `
         background: #2196F3;
@@ -1944,7 +1944,7 @@ function syncSubslotsFromJson(data) {
         font-size: 9px;
         cursor: pointer;
         line-height: 1.1;
-        min-width: 32px;
+        min-width: 40px;
         text-align: center;
       `;
       
@@ -1978,7 +1978,7 @@ function syncSubslotsFromJson(data) {
             textElement.style.opacity = '1';
             textElement.style.visibility = 'visible';
           }
-          auxTextToggleButton.innerHTML = 'ヒント<br>OFF';
+          auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
           auxTextToggleButton.style.backgroundColor = '#2196F3';
           auxTextToggleButton.title = '日本語補助を非表示';
           console.log(`✅ ${fullSlotId}: 日本語補助を表示`);
@@ -2087,7 +2087,7 @@ function syncSubslotsFromJson(data) {
               console.log(`🙈 ${fullSlotId} に hidden-subslot-auxtext クラスを追加（日本語補助テキスト非表示）`);
             } else {
               // 表示状態の場合
-              auxTextToggleButton.innerHTML = 'ヒント<br>OFF';
+              auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
               auxTextToggleButton.style.backgroundColor = '#2196F3';
               auxTextToggleButton.title = '日本語補助を非表示';
             }
