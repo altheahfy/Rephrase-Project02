@@ -1,4 +1,4 @@
-// insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
+﻿// insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
 // 
 // ⚠️⚠️⚠️【重要警告】⚠️⚠️⚠️
 // 動的記載エリア(dynamic-slot-area)は絶対に変更禁止！
@@ -536,6 +536,11 @@ function syncDynamicToStatic() {
                 toggleButton.style.backgroundColor = '#ff9800';
                 toggleButton.title = '英語を表示';
                 console.log(`🙈 ${container.id}: 英語を非表示`);
+                
+                //  イラストヒントトーストを表示
+                if (typeof window.showIllustrationHintToast === 'function') {
+                  window.showIllustrationHintToast(toggleButton);
+                }
               }
             });
             
@@ -1041,6 +1046,11 @@ function displayTopQuestionWord() {
         textToggleBtn.innerHTML = '英語<br>ON';
         textToggleBtn.style.backgroundColor = '#ff9800';
         console.log('🙈 疑問詞英語を非表示');
+        
+        // 💡 イラストヒントトーストを表示
+        if (typeof window.showIllustrationHintToast === 'function') {
+          window.showIllustrationHintToast(textToggleBtn);
+        }
       }
     });
     
@@ -1309,6 +1319,11 @@ function syncUpperSlotsFromJson(data) {
                 toggleButton.style.backgroundColor = '#ff9800';
                 toggleButton.title = '英語を表示';
                 console.log(`🙈 ${container.id}: 英語を非表示`);
+                
+                //  イラストヒントトーストを表示
+                if (typeof window.showIllustrationHintToast === 'function') {
+                  window.showIllustrationHintToast(toggleButton);
+                }
               }
             });
             
@@ -1906,6 +1921,11 @@ function syncSubslotsFromJson(data) {
           toggleButton.style.backgroundColor = '#ff9800';
           toggleButton.title = '英語を表示';
           console.log(`🙈 ${fullSlotId}: 英語を非表示`);
+          
+          // 💡 イラストヒントトーストを表示
+          if (typeof window.showIllustrationHintToast === 'function') {
+            window.showIllustrationHintToast(toggleButton);
+          }
         }
       });
       
