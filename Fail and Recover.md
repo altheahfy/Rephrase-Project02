@@ -5,6 +5,117 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-02] ランダマイズ時に英語テキストが消失する問題
+
+### 発生した問題
+- 個別ON/OFFボタン（英語表示切替）実装後、ランダマイズすると英語テキストが消える
+- Consoleログでは`isTextVisible=true`で`opacity: 1; visibility: visible;`が設定されているのに、DOM上の`.slot-phrase`が空
+- 2回目以降のランダマイズで「❌ 上位phraseDiv取得失敗」エラーが連続表示
+
+### Root Cause（根本原因）
+**syncUpperSlotsFromJson関数のセレクタが初回表示後のDOM構造と不一致**
+
+#### DOM構造の変化
+1. **初回表示時**（insertTestData関数）:
+   ```html
+   <div class="slot-container" id="slot-m1">
+     <div class="slot-phrase">...</div>  <!-- 直下にslot-phrase -->
+   </div>
+   ```
+   → `.upper-slot-phrase-row`を作成し、`replaceWith()`で古い`.slot-phrase`を削除
+
+2. **ランダマイズ後**:
+   ```html
+   <div class="slot-container" id="slot-m1">
+     <div class="upper-slot-phrase-row">     <!-- 新しい親コンテナ -->
+       <button class="upper-slot-toggle-btn">...</button>
+       <div class="slot-phrase">...</div>    <!-- phraseRow内に移動 -->
+     </div>
+   </div>
+   ```
+
+#### セレクタの不一致
+```javascript
+// syncUpperSlotsFromJson関数（Line 907）
+const phraseDiv = container.querySelector(":scope > .slot-phrase");
+// ↑ slot-containerの「直下」のslot-phraseを探す
+```
+
+- **初回**: `:scope > .slot-phrase` → 見つかる（直下に存在）
+- **2回目以降**: `:scope > .slot-phrase` → **見つからない**（`.upper-slot-phrase-row`内に移動）
+- `if (phraseDiv)`が`false` → テキスト更新処理がスキップされる
+
+### Design Rationale（設計判断）
+**なぜDOM構造を変更したか**:
+1. 個別ON/OFFボタンを追加するため、`.slot-phrase`と並列配置が必要
+2. 従来：`.slot-phrase`単独（grid-row: 4, grid-column: 1）
+3. 新構造：`.upper-slot-phrase-row`（flexコンテナ）に`button`+`.slot-phrase`
+
+**なぜ2回目で失敗したか**:
+- insertTestData関数は`if (!phraseRow)`で新規DOM作成のみ実装
+- syncUpperSlotsFromJson関数は`:scope > .slot-phrase`を探し続けた
+- 既存の`.upper-slot-phrase-row`をチェックする処理が欠落
+
+### 解決策
+
+#### コード修正（training/js/insert_test_data_clean.js）
+
+**修正箇所1**: 既存phraseRowの検出（Line 907-911追加）
+```javascript
+// 修正前
+const phraseDiv = container.querySelector(":scope > .slot-phrase");
+
+if (phraseDiv) { ... }
+
+// 修正後
+const phraseDiv = container.querySelector(":scope > .slot-phrase");
+
+// 🆕 .upper-slot-phrase-rowが既に存在する場合もチェック
+const existingPhraseRow = container.querySelector('.upper-slot-phrase-row');
+if (existingPhraseRow) {
+  console.log("✅ .upper-slot-phrase-row既存、内容を更新: ", container.id);
+}
+
+if (phraseDiv || existingPhraseRow) { ... }  // 条件を拡張
+```
+
+**修正箇所2**: 既存phraseRowの再利用（Line 929）
+```javascript
+// 修正前
+let phraseRow = container.querySelector('.upper-slot-phrase-row');
+
+// 修正後
+let phraseRow = existingPhraseRow; // 既存のphraseRowを使用
+```
+
+#### 実装の完全性
+- **初回ランダマイズ**: `phraseDiv`が存在 → `phraseRow`は`null` → 新規DOM作成（ifブロック）
+- **2回目以降**: `phraseDiv`は`null`、`existingPhraseRow`が存在 → 既存DOM更新（elseブロック）
+- **elseブロックの処理**（Line 1035-1060）:
+  ```javascript
+  const existingPhraseElement = phraseRow.querySelector('.slot-phrase');
+  existingPhraseElement.textContent = item.SlotPhrase || "";
+  existingPhraseElement.style.opacity = isTextVisible ? '1' : '0';
+  existingPhraseElement.style.visibility = isTextVisible ? 'visible' : 'hidden';
+  ```
+
+### 影響範囲
+- **修正ファイル**: `training/js/insert_test_data_clean.js`（3行追加、1行変更）
+- **影響を受ける機能**: 全体ランダマイズ、個別ランダマイズ（ランダマイズ全般）
+- **テスト対象**: 全親スロット（S, V, O1, C1, M1, M2, Aux等）× ランダマイズ複数回
+
+### 学んだ教訓
+1. **DOM構造変更時は全関連セレクタを確認**: insertTestDataだけでなく、syncUpperSlotsFromJsonも同じ構造を想定
+2. **初回と2回目以降の分岐を明示**: `if (!phraseRow)`だけでなく、`if (phraseDiv || existingPhraseRow)`で両方のケースをカバー
+3. **デバッグログの重要性**: `📌 上位スロットのphraseDiv: 未検出`で問題箇所を即座に特定できた
+
+### 再発防止策
+- 新規DOM要素を追加する際は、既存要素の検出条件を必ず確認
+- `querySelector(":scope > .class")`のような直下セレクタを使う場合、DOM構造変更の影響を考慮
+- 初回と2回目以降で異なる処理が必要な場合、明示的にコメントで記載
+
+---
+
 ## [2025-12-29] サブスロット表示要素の正確なクラス名（重要）
 
 ### 調査結果
