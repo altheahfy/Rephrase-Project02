@@ -648,6 +648,24 @@ function hideAllEnglishText() {
     localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
     console.log("🔒 全サブスロットの英文状態をlocalStorageに保存しました");
     
+    // 🆕 画面上の個別ボタンも同期（サブスロット）
+    const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
+    allSubslotToggleButtons.forEach(button => {
+      button.innerHTML = '英語<br>ON';
+      button.style.backgroundColor = '#ff9800';
+      button.title = '英語を表示';
+    });
+    console.log(`🔄 ${allSubslotToggleButtons.length}個のサブスロット個別ボタンを「英語ON」に同期しました`);
+    
+    // 🆕 画面上の個別ボタンも同期（親スロット）
+    const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
+    allUpperSlotToggleButtons.forEach(button => {
+      button.innerHTML = '英語<br>ON';
+      button.style.backgroundColor = '#ff9800';
+      button.title = '英語を表示';
+    });
+    console.log(`🔄 ${allUpperSlotToggleButtons.length}個の親スロット個別ボタンを「英語ON」に同期しました`);
+    
   } catch (error) {
     console.error("❌ サブスロット英文状態の保存に失敗:", error);
   }
@@ -699,6 +717,24 @@ function showAllEnglishText() {
     
     localStorage.setItem('rephrase_subslot_visibility_state', JSON.stringify(visibilityState));
     console.log("👁️ 全サブスロットの英文状態をlocalStorageに保存しました");
+    
+    // 🆕 画面上の個別ボタンも同期（サブスロット）
+    const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
+    allSubslotToggleButtons.forEach(button => {
+      button.innerHTML = '英語<br>OFF';
+      button.style.backgroundColor = '#4CAF50';
+      button.title = '英語を非表示';
+    });
+    console.log(`🔄 ${allSubslotToggleButtons.length}個のサブスロット個別ボタンを「英語OFF」に同期しました`);
+    
+    // 🆕 画面上の個別ボタンも同期（親スロット）
+    const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
+    allUpperSlotToggleButtons.forEach(button => {
+      button.innerHTML = '英語<br>OFF';
+      button.style.backgroundColor = '#4CAF50';
+      button.title = '英語を非表示';
+    });
+    console.log(`🔄 ${allUpperSlotToggleButtons.length}個の親スロット個別ボタンを「英語OFF」に同期しました`);
     
   } catch (error) {
     console.error("❌ サブスロット英文状態の保存に失敗:", error);

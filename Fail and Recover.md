@@ -1839,11 +1839,258 @@ auxTextToggleButton.style.cssText = `
 
 ---
 
+## [2026-01-02] ボタン文言変更でJavaScript動的書き換えを見落とし
+
+### 発生した問題
+- HTMLで「🎲 例文シャッフル」→「🎲 例文全シャッフル」、「🙈 英語OFF」→「🙈 英語全OFF」に変更
+- ブラウザでハードリロード・LiveServer再起動しても「英語OFF」のまま表示される
+- HTMLファイルは正しく「英語全OFF」に変更されている
+
+### Root Cause（根本原因）
+**JavaScriptがボタンテキストを動的に書き換えていた**
+
+#### 影響箇所
+```javascript
+// training/js/visibility_control.js（2箇所）
+hideAllEnglishButton.innerHTML = '🙈 英語OFF';  // Line 404, 746
+
+// training/js/inline_visibility_toggle.js（2箇所）
+toggleButton.innerHTML = '🙈 英語OFF';  // Line 53, 74
+```
+
+#### 見落とした理由
+1. HTMLファイルしか確認していなかった
+2. ボタンが動的に生成・更新されることを認識していなかった
+3. 初期表示は正しくても、トグル時にJSが上書き
+
+### Solution（解決策）
+**HTML + JavaScript両方を修正**
+
+#### 修正箇所
+1. **training/index.html** (Line 1082, 1097)
+   - 初期表示用のHTML
+   
+2. **training/js/visibility_control.js** (Line 404, 746)
+   - トグル処理での書き換え
+   
+3. **training/js/inline_visibility_toggle.js** (Line 53, 74)
+   - もう1つのトグル処理
+
+#### 実装
+```javascript
+// visibility_control.js Line 404
+hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+
+// visibility_control.js Line 746
+hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+
+// inline_visibility_toggle.js Line 53, 74
+toggleButton.innerHTML = '🙈 英語全OFF';
+```
+
+### Design Rationale（設計根拠）
+- 初心者層が「全部を一括操作できる」ことを明示
+- 「一個ずつ操作するのか？」という誤解を防ぐ
+- "サルでも分かるUI" の要件を満たす
+
+### Lessons Learned（教訓）
+1. **UI変更時はgrep検索でJSも確認**
+   ```bash
+   grep -r "英語OFF" training/js/
+   ```
+2. **動的生成・更新されるUIは複数箇所に分散**
+   - HTML: 初期表示
+   - JS: イベントハンドラでの書き換え
+   - 両方を修正する必要がある
+
+3. **デバッグ手順**
+   - ブラウザの開発者ツールでElements検査
+   - 実行時のHTML構造を確認（初期HTMLとは異なる場合がある）
+
+### 類似ケースの防止策
+- UI文言変更時は必ずJSも含めてgrep検索
+- 動的生成UIは設計ドキュメントに明記（将来のK-MAD適用時）
+- コードレビューで「HTMLとJSの整合性」を確認項目に追加
+
+### 影響範囲
+- 変更時間: 10分
+- 影響ファイル: 3ファイル、6箇所
+- 類似箇所: 他のボタン文言変更時にも同様の確認が必要
+
+### Git Diff
+```bash
+# HTML
+- 🎲 例文シャッフル → 🎲 例文全シャッフル
+- 🙈 英語OFF → 🙈 英語全OFF
+
+# JavaScript（4箇所）
+- hideAllEnglishButton.innerHTML = '🙈 英語OFF';
++ hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+```
+
+---
+
+## [2026-01-02] 上部ボタンと個別ボタンの状態不整合（UIとロジックの乖離）
+
+### 発生した問題
+- 上部「🙈 英語全OFF」ボタンをクリック → 全英語が非表示になる
+- しかし親スロット・サブスロットの個別ボタンが「英語OFF」（緑）のまま
+- ユーザー混乱：「ONと表示されているのに見えない？」
+- サブスロットは正常、親スロットだけ問題発生
+
+### Root Cause（根本原因）
+**状態（localStorage）は更新されているが、UIボタンが同期されていなかった**
+
+#### 問題の構造
+```javascript
+// visibility_control.js の hideAllEnglishText()
+function hideAllEnglishText() {
+  // ✅ localStorageは正しく更新
+  visibilityState[subslotId].text = false;
+  localStorage.setItem('rephrase_subslot_visibility_state', ...);
+  
+  // ❌ 個別ボタンのUI更新が欠落
+  // → ボタンは「英語OFF」のままで、実際は「非表示」という不整合
+}
+```
+
+#### さらに複雑な問題：親と子で異なるクラス名
+- **親スロット**：`.upper-slot-toggle-btn`
+- **サブスロット**：`.subslot-toggle-btn`
+- 最初は `.subslot-toggle-btn` だけ修正 → 親スロットが直らない
+- grep検索で両方のクラス名を発見
+
+### Solution（解決策）
+**hideAllEnglishText() と showAllEnglishText() に個別ボタン同期処理を追加**
+
+#### 実装（training/js/visibility_control.js）
+
+```javascript
+// hideAllEnglishText()内
+// 🆕 画面上の個別ボタンも同期（サブスロット）
+const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
+allSubslotToggleButtons.forEach(button => {
+  button.innerHTML = '英語<br>ON';
+  button.style.backgroundColor = '#ff9800';
+  button.title = '英語を表示';
+});
+
+// 🆕 画面上の個別ボタンも同期（親スロット）
+const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
+allUpperSlotToggleButtons.forEach(button => {
+  button.innerHTML = '英語<br>ON';
+  button.style.backgroundColor = '#ff9800';
+  button.title = '英語を表示';
+});
+```
+
+```javascript
+// showAllEnglishText()内
+// 🆕 画面上の個別ボタンも同期（サブスロット）
+const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
+allSubslotToggleButtons.forEach(button => {
+  button.innerHTML = '英語<br>OFF';
+  button.style.backgroundColor = '#4CAF50';
+  button.title = '英語を非表示';
+});
+
+// 🆕 画面上の個別ボタンも同期（親スロット）
+const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
+allUpperSlotToggleButtons.forEach(button => {
+  button.innerHTML = '英語<br>OFF';
+  button.style.backgroundColor = '#4CAF50';
+  button.title = '英語を非表示';
+});
+```
+
+### Design Rationale（設計根拠）
+- **上部ボタン = マスターコントロール**
+  - 全体の状態を一括制御
+  - 個別ボタンも従属させる（マスター・スレーブ関係）
+- **状態の単一真実源（Single Source of Truth）**
+  - localStorage = データの真実
+  - UI = データの反映
+  - 両者を常に同期させる
+
+### Lessons Learned（教訓）
+1. **状態管理とUI表示は別物**
+   - localStorageを更新 ≠ UIが更新される
+   - 両方を明示的に同期する必要がある
+
+2. **同じ機能でも複数のクラス名が存在**
+   - 親スロット：`.upper-slot-toggle-btn`
+   - サブスロット：`.subslot-toggle-btn`
+   - grep検索で全クラス名を探す必要がある
+
+3. **ユーザー視点のテスト**
+   - 開発者：「localStorageは正しい → OK」
+   - ユーザー：「ボタンが嘘をついている → バグ」
+   - UIの一貫性がUX品質を決める
+
+4. **段階的デバッグの重要性**
+   - ユーザー：「サブスロットは正常、親スロットだけダメ」
+   - → 即座にクラス名の違いを疑う
+   - → grep検索で2つのクラス名を発見
+   - → 両方を修正
+
+### 類似ケースの防止策
+- **状態変更時のチェックリスト**
+  1. localStorageを更新
+  2. DOMを更新（CSSクラス、style属性）
+  3. UIボタンを更新（innerHTML、backgroundColor）
+  4. 関連する全クラス名をgrep検索で確認
+
+- **将来のK-MAD適用時**
+  - 情報統一システム：状態管理を一元化
+  - 職務分掌：UI同期専用のヘルパー関数
+  - AST Linter：状態更新後のUI同期を強制
+
+### 影響範囲
+- 変更時間: 15分
+- 影響ファイル: 1ファイル（visibility_control.js）、2関数
+- 修正行数: 約30行追加
+
+### Git Diff
+```javascript
+// hideAllEnglishText()
++ // 🆕 画面上の個別ボタンも同期（サブスロット）
++ const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
++ allSubslotToggleButtons.forEach(button => {
++   button.innerHTML = '英語<br>ON';
++   button.style.backgroundColor = '#ff9800';
++ });
++ 
++ // 🆕 画面上の個別ボタンも同期（親スロット）
++ const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
++ allUpperSlotToggleButtons.forEach(button => {
++   button.innerHTML = '英語<br>ON';
++   button.style.backgroundColor = '#ff9800';
++ });
+
+// showAllEnglishText()
++ // 🆕 画面上の個別ボタンも同期（サブスロット）
++ const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
++ allSubslotToggleButtons.forEach(button => {
++   button.innerHTML = '英語<br>OFF';
++   button.style.backgroundColor = '#4CAF50';
++ });
++ 
++ // 🆕 画面上の個別ボタンも同期（親スロット）
++ const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
++ allUpperSlotToggleButtons.forEach(button => {
++   button.innerHTML = '英語<br>OFF';
++   button.style.backgroundColor = '#4CAF50';
++ });
+```
+
+---
+
 ## 🚀 次のステップ
 
-1. **プロダクション展開前の総合テスト**
-2. **パフォーマンス最適化**（音声読み上げ、描画速度）
-3. **UI/UX改善**（制御パネル、スロット配置の最終調整）
-4. **商用展開準備**（エラーログ監視、バックアップ体制構築）
-5. **将来課題**: K-MAD完全導入リファクタリング（時間的余裕ができ次第）
+1. **英語版への切り替え実装**（明日以降）
+2. **プロダクション展開前の総合テスト**
+3. **パフォーマンス最適化**（音声読み上げ、描画速度）
+4. **UI/UX改善**（制御パネル、スロット配置の最終調整）
+5. **商用展開準備**（エラーログ監視、バックアップ体制構築）
+6. **将来課題**: K-MAD完全導入リファクタリング（時間的余裕ができ次第）
 
