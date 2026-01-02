@@ -9,6 +9,8 @@
    * @param {HTMLElement} triggerButton - クリックされたボタン要素
    */
   function showIllustrationHintToast(triggerButton) {
+    console.log('💡 [showIllustrationHintToast] 呼び出されました', triggerButton);
+    
     // localStorage で「今後表示しない」設定を確認
     const dismissed = localStorage.getItem('illustration_hint_dismissed');
     if (dismissed === 'true') {
@@ -16,34 +18,49 @@
       return;
     }
     
-    console.log('💡 イラストヒントトーストを表示', triggerButton);
-    
     // トリガーボタンから親スロットを探す
     let targetSlot = null;
     if (triggerButton) {
       targetSlot = triggerButton.closest('.slot-container') || 
                    triggerButton.closest('.subslot-container') ||
                    triggerButton.closest('#display-top-question-word');
+      console.log('🎯 ターゲットスロット:', targetSlot);
     }
     
     // ターゲットスロット内のイラストを取得
     let targetImage = null;
     if (targetSlot) {
       targetImage = targetSlot.querySelector('.slot-image');
-      console.log('🎯 ターゲットスロット:', targetSlot.id || targetSlot.className);
       console.log('🎯 ターゲットイラスト:', targetImage);
+      if (targetImage) {
+        console.log('🎯 イラストのbackgroundImage:', targetImage.style.backgroundImage);
+      }
     }
     
     // イラストがない場合は全スロットのイラストをハイライト
     const images = targetImage ? [targetImage] : Array.from(document.querySelectorAll('.slot-image'));
     const highlightedImages = [];
     
-    images.forEach(img => {
-      const hasImage = img.style.backgroundImage && img.style.backgroundImage !== 'none' && img.style.backgroundImage !== '';
-      console.log('🔍 イラスト要素:', img.id || img.className, 'backgroundImage:', img.style.backgroundImage, 'hasImage:', hasImage);
+    console.log(`🔍 検査対象イラスト数: ${images.length}`);
+    
+    images.forEach((img, index) => {
+      // <img>タグの場合はsrc属性、<div>の場合はbackgroundImageをチェック
+      const hasBackgroundImage = img.style.backgroundImage && 
+                                 img.style.backgroundImage !== 'none' && 
+                                 img.style.backgroundImage !== '';
+      const hasSrcAttribute = img.tagName === 'IMG' && 
+                              img.src && 
+                              img.src !== '' &&
+                              !img.src.includes('placeholder.png');
+      
+      const hasImage = hasBackgroundImage || hasSrcAttribute;
+      
+      console.log(`🔍 [${index}] tagName:`, img.tagName, 'src:', img.src, 'backgroundImage:', img.style.backgroundImage, 'hasImage:', hasImage);
+      
       if (hasImage) {
         img.classList.add('slot-image-highlight');
         highlightedImages.push(img);
+        console.log(`✅ [${index}] ハイライト追加`);
       }
     });
     
@@ -51,76 +68,77 @@
     
     if (highlightedImages.length === 0) {
       console.warn('⚠ ハイライトするイラストが見つかりません');
-      return;
+      // イラストがなくてもトーストは表示する
     }
     
-    // 吹き出しの位置を計算（最初のハイライトされたイラストを基準）
-    const firstImage = highlightedImages[0];
-    const imageRect = firstImage.getBoundingClientRect();
+    // 吹き出しの位置を計算
+    let toastLeft, toastTop, arrowPosition;
     
-    // 吹き出しトースト（イラストの右側に配置）
+    if (highlightedImages.length > 0) {
+      const firstImage = highlightedImages[0];
+      const imageRect = firstImage.getBoundingClientRect();
+      console.log('📐 イラスト位置:', imageRect);
+      
+      // イラストの右側に配置（画面外に出る場合は左側）
+      const toastWidth = 280;
+      const spaceOnRight = window.innerWidth - imageRect.right;
+      const positionOnRight = spaceOnRight > toastWidth + 40;
+      
+      if (positionOnRight) {
+        toastLeft = imageRect.right + 20;
+        arrowPosition = 'left';
+      } else {
+        toastLeft = imageRect.left - toastWidth - 20;
+        arrowPosition = 'right';
+      }
+      
+      toastTop = imageRect.top + (imageRect.height / 2);
+    } else {
+      // イラストがない場合は中央に表示
+      toastLeft = window.innerWidth / 2;
+      toastTop = window.innerHeight / 2;
+      arrowPosition = 'none';
+    }
+    
+    console.log('📍 トースト位置:', { toastLeft, toastTop, arrowPosition });
+    
+    // 吹き出しトースト
     const toast = document.createElement('div');
     toast.id = 'illustration-hint-toast';
     
-    // イラストの右側に配置（画面外に出る場合は左側）
-    const toastWidth = 280;
-    const spaceOnRight = window.innerWidth - imageRect.right;
-    const positionOnRight = spaceOnRight > toastWidth + 40;
-    
-    let toastLeft, arrowPosition;
-    if (positionOnRight) {
-      toastLeft = imageRect.right + 20;
-      arrowPosition = 'left'; // 矢印は左側
-    } else {
-      toastLeft = imageRect.left - toastWidth - 20;
-      arrowPosition = 'right'; // 矢印は右側
-    }
-    
-    const toastTop = imageRect.top + (imageRect.height / 2);
-    
-    toast.style.cssText = `
-      position: fixed;
-      left: ${toastLeft}px;
-      top: ${toastTop}px;
-      transform: translateY(-50%);
-      background: white;
-      border: 2px solid #333;
-      border-radius: 12px;
-      padding: 16px 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-      z-index: 10001;
-      text-align: center;
-      animation: fadeIn 0.3s ease-out;
-      pointer-events: auto;
-      width: ${toastWidth}px;
-    `;
-    
-    // 矢印（CSS triangle）
-    const arrow = document.createElement('div');
-    arrow.className = 'toast-arrow';
-    if (arrowPosition === 'left') {
-      arrow.style.cssText = `
-        position: absolute;
-        left: -12px;
+    if (arrowPosition === 'none') {
+      toast.style.cssText = `
+        position: fixed;
+        left: 50%;
         top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-right: 12px solid #333;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        text-align: center;
+        animation: fadeIn 0.3s ease-out;
+        pointer-events: auto;
+        width: 280px;
       `;
     } else {
-      arrow.style.cssText = `
-        position: absolute;
-        right: -12px;
-        top: 50%;
+      toast.style.cssText = `
+        position: fixed;
+        left: ${toastLeft}px;
+        top: ${toastTop}px;
         transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        border-left: 12px solid #333;
+        background: white;
+        border: 2px solid #333;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        text-align: center;
+        animation: fadeIn 0.3s ease-out;
+        pointer-events: auto;
+        width: 280px;
       `;
     }
     
@@ -144,7 +162,37 @@
       ">OK</button>
     `;
     
-    toast.appendChild(arrow);
+    // 矢印を追加（イラストがある場合のみ）
+    if (arrowPosition !== 'none') {
+      const arrow = document.createElement('div');
+      arrow.className = 'toast-arrow';
+      if (arrowPosition === 'left') {
+        arrow.style.cssText = `
+          position: absolute;
+          left: -12px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 0;
+          height: 0;
+          border-top: 10px solid transparent;
+          border-bottom: 10px solid transparent;
+          border-right: 12px solid #333;
+        `;
+      } else {
+        arrow.style.cssText = `
+          position: absolute;
+          right: -12px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 0;
+          height: 0;
+          border-top: 10px solid transparent;
+          border-bottom: 10px solid transparent;
+          border-left: 12px solid #333;
+        `;
+      }
+      toast.appendChild(arrow);
+    }
     
     // アニメーションCSS
     const style = document.createElement('style');
@@ -184,6 +232,7 @@
     
     document.head.appendChild(style);
     document.body.appendChild(toast);
+    console.log('✅ トースト DOM追加完了');
     
     // OKボタンクリック
     const closeBtn = document.getElementById('close-illustration-hint');
@@ -201,15 +250,16 @@
         // トーストを削除
         if (toast.parentNode) {
           toast.remove();
+          console.log('✅ トースト削除');
         }
         if (style.parentNode) {
           style.remove();
+          console.log('✅ スタイル削除');
         }
         
         // ハイライトを解除
         highlightedImages.forEach(img => img.classList.remove('slot-image-highlight'));
-        
-        console.log('💡 イラストヒントトーストを閉じました');
+        console.log('✅ ハイライト解除');
       });
     } else {
       console.error('❌ OKボタンが見つかりません');
