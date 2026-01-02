@@ -660,6 +660,30 @@ h1 {
   box-sizing: border-box;
 }
 
+/* 🎯 サブスロット展開時：親スロットを下に延長してタブ感を演出 */
+.active-parent-slot {
+  position: relative;
+  min-height: 460px !important; /* 380px → 460pxに拡大（+80px） */
+  border-bottom: none !important; /* 下ボーダーを削除 */
+  border-bottom-left-radius: 0 !important; /* 下の角丸を削除 */
+  border-bottom-right-radius: 0 !important; /* 下の角丸を削除 */
+  z-index: 1; /* サブスロットより後ろに配置 */
+}
+
+/* 🎯 サブスロット展開時：サブスロットエリアとの接続 */
+.active-subslot-area {
+  margin-top: -100px !important; /* 親スロットに大きく食い込む */
+  padding-top: 100px !important; /* 食い込んだ分を上部余白で確保 */
+  z-index: 2; /* 親スロットの上に配置（親スロット下端を隠す） */
+}
+
+/* 🎯 サブスロット展開時：サブスロット内の最初の要素の上ボーダーを削除 */
+.active-subslot-area .subslot-container:first-of-type {
+  border-top: none !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 /* 🎯 Grid衁E: スロチE��名（忁E��1番目に配置�E�E*/
 .slot-container label {
   grid-row: 1;

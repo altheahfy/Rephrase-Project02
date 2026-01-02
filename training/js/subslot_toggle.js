@@ -455,6 +455,13 @@ function applyTabConnection(parentSlotId, isActive) {
     parentSlot.classList.add('active-parent-slot');
     subslotArea.classList.add('active-subslot-area');
     
+    // 🆕 インラインスタイルで確実にサブスロットを引き上げ＋z-index制御（CSS詳細度問題を回避）
+    parentSlot.style.setProperty('z-index', '1', 'important'); // 親は後ろ
+    subslotArea.style.setProperty('margin-top', '-80px', 'important');
+    subslotArea.style.setProperty('padding-top', '80px', 'important');
+    subslotArea.style.setProperty('z-index', '2', 'important'); // サブは手前
+    console.log(`📍 ${parentSlotId} のサブスロットを手前に配置: z-index=2, margin-top=-80px`);
+    
     // 📂 サブスロットラベルをタブ風にスタイリング
     if (subslotLabel) {
       subslotLabel.classList.add('tab-style');
@@ -715,7 +722,8 @@ function clearAllTabConnections() {
     area.style.removeProperty('border');
     area.style.removeProperty('border-top');
     area.style.removeProperty('border-radius');
-    area.style.removeProperty('margin-top');
+    area.style.removeProperty('margin-top'); // 🆕 引き上げ用margin-topをクリア
+    area.style.removeProperty('padding-top'); // 🆕 引き上げ用padding-topをクリア
     area.style.removeProperty('box-shadow');
     area.style.removeProperty('padding');
     area.style.removeProperty('z-index');
