@@ -918,14 +918,157 @@ function displayTopQuestionWord() {
     
     // 🔧 常にHTML構造を強制的に再作成（確実に動作させるため）
     const translation = translations[capitalizedQuestionWord] || translations[questionWord] || '';
+    
+    // 🆕 日本語補助テキスト個別ボタンを作成
+    const auxTextToggleBtn = document.createElement('button');
+    auxTextToggleBtn.className = 'question-word-auxtext-toggle-btn';
+    auxTextToggleBtn.innerHTML = 'ヒント<br>OFF';
+    auxTextToggleBtn.title = '日本語補助表示切替';
+    auxTextToggleBtn.style.cssText = `
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 9px;
+      cursor: pointer;
+      line-height: 1.1;
+      min-width: 32px;
+      text-align: center;
+    `;
+    
+    // 🆕 英語テキスト個別ボタンを作成
+    const textToggleBtn = document.createElement('button');
+    textToggleBtn.className = 'question-word-text-toggle-btn';
+    textToggleBtn.innerHTML = '英語<br>OFF';
+    textToggleBtn.title = '英語表示切替';
+    textToggleBtn.style.cssText = `
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 4px;
+      font-size: 9px;
+      cursor: pointer;
+      line-height: 1.1;
+      min-width: 32px;
+      text-align: center;
+    `;
+    
     topDiv.innerHTML = `
       <div class="question-word-label">疑問詞</div>
       <div class="question-word-image"></div>
-      <div class="question-word-auxtext">${translation}</div>
-      <div class="question-word-text">${capitalizedQuestionWord}</div>
+      <div class="question-word-auxtext-row" style="grid-row: 3; display: flex; align-items: center; gap: 4px;">
+        <div class="auxtext-toggle-container"></div>
+        <div class="question-word-auxtext">${translation}</div>
+      </div>
+      <div class="question-word-text-row" style="grid-row: 4; display: flex; align-items: center; gap: 4px;">
+        <div class="text-toggle-container"></div>
+        <div class="question-word-text">${capitalizedQuestionWord}</div>
+      </div>
       <div class="question-word-button-placeholder"></div>
       <div class="question-word-button-placeholder"></div>
     `;
+    
+    // ボタンを挿入
+    const auxTextToggleContainer = topDiv.querySelector('.auxtext-toggle-container');
+    const textToggleContainer = topDiv.querySelector('.text-toggle-container');
+    if (auxTextToggleContainer) auxTextToggleContainer.appendChild(auxTextToggleBtn);
+    if (textToggleContainer) textToggleContainer.appendChild(textToggleBtn);
+    
+    // 🆕 日本語補助ボタンクリックイベント
+    auxTextToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      console.log('🔄 疑問詞日本語補助トグルボタンクリック');
+      
+      const saved = localStorage.getItem('question_word_visibility_state');
+      let state = saved ? JSON.parse(saved) : { text: true, auxtext: true };
+      
+      const currentVisible = state.auxtext !== false;
+      state.auxtext = !currentVisible;
+      
+      localStorage.setItem('question_word_visibility_state', JSON.stringify(state));
+      
+      const auxtextEl = topDiv.querySelector('.question-word-auxtext');
+      if (!currentVisible) {
+        if (auxtextEl) {
+          auxtextEl.style.opacity = '1';
+          auxtextEl.style.visibility = 'visible';
+        }
+        auxTextToggleBtn.innerHTML = 'ヒント<br>OFF';
+        auxTextToggleBtn.style.backgroundColor = '#4CAF50';
+        console.log('✅ 疑問詞日本語補助を表示');
+      } else {
+        if (auxtextEl) {
+          auxtextEl.style.opacity = '0';
+          auxtextEl.style.visibility = 'hidden';
+        }
+        auxTextToggleBtn.innerHTML = 'ヒント<br>ON';
+        auxTextToggleBtn.style.backgroundColor = '#ff9800';
+        console.log('🙈 疑問詞日本語補助を非表示');
+      }
+    });
+    
+    // 🆕 英語テキストボタンクリックイベント
+    textToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      console.log('🔄 疑問詞英語トグルボタンクリック');
+      
+      const saved = localStorage.getItem('question_word_visibility_state');
+      let state = saved ? JSON.parse(saved) : { text: true, auxtext: true };
+      
+      const currentVisible = state.text !== false;
+      state.text = !currentVisible;
+      
+      localStorage.setItem('question_word_visibility_state', JSON.stringify(state));
+      
+      const textEl = topDiv.querySelector('.question-word-text');
+      if (!currentVisible) {
+        if (textEl) {
+          textEl.style.opacity = '1';
+          textEl.style.visibility = 'visible';
+        }
+        textToggleBtn.innerHTML = '英語<br>OFF';
+        textToggleBtn.style.backgroundColor = '#4CAF50';
+        console.log('✅ 疑問詞英語を表示');
+      } else {
+        if (textEl) {
+          textEl.style.opacity = '0';
+          textEl.style.visibility = 'hidden';
+        }
+        textToggleBtn.innerHTML = '英語<br>ON';
+        textToggleBtn.style.backgroundColor = '#ff9800';
+        console.log('🙈 疑問詞英語を非表示');
+      }
+    });
+    
+    // 🆕 localStorageの状態を即座に適用
+    try {
+      const saved = localStorage.getItem('question_word_visibility_state');
+      if (saved) {
+        const state = JSON.parse(saved);
+        const auxtextEl = topDiv.querySelector('.question-word-auxtext');
+        const textEl = topDiv.querySelector('.question-word-text');
+        
+        if (state.auxtext === false && auxtextEl) {
+          auxtextEl.style.opacity = '0';
+          auxtextEl.style.visibility = 'hidden';
+          auxTextToggleBtn.innerHTML = 'ヒント<br>ON';
+          auxTextToggleBtn.style.backgroundColor = '#ff9800';
+        }
+        
+        if (state.text === false && textEl) {
+          textEl.style.opacity = '0';
+          textEl.style.visibility = 'hidden';
+          textToggleBtn.innerHTML = '英語<br>ON';
+          textToggleBtn.style.backgroundColor = '#ff9800';
+        }
+      }
+    } catch (error) {
+      console.warn('localStorage状態適用エラー:', error);
+    }
     
     console.log("✅ 分離疑問詞として表示（大文字化）: " + capitalizedQuestionWord + " (" + translation + ")");
     
