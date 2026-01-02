@@ -1380,6 +1380,125 @@ class StateManager:
 
 ---
 
+## [2026-01-02] イラストヒントトーストが画面左上に表示される問題
+
+### 発生した問題
+- イラストヒントトーストが一部のスロットで画面左上(20, 100)に表示される
+- slot-vのみ正常動作（イラスト横に表示）
+- 複数イラストスロット（M1など）、サブスロット: 左上に表示
+
+### Root Cause（根本原因）
+**非表示状態のイラストを基準に位置計算を行っていた**
+
+#### 問題の流れ
+1. `targetImage = targetSlot.querySelector('.slot-image')` → ✅ 要素は取得成功
+2. しかし `display: none; visibility: hidden;` で非表示状態
+3. `getBoundingClientRect()` が全て 0 を返す（width: 0, height: 0）
+4. 位置計算失敗 → フォールバック処理で画面左上(20, 100)に表示
+
+#### 詳細ログ
+```javascript
+🎯 ターゲットイラスト: <img ... style="display: none; visibility: hidden; ...">
+📐 イラスト位置: DOMRect {x: 0, y: 0, width: 0, height: 0, top: 0, …}
+📍 トースト位置: {toastLeft: 20, toastTop: 0, arrowPosition: 'left'}
+```
+
+#### なぜ非表示だったか
+- `image_auto_hide.js` が placeholder.png を検出
+- プレースホルダー画像として自動非表示に設定
+- `console.log('🙈 画像を自動非表示に設定: image for slot-m1')`
+
+### Design Rationale（設計判断）
+**イラスト有無・表示状態は完全に無視する**
+
+#### 理由
+1. イラストがあるかどうかは関係ない
+2. 非表示でも表示でも関係ない
+3. **スロット自体の位置**を基準にトーストを表示すればよい
+
+#### 実装方針
+- ❌ イラスト検出ロジック削除（`.slot-image` 取得、表示チェック、ハイライト処理）
+- ✅ `targetSlot.getBoundingClientRect()` でスロット位置取得
+- ✅ スロットの右横（または左横）、垂直中央に配置
+
+### 実装内容
+#### 修正箇所: training/js/illustration-hint-toast.js
+
+**削除したコード**:
+```javascript
+// イラスト検出（不要）
+let targetImage = null;
+if (targetSlot) {
+  targetImage = targetSlot.querySelector('.slot-image');
+  console.log('🎯 ターゲットイラスト:', targetImage);
+}
+
+if (targetImage) {
+  const imageRect = targetImage.getBoundingClientRect();  // ← 0を返す
+  // ...位置計算...
+  targetImage.classList.add('slot-image-highlight');  // ← ハイライト
+} else {
+  // フォールバック（左上）
+  toastLeft = 20;
+  toastTop = 100;
+}
+```
+
+**修正後のコード**:
+```javascript
+// スロット自体の位置を基準に配置
+let toastLeft, toastTop, arrowPosition;
+
+if (targetSlot) {
+  const slotRect = targetSlot.getBoundingClientRect();  // ← スロット位置
+  console.log('📐 スロット位置:', slotRect);
+  
+  // スロットの右側に配置（画面外に出る場合は左側）
+  const toastWidth = 280;
+  const spaceOnRight = window.innerWidth - slotRect.right;
+  const positionOnRight = spaceOnRight > toastWidth + 40;
+  
+  if (positionOnRight) {
+    toastLeft = slotRect.right + 20;
+    arrowPosition = 'left';
+  } else {
+    toastLeft = slotRect.left - toastWidth - 20;
+    arrowPosition = 'right';
+  }
+  
+  // スロットの垂直中央に配置
+  toastTop = slotRect.top + (slotRect.height / 2);
+} else {
+  // スロットなし → 画面左上に配置
+  toastLeft = 20;
+  toastTop = 100;
+  arrowPosition = 'none';
+}
+```
+
+### 結果
+- ✅ 全スロット（M1、サブスロット等）で正しい位置にトースト表示
+- ✅ イラスト有無・表示状態に依存しないシンプルなロジック
+- ✅ スロット右横（または左横）、垂直中央に配置
+- ✅ フォールバック処理は「スロットなし」時のみ
+
+### 学んだこと
+1. **DOM要素の存在 ≠ 画面上の存在**
+   - `querySelector` で取得成功しても、`display: none` なら `getBoundingClientRect()` は全て 0
+2. **シンプルな基準を選ぶ**
+   - イラスト（不確実、動的変化）ではなく、スロット（確実、固定）を基準にする
+3. **ユーザー要求を正確に理解する**
+   - 「イラストの横に」→ 実際は「スロットの高さのあたりに」
+   - 細かいUI要素ではなく、全体の配置を重視
+
+### 類似ケース検索キーワード
+- `getBoundingClientRect 0`
+- `display none 位置取得`
+- `イラスト 非表示 トースト`
+- `スロット 基準 配置`
+
+---
+
 ## 🚀 次のステップ
 
 1. **プロダクション展開前の総合テスト**

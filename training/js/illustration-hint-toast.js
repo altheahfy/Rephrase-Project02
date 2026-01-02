@@ -27,77 +27,34 @@
       console.log('🎯 ターゲットスロット:', targetSlot);
     }
     
-    // ターゲットスロット内のイラストを取得
-    let targetImage = null;
-    if (targetSlot) {
-      targetImage = targetSlot.querySelector('.slot-image');
-      console.log('🎯 ターゲットイラスト:', targetImage);
-      if (targetImage) {
-        console.log('🎯 イラストのbackgroundImage:', targetImage.style.backgroundImage);
-      }
-    }
-    
-    // イラストがない場合は全スロットのイラストをハイライト
-    const images = targetImage ? [targetImage] : Array.from(document.querySelectorAll('.slot-image'));
-    const highlightedImages = [];
-    
-    console.log(`🔍 検査対象イラスト数: ${images.length}`);
-    
-    images.forEach((img, index) => {
-      // <img>タグの場合はsrc属性、<div>の場合はbackgroundImageをチェック
-      const hasBackgroundImage = img.style.backgroundImage && 
-                                 img.style.backgroundImage !== 'none' && 
-                                 img.style.backgroundImage !== '';
-      const hasSrcAttribute = img.tagName === 'IMG' && 
-                              img.src && 
-                              img.src !== '' &&
-                              !img.src.includes('placeholder.png');
-      
-      const hasImage = hasBackgroundImage || hasSrcAttribute;
-      
-      console.log(`🔍 [${index}] tagName:`, img.tagName, 'src:', img.src, 'backgroundImage:', img.style.backgroundImage, 'hasImage:', hasImage);
-      
-      if (hasImage) {
-        img.classList.add('slot-image-highlight');
-        highlightedImages.push(img);
-        console.log(`✅ [${index}] ハイライト追加`);
-      }
-    });
-    
-    console.log(`✅ ${highlightedImages.length}個のイラストをハイライト`);
-    
-    if (highlightedImages.length === 0) {
-      console.warn('⚠ ハイライトするイラストが見つかりません');
-      // イラストがなくてもトーストは表示する
-    }
-    
-    // 吹き出しの位置を計算
+    // トーストの位置を計算（スロット自体の位置を基準）
     let toastLeft, toastTop, arrowPosition;
     
-    if (highlightedImages.length > 0) {
-      const firstImage = highlightedImages[0];
-      const imageRect = firstImage.getBoundingClientRect();
-      console.log('📐 イラスト位置:', imageRect);
+    if (targetSlot) {
+      const slotRect = targetSlot.getBoundingClientRect();
+      console.log('📐 スロット位置:', slotRect);
       
-      // イラストの右側に配置（画面外に出る場合は左側）
+      // スロットの右側に配置（画面外に出る場合は左側）
       const toastWidth = 280;
-      const spaceOnRight = window.innerWidth - imageRect.right;
+      const spaceOnRight = window.innerWidth - slotRect.right;
       const positionOnRight = spaceOnRight > toastWidth + 40;
       
       if (positionOnRight) {
-        toastLeft = imageRect.right + 20;
+        toastLeft = slotRect.right + 20;
         arrowPosition = 'left';
       } else {
-        toastLeft = imageRect.left - toastWidth - 20;
+        toastLeft = slotRect.left - toastWidth - 20;
         arrowPosition = 'right';
       }
       
-      toastTop = imageRect.top + (imageRect.height / 2);
+      // スロットの垂直中央に配置
+      toastTop = slotRect.top + (slotRect.height / 2);
     } else {
-      // イラストがない場合は中央に表示
-      toastLeft = window.innerWidth / 2;
-      toastTop = window.innerHeight / 2;
+      // スロットなし → 画面左上に配置
+      toastLeft = 20;
+      toastTop = 100;
       arrowPosition = 'none';
+      console.log('⚠ スロットなし: 画面左上に表示');
     }
     
     console.log('📍 トースト位置:', { toastLeft, toastTop, arrowPosition });
@@ -109,9 +66,8 @@
     if (arrowPosition === 'none') {
       toast.style.cssText = `
         position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        left: ${toastLeft}px;
+        top: ${toastTop}px;
         background: white;
         border: 2px solid #333;
         border-radius: 12px;
@@ -251,6 +207,16 @@
         if (toast.parentNode) {
           toast.remove();
           console.log('✅ トースト削除');
+        }
+        if (style.parentNode) {
+          style.remove();
+          console.log('✅ スタイル削除');
+        }
+        
+        // ハイライトを解除
+        if (targetImage) {
+          targetImage.classList.remove('slot-image-highlight');
+          console.log('✅ ハイライト解除');
         }
         if (style.parentNode) {
           style.remove();
