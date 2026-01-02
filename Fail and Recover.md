@@ -1499,6 +1499,113 @@ if (targetSlot) {
 
 ---
 
+## [2026-01-02] サブスロット日本語補助ボタンが3行表示（ヒ/ン/ト/OFF）になる問題
+
+### 発生した問題
+- サブスロットの日本語補助テキストボタンが「ヒ/ン/ト/OFF」と4行になる
+- 目標: 「ヒント / OFF」の2行表示
+- 親スロットの同じボタンは正常（2行表示）
+
+### Root Cause（根本原因）
+**`min-width: 32px` が狭すぎて、HTMLの `<br>` 改行が機能しなかった**
+
+#### 問題のコード
+```javascript
+auxTextToggleButton.innerHTML = 'ヒント<br>OFF';  // ← <br>があるのに3-4行表示
+auxTextToggleButton.style.cssText = `
+  ...
+  min-width: 32px;  // ← 狭すぎる！
+  text-align: center;
+`;
+```
+
+#### なぜ3-4行になったか
+1. `min-width: 32px` では「ヒント」（全角4文字、約36px）が収まらない
+2. ブラウザが強制的に改行 → 「ヒ」「ン」「ト」が個別の行に
+3. `<br>` による改行も機能 → 「OFF」も別行
+4. 結果: 4行表示（最悪の場合）
+
+### Design Rationale（設計判断）
+**2段階修正アプローチ**
+
+#### 修正1: HTMLテキストの調整
+```javascript
+// Before
+auxTextToggleButton.innerHTML = 'ヒント<br>OFF';
+
+// After
+auxTextToggleButton.innerHTML = 'ヒント<br> OFF';  // ← 半角スペース追加
+```
+
+**理由**: `<br>` 直後に半角スペースを入れることで、「 OFF」を1単位として扱わせる
+
+#### 修正2: ボタン幅の拡大
+```javascript
+// Before
+min-width: 32px;
+
+// After
+min-width: 40px;  // ← +8px拡大
+```
+
+**理由**: 
+- 「ヒント」（全角4文字） ≈ 36px (9px × 4)
+- `min-width: 40px` なら余裕を持って収まる
+- 親スロットの日本語補助ボタンは既に適切な幅を持つ
+
+### 実装内容
+#### 修正箇所: training/js/insert_test_data_clean.js
+
+**3箇所修正**:
+1. Line 1936: サブスロット初期表示
+2. Line 1981: サブスロットトグル（表示→非表示）
+3. Line 2090: サブスロットランダマイズ後の復元
+
+```javascript
+// 修正後の統一コード
+auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
+auxTextToggleButton.style.cssText = `
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-size: 9px;
+  cursor: pointer;
+  line-height: 1.1;
+  min-width: 40px;  // ← 32px → 40px
+  text-align: center;
+`;
+```
+
+### 結果
+- ✅ サブスロット日本語補助ボタンが2行表示（ヒント / OFF）
+- ✅ 親スロットと統一されたUI
+- ✅ レスポンシブ対応（幅が十分）
+
+### 学んだこと
+1. **`<br>` は万能ではない**
+   - コンテナ幅が狭いと、`<br>` 前後でも強制改行が発生
+   - `min-width` はコンテンツ幅 + 余裕が必要
+
+2. **デバッグの落とし穴**
+   - JavaScript修正（`'ヒント<br>OFF'` → `'ヒント<br> OFF'`）だけでは不十分
+   - CSS（`min-width`）も同時にチェックすべき
+   - ブラウザキャッシュではなく、CSS設定が原因だった
+
+3. **親子スロットの一貫性**
+   - 親スロットと子（サブ）スロットで同じUI要素は同じスタイルを適用
+   - `min-width` の統一が重要
+
+### 類似ケース検索キーワード
+- `min-width 改行`
+- `<br> 効かない`
+- `ボタン 3行表示`
+- `text-align center 改行`
+- `全角文字 min-width`
+
+---
+
 ## 🚀 次のステップ
 
 1. **プロダクション展開前の総合テスト**
