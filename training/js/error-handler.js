@@ -489,6 +489,15 @@ class ErrorHandler {
      * パブリックAPI: 安全なエラーハンドリング
      */
     handleError(error, context = {}, userErrorCode = null) {
+        // 🔍 デバッグ用：元のエラーをConsoleに常に出力
+        console.error('🔴 [ErrorHandler] エラー発生:', {
+            error: error,
+            message: error?.message,
+            stack: error?.stack,
+            context: context,
+            userErrorCode: userErrorCode
+        });
+        
         this.logError('application', error, context);
 
         // 明示的に要求された場合のみモーダル表示

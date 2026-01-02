@@ -5,6 +5,218 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-02] JavaScript変数重複宣言による全関数undefined問題
+
+### 発生した問題
+- DBのJSON読み込みで「データファイルの読み込みに失敗しました」エラー
+- Consoleで`typeof syncUpperSlotsFromJson`を実行すると`undefined`
+- `fetch('data/slot_order_data.json')`は成功（200 OK、273件）→ JSONファイル自体は正常
+- JSONファイルは正常なのに、JSファイルの関数が存在しない矛盾
+
+### Root Cause（根本原因）
+**JavaScriptファイル内での変数重複宣言による構文エラー**
+
+#### 問題のコード（training/js/insert_test_data_clean.js）
+```javascript
+// Line 1058: 1回目の宣言（正しい位置）
+const existingTextRow = container.querySelector('.upper-slot-text-row');
+if (existingTextRow) {
+  console.log("✅ .upper-slot-text-row既存、内容を更新");
+}
+
+// Line 1212: 2回目の宣言（重複エラー）
+const existingTextRow = container.querySelector('.upper-slot-text-row');  // ← 重複！
+if (existingTextRow) {
+  console.log("✅ .upper-slot-text-row既存、内容を更新");
+}
+```
+
+#### JavaScriptの動作
+- **`const`での重複宣言はSyntaxError** → ファイル全体のパースが途中で停止
+- `syncUpperSlotsFromJson`関数（Line 1012）は定義される前にエラー発生
+- 結果として、関数が`undefined`になり、DBロード処理が失敗
+
+#### なぜ気づきにくかったか
+1. エラーハンドラーが「データファイルの読み込みに失敗」という一般的なメッセージを表示
+2. JSONファイル自体は正常なため、原因がJSファイルにあると気づきにくい
+3. ブラウザConsoleで`error`を検索しても、構文エラーが別の形式で表示される可能性
+
+### Design Rationale（設計判断）
+**なぜ重複宣言が発生したか**:
+1. 日本語補助テキスト個別ボタン実装時、英語テキストと同じパターンを適用
+2. `existingTextRow`をLine 1058で宣言したが、コピー元のコメントも一緒にコピー
+3. Line 1212で再度宣言するコードが残ってしまった
+
+**正しいパターン**（英語テキストで実装済み）:
+```javascript
+// 上部で1回だけ宣言
+const existingPhraseRow = container.querySelector('.upper-slot-phrase-row');
+
+// 複数箇所で再利用
+if (phraseDiv || existingPhraseRow) { ... }
+```
+
+### 解決策
+
+#### コード修正（training/js/insert_test_data_clean.js）
+
+**修正箇所**: Line 1212の重複宣言を削除
+```javascript
+// 修正前（Line 1212-1219）
+// 🆕 .upper-slot-text-rowが既に存在する場合もチェック（textDivより前に宣言）
+const existingTextRow = container.querySelector('.upper-slot-text-row');
+if (existingTextRow) {
+  console.log("✅ .upper-slot-text-row既存、内容を更新: ", container.id);
+}
+
+if (textDiv || existingTextRow) {
+
+// 修正後（Line 1212-1213）
+// existingTextRowは既にLine 1058で宣言済み（重複宣言を削除）
+if (textDiv || existingTextRow) {
+```
+
+### 教訓・予防策
+
+1. **大きな編集前にgrep検索**: 同じ変数名が既に存在しないか確認
+   ```bash
+   grep "const existingTextRow" training/js/insert_test_data_clean.js
+   ```
+
+2. **変数のスコープ設計**: 
+   - 複数箇所で使う変数は**上部で1回だけ宣言**
+   - ブロック内で再利用する際は新しい宣言をしない
+
+3. **構文チェックツールの活用**:
+   ```bash
+   node -c training/js/insert_test_data_clean.js  # Node.jsでの構文チェック
+   ```
+
+4. **エラーハンドラーの改善**: 
+   - 構文エラーを検出した場合、より具体的なメッセージを表示
+   - `error-handler.js`でJavaScriptパースエラーを特別扱い
+
+5. **段階的なテスト**: 
+   - 大きな編集（200行以上）後は、必ずブラウザリロードして`typeof 関数名`を確認
+   - 関数が`undefined`なら、その前に構文エラーが存在
+
+### 精度改善（accuracy_improved）
+- **構文エラー検出時間**: 2-3時間 → 即座（grep検索で重複検出）
+- **デバッグ時間**: 2-3時間 → 5-10分（変数宣言位置の確認のみ）
+- **再発防止**: 変数スコープ設計ガイドライン確立
+
+### 影響範囲
+- **ファイル**: `training/js/insert_test_data_clean.js` Line 1212
+- **影響**: ファイル全体のパース停止 → 全関数が`undefined`
+- **修正**: 1行削除（重複宣言の除去）
+
+---
+
+## [2026-01-02] ランダマイズ時に日本語補助テキストが消失する問題
+
+### 発生した問題
+- 個別ON/OFFボタン（ヒント表示切替）実装後、ランダマイズすると日本語補助テキストが消える
+- 英語テキスト問題（上記記録）と**全く同じパターン**で発生
+
+### Root Cause（根本原因）
+**syncUpperSlotsFromJson関数のセレクタが初回表示後のDOM構造と不一致**（英語テキストと同一）
+
+#### DOM構造の変化
+1. **初回表示時**:
+   ```html
+   <div class="slot-container" id="slot-m1">
+     <div class="slot-text">日本語補助</div>  <!-- 直下にslot-text -->
+   </div>
+   ```
+
+2. **個別ボタン追加後**:
+   ```html
+   <div class="slot-container" id="slot-m1">
+     <div class="upper-slot-text-row" style="grid-row: 3;">  <!-- 新しい親コンテナ -->
+       <button class="upper-slot-auxtext-toggle-btn">ヒント OFF</button>
+       <div class="slot-text">日本語補助</div>
+     </div>
+   </div>
+   ```
+
+#### セレクタの不一致
+```javascript
+const textDiv = container.querySelector(":scope > .slot-text");
+// ↑ slot-containerの「直下」のslot-textを探す（英語テキストと同じ問題）
+```
+
+### 解決策
+
+#### コード修正（training/js/insert_test_data_clean.js）
+
+**修正箇所1**: 既存textRowの検出（Line 1058-1061追加）
+```javascript
+// 🆕 .upper-slot-text-rowが既に存在する場合もチェック
+const existingTextRow = container.querySelector('.upper-slot-text-row');
+if (existingTextRow) {
+  console.log("✅ .upper-slot-text-row既存、内容を更新: ", container.id);
+}
+```
+
+**修正箇所2**: 条件式の拡張（Line 1215）
+```javascript
+// 修正前
+if (textDiv) {
+
+// 修正後
+if (textDiv || existingTextRow) {  // 両方をチェック
+```
+
+**修正箇所3**: 既存textRowの再利用（Line 1226）
+```javascript
+let textRow = existingTextRow;  // 既存を使用
+
+if (!textRow) {
+  // 新規DOM作成（初回のみ）
+} else {
+  // 既存更新（2回目以降）
+  const existingTextElement = textRow.querySelector('.slot-text');
+  existingTextElement.textContent = item.SlotText || "";
+  existingTextElement.style.opacity = isAuxtextVisible ? '1' : '0';
+}
+```
+
+**修正箇所4**: grid-row位置の変更
+```javascript
+// 修正前
+grid-row: 5;  // 英語テキストの下
+
+// 修正後
+grid-row: 3;  // イラスト（row 2）と英語テキスト（row 4）の間
+```
+
+### 教訓・予防策
+
+1. **同じパターンは一括実装**: 英語テキストと日本語補助テキストは同じ構造なので、一緒に実装すべきだった
+2. **DOM構造変更時のチェックリスト**:
+   - `insertTestData`関数での初回生成
+   - `syncUpperSlotsFromJson`関数でのランダマイズ対応
+   - 両方のセレクタを更新
+
+3. **テストパターン**: 
+   - 初回表示 → OK
+   - 1回目のランダマイズ → OK
+   - **2回目のランダマイズ** → ここで失敗（重要！）
+
+### 精度改善（accuracy_improved）
+- **デバッグ時間**: 英語テキスト問題の解決パターンを適用 → 即座に解決
+- **コード再利用**: 英語テキストの修正パターンを100%踏襲
+
+### 影響範囲
+- **ファイル**: `training/js/insert_test_data_clean.js` Line 1058, 1215, 1226
+- **Git diff**:
+  - Line 597: `grid-row: 5;` → `grid-row: 3;`（syncDynamicToStatic関数）
+  - Line 1058-1061: `existingTextRow`検出追加
+  - Line 1215: 条件式を`if (textDiv || existingTextRow)`に変更
+  - Line 1233: `grid-row: 5;` → `grid-row: 3;`（syncUpperSlotsFromJson関数）
+
+---
+
 ## [2026-01-02] ランダマイズ時に英語テキストが消失する問題
 
 ### 発生した問題
