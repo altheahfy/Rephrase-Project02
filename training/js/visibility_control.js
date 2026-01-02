@@ -401,7 +401,7 @@ function setupVisibilityControlUI() {
         // 表示にする
         console.log("👁️ 全英文を表示します");
         showAllEnglishText();
-        hideAllEnglishButton.innerHTML = '🙈 英語OFF';
+        hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
         hideAllEnglishButton.style.backgroundColor = '#ff9800'; // オレンジ色
       }
       
@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hideAllEnglishButton.innerHTML = '👁️ 英語ON';
         hideAllEnglishButton.style.backgroundColor = '#4CAF50';
       } else {
-        hideAllEnglishButton.innerHTML = '🙈 英語OFF';
+        hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
         hideAllEnglishButton.style.backgroundColor = '#ff9800';
       }
       console.log('🔄 ボタンラベルを同期しました:', isCurrentlyVisible ? '表示中' : '非表示');

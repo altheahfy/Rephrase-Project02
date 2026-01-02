@@ -120,17 +120,18 @@ function toggleExclusiveSubslot(slotId) {
       console.error(`❌ 必要な要素が見つかりません`);
     }
     
-    // 従来の関数も呼び出し
-    applyTabConnection(slotId, true);
-    
-    // �️ 横スクロールドラッグ機能を追加
+    // 🖱️ 横スクロールドラッグ機能を追加
     console.log(`🖱️ サブスロット ${slotId} に横スクロールドラッグ機能を追加します`);
     addHorizontalDragToSubslot(target);
     
-    // �📍 サブスロット位置を調整（安全な軽微調整版）
+    // 📍 サブスロット位置を調整（安全な軽微調整版）
+    // 🔗 タブ連結時は位置調整を完全にスキップ（コメントアウト）
+    /*
     setTimeout(() => {
       adjustSubslotPositionSafe(slotId);
     }, 300); // DOM更新とレンダリング完了を確実に待つ（150ms→300ms）
+    */
+    console.log(`🔗 タブ連結優先のため、位置調整をスキップ: ${slotId}`);
 
     // ★★★ 並べ替え処理を呼び出す ★★★
     if (window.reorderSubslotsInContainer && window.loadedJsonData) {
@@ -172,11 +173,21 @@ function toggleExclusiveSubslot(slotId) {
               expandedSubslot.style.setProperty('transform', `scale(${currentZoom})`, 'important');
               expandedSubslot.style.setProperty('transform-origin', 'top left', 'important');
             }
+            
+            // 🔗 ズーム処理完了後、タブ連結を最終適用
+            setTimeout(() => {
+              console.log(`🔗 [最終] ズーム後のタブ連結適用: ${slotId}`);
+              applyTabConnection(slotId, true);
+            }, 150); // 50ms → 150msに延長（初回実行時の安定性向上）
           }
         }, 100);
-      }, 300); // 遅延を300msに短縮してより迅速なズーム適用
+      }, 100);
     } else {
-      console.warn("⚠ ズームコントローラーが利用できません");
+      // ズーム機能がない場合は、通常通り適用
+      setTimeout(() => {
+        console.log(`🔗 [最終] タブ連結適用: ${slotId}`);
+        applyTabConnection(slotId, true);
+      }, 300); // 50ms → 300msに延長（初回実行時の安定性向上）
     }
 
     // ★★★ サブスロット用コントロールパネルを追加 ★★★
@@ -613,7 +624,13 @@ function adjustSubslotPositionSafe(parentSlotId) {
     return;
   }
   
-  // 🔍 現在の表示状態を確認
+  // � タブ連結中はmargin-leftの位置調整をスキップ（タブ連結を優先）
+  if (subslotArea.classList.contains('active-subslot-area')) {
+    console.log(`🔗 ${parentSlotId} タブ連結中のため位置調整をスキップ`);
+    return;
+  }
+  
+  // �🔍 現在の表示状態を確認
   if (getComputedStyle(subslotArea).display === 'none') {
     console.warn(`⚠ 安全位置調整: サブスロットが非表示状態のため調整をスキップ`);
     return;

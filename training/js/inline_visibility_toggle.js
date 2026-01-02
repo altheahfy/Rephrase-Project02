@@ -50,7 +50,7 @@
         toggleButton.innerHTML = '👁️ 英語ON';
         console.log('[InlineVisibility] → 英語を非表示にしました');
       } else {
-        toggleButton.innerHTML = '🙈 英語OFF';
+        toggleButton.innerHTML = '🙈 英語全OFF';
         console.log('[InlineVisibility] → 英語を表示しました');
       }
     });

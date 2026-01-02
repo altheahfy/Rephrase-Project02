@@ -5,6 +5,131 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-02] Sスロットだけサブスロット展開時にタブ接続が一瞬で消える問題
+
+### 発生した問題
+- 親スロットSのときだけ、サブスロット展開するとタブ風接続が一瞬できてすぐサブスロットが下に離れる
+- 他のスロット（O1, M1など）では正常に動作
+- 一度他のスロットでサブスロット展開してからSを展開すると成功、最初にSで展開するとダメ
+
+### Root Cause（根本原因）
+**タブ連結適用のタイミングが早すぎて、後続処理でスタイルが上書きされる**
+
+#### 実行順序の問題
+```javascript
+// toggleExclusiveSubslot()内の処理順序
+1. applyTabConnection(slotId, true)  // ← ここでmargin-top: -80px設定
+2. addHorizontalDragToSubslot()
+3. reorderSubslotsInContainer()
+4. hideEmptySubslotsInContainer()
+5. createSubslotControlPanel()
+6. setTimeout(adjustSubslotPositionSafe, 300ms)  // ← margin-leftやtransform設定で視覚的に混乱
+7. setTimeout(forceSubslotDetection, 100ms)      // ← ズーム機能がtransform設定
+   └─ setTimeout(transform適用, 100ms)          // ← さらに100ms後にtransform
+```
+
+#### なぜSスロットだけ問題が発生したか
+- `adjustSubslotPositionSafe()`が画面端に近いスロットに対してmargin-leftやtransformを設定
+- Sスロットの位置が画面中央からやや離れている
+- ズーム機能が`transform`を`scale()`で上書き
+- 初回実行時はDOMの準備が完了していないため、タイミングの問題が顕在化
+
+### Solution（解決策）
+**applyTabConnection()の実行を全処理の最後に移動（最大350ms遅延）**
+
+#### 実装（training/js/subslot_toggle.js）
+```javascript
+// toggleExclusiveSubslot()内
+
+// ★★★ サブスロット制御パネルを作成 ★★★
+if (window.createSubslotControlPanel) {
+  window.createSubslotControlPanel(slotId);
+}
+
+// 🔍 ★★★ ズーム機能連携：サブスロット展開後にズーム適用 ★★★
+if (window.forceSubslotDetection) {
+  setTimeout(() => {
+    window.forceSubslotDetection();
+    
+    setTimeout(() => {
+      const expandedSubslot = document.getElementById(`slot-${slotId}-sub`);
+      if (expandedSubslot) {
+        // ズーム適用
+        if (window.zoomController && !currentTransform.includes('scale')) {
+          expandedSubslot.style.setProperty('transform', `scale(${currentZoom})`, 'important');
+        }
+        
+        // 🔗 ズーム処理完了後、タブ連結を最終適用
+        setTimeout(() => {
+          console.log(`🔗 [最終] ズーム後のタブ連結適用: ${slotId}`);
+          applyTabConnection(slotId, true);
+        }, 150); // ← 全処理完了後（合計350ms）
+      }
+    }, 100);
+  }, 100);
+} else {
+  // ズーム機能がない場合
+  setTimeout(() => {
+    console.log(`🔗 [最終] タブ連結適用: ${slotId}`);
+    applyTabConnection(slotId, true);
+  }, 300); // ← 全処理完了後
+}
+```
+
+#### adjustSubslotPositionSafe()の無効化
+```javascript
+// Line 131: 位置調整処理をコメントアウト
+/*
+setTimeout(() => {
+  adjustSubslotPositionSafe(slotId);
+}, 300);
+*/
+console.log(`🔗 タブ連結優先のため、位置調整をスキップ: ${slotId}`);
+```
+
+さらに、`adjustSubslotPositionSafe()`内でタブ連結中はスキップする処理も追加：
+```javascript
+function adjustSubslotPositionSafe(parentSlotId) {
+  // 🔗 タブ連結中はmargin-leftの位置調整をスキップ（タブ連結を優先）
+  if (subslotArea.classList.contains('active-subslot-area')) {
+    console.log(`🔗 ${parentSlotId} タブ連結中のため位置調整をスキップ`);
+    return;
+  }
+  // ...
+}
+```
+
+### Design Rationale（設計判断）
+**なぜタブ連結適用を最後にするか**:
+1. **スタイル上書きの防止**: 他の処理（margin-left、transform）がタブ連結のmargin-topを無効化しない
+2. **初回実行の安定性**: DOMの準備完了を待つことで、初回展開でも確実に動作
+3. **ズーム機能との競合回避**: ズーム処理が完了してからタブ連結を適用
+
+**なぜadjustSubslotPositionSafe()を無効化するか**:
+- タブ連結時は親スロット直下にサブスロットを配置するため、水平位置調整は不要
+- margin-leftやtransformがタブ連結の視覚効果を妨げる
+
+**なぜ350msまたは300msか**:
+- ズーム機能がある場合: 100ms（初回） + 100ms（transform適用） + 150ms（余裕） = 350ms
+- ズーム機能がない場合: 300ms（全処理完了を待つ）
+
+### Lessons Learned（学んだこと）
+1. **非同期処理の順序管理の重要性**: 複数のsetTimeout()が絡む場合、最終的な適用順序を明確に設計する
+2. **初回実行の特殊性**: 初回だけ失敗する場合、DOMの準備状態やキャッシュの有無を疑う
+3. **特定条件での問題発生**: 「Sスロットだけ」という条件から、画面位置やスロット順序に依存する処理を探す
+4. **デバッグの効率化**: 「一度他のスロットで展開すると成功」という情報は、初回実行時の処理順序問題を示唆
+5. **スタイル競合の解決**: 複数の処理がスタイルを変更する場合、最後に適用する処理を決定的にする
+
+### 影響範囲
+- **変更ファイル**: training/js/subslot_toggle.js
+- **影響機能**: サブスロット展開時のタブ連結UI、adjustSubslotPositionSafe()
+- **副作用**: なし（水平位置調整が不要になったが、タブ連結が優先されるため問題なし）
+
+### 実装日時
+2026-01-02
+
+---
+
 ## [2026-01-02] サブスロット展開時のエクセル風タブUI実装（CSS詳細度とz-index制御）
 
 ### 発生した問題
