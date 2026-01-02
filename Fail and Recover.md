@@ -5,6 +5,114 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-02] サブスロット展開時のエクセル風タブUI実装（CSS詳細度とz-index制御）
+
+### 発生した問題
+- サブスロット展開時に親スロットとサブスロットが視覚的に分離
+- エクセル風のタブ感（親スロット下延長+サブスロット接続）が実現できない
+- CSSクラスでmargin-top指定しても効果なし（7回のアプローチが全て失敗）
+
+### Root Cause（根本原因）
+**CSS詳細度の問題とz-index制御の不足**
+
+#### 失敗したアプローチ（1-7回目）
+1. **`:has()`セレクタ** → ブラウザ未対応
+2. **padding-bottom拡大** → サブスロットが下に押される
+3. **::after疑似要素** → 色が違って見える、z-index問題
+4. **min-height拡大** → 同じく押し下げ
+5. **margin-bottom負の値** → 親スロット自体が縮む
+6. **min-height + サブslot margin-top負（CSSのみ）** → 詳細度の問題で効果なし
+7. **JavaScript動的クラス追加** → CSS `!important`でも上書きされる
+
+#### 問題の本質
+```css
+/* training/style.css - 効かない */
+.active-subslot-area {
+  margin-top: -100px !important; /* ← 他のCSSに負けている */
+}
+```
+
+- `.slot-wrapper[id$="-sub"]`などの既存CSSルールが優先される
+- `!important`でも詳細度の問題で上書きできない
+- z-index未設定で、親スロットの下端が見えてしまう
+
+### Solution（解決策）
+**JavaScriptでインラインスタイルを強制設定 + z-index制御**
+
+#### 実装（training/js/subslot_toggle.js）
+```javascript
+function applyTabConnection(parentSlotId, isActive) {
+  const parentSlot = document.getElementById(`slot-${parentSlotId}`);
+  const subslotArea = document.getElementById(`slot-${parentSlotId}-sub`);
+  
+  if (isActive) {
+    clearAllTabConnections();
+    
+    parentSlot.classList.add('active-parent-slot');
+    subslotArea.classList.add('active-subslot-area');
+    
+    // 🆕 インラインスタイルで確実に制御（CSS詳細度問題を回避）
+    parentSlot.style.setProperty('z-index', '1', 'important'); // 親は後ろ
+    subslotArea.style.setProperty('margin-top', '-80px', 'important'); // 80px引き上げ
+    subslotArea.style.setProperty('padding-top', '80px', 'important'); // 食い込み分を確保
+    subslotArea.style.setProperty('z-index', '2', 'important'); // サブは手前（親の下端を隠す）
+  }
+}
+```
+
+#### CSS側の定義（training/style.css）
+```css
+/* 🎯 親スロット延長（+80px） */
+.active-parent-slot {
+  position: relative;
+  min-height: 460px !important; /* 380px + 80px */
+  border-bottom: none !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  z-index: 1; /* サブより後ろ */
+}
+
+/* 🎯 サブスロット接続 */
+.active-subslot-area {
+  margin-top: -100px !important; /* フォールバック */
+  padding-top: 100px !important;
+  z-index: 2; /* 親の上に配置 */
+}
+```
+
+### Design Rationale（設計判断）
+**なぜインラインスタイルを使うか**:
+1. **CSS詳細度問題の回避**: インラインスタイルは最高優先度（`!important`付きなら絶対）
+2. **動的制御の確実性**: JavaScript側で完全に制御できる
+3. **デバッグの容易性**: ブラウザDevToolsで即座に確認可能
+
+**なぜz-indexを2段階にするか**:
+- 親スロット下端の不格好な表示を隠すため
+- 親（z-index: 1）を後ろ、サブ（z-index: 2）を手前に配置
+- エクセル風タブの自然な視覚効果を実現
+
+**なぜ-80pxか**:
+- 親スロットの延長部分が+80px
+- サブスロットを-80px引き上げることで、ぴったり接続
+- -100pxでは他の親スロットと重なってしまう
+
+### Lessons Learned（学んだこと）
+1. **CSS `!important`の限界**: 詳細度の問題は`!important`でも解決できない場合がある
+2. **インラインスタイルの強力さ**: JavaScript + `setProperty('prop', 'value', 'important')`が最終手段
+3. **z-index制御の重要性**: 重なりの前後関係を明示的に制御することで視覚的品質向上
+4. **試行錯誤の価値**: 7回のアプローチで問題の本質（CSS詳細度）が明らかになった
+5. **DevToolsの活用**: Computed Stylesで実際の適用値を確認することが重要
+
+### 影響範囲
+- **変更ファイル**: training/js/subslot_toggle.js, training/style.css
+- **影響機能**: サブスロット展開時のUI表示
+- **副作用**: なし（既存機能に影響なし）
+
+### 実装日時
+2026-01-02
+
+---
+
 ## [2026-01-02] JavaScript変数重複宣言による全関数undefined問題
 
 ### 発生した問題

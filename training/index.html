@@ -686,10 +686,29 @@ function handleLogout() {
 </style>
 
 <!-- タイトル（常に表示） -->
-<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-  <h1 style="margin: 0; margin-right: 30px; color: #333; font-size: 28px; font-weight: bold;">
+<div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); gap: 20px;">
+  <h1 style="margin: 0; color: #333; font-size: 28px; font-weight: bold; flex-shrink: 0;">
    🔄 Rephrase 例文トレーニング
   </h1>
+  
+  <!-- 使い方ガイド（コンパクト版） -->
+  <div style="display: flex; gap: 10px; font-size: 13px; color: #495057; align-items: center; flex-wrap: wrap; margin-left: 20px;">
+    <span style="display: flex; align-items: center; gap: 4px;">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">①</span>
+      <span>🔄 シャッフルで「イラスト＝英語」を覚える</span>
+    </span>
+    <span style="display: flex; align-items: center; gap: 4px;">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">②</span>
+      <span>👁️ 練習したい場所の英語を消す（一部～全文）</span>
+    </span>
+    <span style="display: flex; align-items: center; gap: 4px;">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">③</span>
+      <span>🔄 シャッフルで練習（一部～全文）</span>
+    </span>
+    <span style="color: #6c757d; font-size: 12px; margin-left: 6px;">
+      <span>※ 🔊 発音確認・発話診断</span>
+    </span>
+  </div>
 </div>
 
 <!-- 🎯 メインコンテンツエリア（ローディング完了まで非表示） -->
