@@ -421,6 +421,11 @@ function setupVisibilityControlUI() {
   // 🆕 全英文非表示ボタン（トグル方式に変更）
   const hideAllEnglishButton = document.getElementById('hide-all-english-visibility');
   if (hideAllEnglishButton) {
+    // 🆕 最初に強制的に緑色を設定（HTMLの初期値を上書き）
+    hideAllEnglishButton.style.backgroundColor = '#4CAF50';
+    hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+    console.log("🎨 英語全OFFボタンの初期色を緑色に設定しました");
+    
     hideAllEnglishButton.addEventListener('click', function() {
       console.log("🔄 英語表示切替ボタンがクリックされました");
       
