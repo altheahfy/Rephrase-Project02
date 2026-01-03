@@ -767,9 +767,9 @@ h1 {
   white-space: normal; /* 改行を許可 */
   
   /* 例文テキストエリアを明確にする新デザイン */
-  background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+  background: #ffffff;
   border: var(--border-medium);
-  border-color: var(--warning);
+  border-color: #cccccc;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
@@ -1312,9 +1312,9 @@ h1 {
   line-height: 1.2; /* スロットの英語テキストと同じ行高 */
   
   /* 🎨 新しいデザインシステムに統一 - 例文テキストエリア */
-  background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+  background: #ffffff;
   border: var(--border-medium);
-  border-color: var(--warning);
+  border-color: #cccccc;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   
