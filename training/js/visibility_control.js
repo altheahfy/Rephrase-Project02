@@ -348,6 +348,24 @@ function setupVisibilityControlUI() {
       
       console.log(`🎛️ UIチェンジ: ${slotKey}-${elementType} = ${isVisible}`);
       
+      // 🆕 チェックボックスの親label要素の背景色を変更（英文のみ）
+      if (elementType === 'text') {
+        const labelElement = this.closest('label');
+        if (labelElement) {
+          if (isVisible) {
+            labelElement.style.backgroundColor = '#4CAF50'; // 緑色
+            labelElement.style.color = 'white';
+            labelElement.style.padding = '2px 6px';
+            labelElement.style.borderRadius = '3px';
+          } else {
+            labelElement.style.backgroundColor = '#757575'; // グレー色
+            labelElement.style.color = 'white';
+            labelElement.style.padding = '2px 6px';
+            labelElement.style.borderRadius = '3px';
+          }
+        }
+      }
+      
       // 疑問詞の場合
       if (slotKey === 'question-word') {
         // question_word_visibility.js の関数を呼び出し
@@ -361,6 +379,24 @@ function setupVisibilityControlUI() {
         toggleSlotElementVisibility(slotKey, elementType, isVisible);
       }
     });
+    
+    // 🆕 初期状態の色を設定（英文チェックボックスのみ）
+    if (checkbox.dataset.type === 'text') {
+      const labelElement = checkbox.closest('label');
+      if (labelElement) {
+        if (checkbox.checked) {
+          labelElement.style.backgroundColor = '#4CAF50'; // 緑色
+          labelElement.style.color = 'white';
+          labelElement.style.padding = '2px 6px';
+          labelElement.style.borderRadius = '3px';
+        } else {
+          labelElement.style.backgroundColor = '#757575'; // グレー色
+          labelElement.style.color = 'white';
+          labelElement.style.padding = '2px 6px';
+          labelElement.style.borderRadius = '3px';
+        }
+      }
+    }
   });
   
   // 全表示ボタン
@@ -412,11 +448,15 @@ function setupVisibilityControlUI() {
       });
     });
     
-    // 初期状態のボタンラベルを設定
+    // 初期状態のボタンラベルと色を設定
     const initiallyVisible = visibilityState['s']?.['text'] !== false;
     if (!initiallyVisible) {
       hideAllEnglishButton.innerHTML = '👁️ 英語ON';
       hideAllEnglishButton.style.backgroundColor = '#757575';
+    } else {
+      // 初期状態が表示中の場合も明示的に緑色を設定
+      hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+      hideAllEnglishButton.style.backgroundColor = '#4CAF50';
     }
   }
   
