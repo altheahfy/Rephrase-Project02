@@ -2697,7 +2697,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // メタデータから動的にマッピングを生成
     async function loadGrammarMetadata() {
       try {
-        const response = await fetch('explanation/grammar-metadata.json');
+        // 🔄 キャッシュバスター追加（メタデータも常に最新を取得）
+        const cacheBuster = '?t=' + Date.now();
+        const response = await fetch('explanation/grammar-metadata.json' + cacheBuster);
         if (response.ok) {
           const metadata = await response.json();
           console.log('📋 文法メタデータ読み込み成功:', metadata);
