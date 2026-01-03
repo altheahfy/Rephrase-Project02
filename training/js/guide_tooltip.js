@@ -12,8 +12,11 @@
   const tooltipConfig = {
     'guide-step-1': {
       content: '例文全シャッフル（<span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">🎲 例文全シャッフル</span>）を押すと、様々な例文が表示されます。<br><br>そこに表示される「英語とイラストのセット」を見て、イラストだけを見て英語が思い出せるようにしましょう'
+    },
+    'guide-step-2': {
+      content: '「<span style="display: inline-flex; align-items: center; justify-content: center; background: #4CAF50; color: white; border: none; padding: 2px 4px; border-radius: 3px; font-size: 9px; font-weight: bold; line-height: 1.2;">英語<br>OFF</span>」を押すと、そこの英語が消えます。<br><br>これによって、自分が練習したい箇所をテストできるようになります。'
     }
-    // ②③④の設定は後で追加
+    // ③④の設定は後で追加
   };
 
   // ツールチップ要素を生成
