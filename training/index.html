@@ -672,8 +672,8 @@ function handleLogout() {
 
 .start-here-arrow {
   position: absolute;
-  left: -65px;
-  top: 0;
+  left: -60px;
+  top: -10px;
   z-index: 10001;
   animation: bounce-arrow 1.5s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
   pointer-events: none;
@@ -687,8 +687,8 @@ function handleLogout() {
 
 .start-here-text {
   position: absolute;
-  left: -245px;
-  top: 0;
+  left: -320px;
+  top: -10px;
   background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
   color: #333;
   padding: 10px 20px;
@@ -770,9 +770,6 @@ function handleLogout() {
     <span style="display: flex; align-items: center; gap: 4px;">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">③</span>
       <span>🔄 シャッフルで練習（一部～全文）</span>
-    </span>
-    <span style="color: #FFC107; font-size: 15px; margin-left: 10px; font-weight: bold;">
-      <span>※ポインタをかざすと説明が出ます</span>
     </span>
   </div>
 </div>
@@ -2507,7 +2504,7 @@ function showStartHereGuide() {
   // テキストを作成
   const text = document.createElement('div');
   text.className = 'start-here-text';
-  text.textContent = 'ここからはじめよう！';
+  text.textContent = 'ポインタをかざすと説明が出ます';
   
   // 要素を追加
   guideStep1.appendChild(arrow);
