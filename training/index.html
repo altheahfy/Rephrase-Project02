@@ -1847,7 +1847,9 @@ document.getElementById("loadPresetButton").addEventListener("click", () => {
   
   if (selectedPreset.startsWith('data/') && selectedPreset.endsWith('.json')) {
     // 🎯 **データセット：fetchでJSONファイルを読み込み**
-    fetch(selectedPreset)
+    // 🔄 キャッシュバスター追加（常に最新のJSONを取得）
+    const cacheBuster = '?t=' + Date.now();
+    fetch(selectedPreset + cacheBuster)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
