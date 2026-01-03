@@ -672,9 +672,9 @@ function handleLogout() {
 
 .start-here-arrow {
   position: absolute;
-  left: -60px;
+  left: -50px;
   top: -10px;
-  z-index: 10001;
+  z-index: 10002;
   animation: bounce-arrow 1.5s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
   pointer-events: none;
 }
@@ -688,7 +688,7 @@ function handleLogout() {
 .start-here-text {
   position: absolute;
   left: -320px;
-  top: -10px;
+  top: -5px;
   background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
   color: #333;
   padding: 10px 20px;
@@ -1130,7 +1130,7 @@ function handleLogout() {
   <section>
    <div class="control-bar" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
      <button id="randomize-all" style="
-       background: linear-gradient(135deg, #8e44ad 0%, #e74c3c 100%);
+       background: #ff9800;
        color: white;
        border: none;
        padding: 12px 20px;
@@ -1146,7 +1146,7 @@ function handleLogout() {
      
      <!-- 既存の動作する「全英文非表示」ボタンを移動・トグル化 -->
      <button id="hide-all-english-visibility" style="
-       background: #ff9800;
+       background: #4CAF50;
        color: white;
        border: none;
        padding: 12px 20px;
@@ -2491,13 +2491,13 @@ function showStartHereGuide() {
     return;
   }
   
-  // 矢印SVGを作成（右向き）
+  // 矢印SVGを作成（右向き、全て黄色）
   const arrow = document.createElement('div');
   arrow.className = 'start-here-arrow';
   arrow.innerHTML = `
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 17l5-5-5-5v10z"/>
-      <path d="M4 12h11" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M10 17l5-5-5-5v10z" fill="#FFC107"/>
+      <path d="M4 12h11" stroke="#FFC107" stroke-width="2" fill="none"/>
     </svg>
   `;
   

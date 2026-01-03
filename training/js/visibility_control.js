@@ -396,13 +396,13 @@ function setupVisibilityControlUI() {
         console.log("🔒 全英文を非表示にします");
         hideAllEnglishText();
         hideAllEnglishButton.innerHTML = '👁️ 英語ON';
-        hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
+        hideAllEnglishButton.style.backgroundColor = '#757575'; // グレー色
       } else {
         // 表示にする
         console.log("👁️ 全英文を表示します");
         showAllEnglishText();
         hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
-        hideAllEnglishButton.style.backgroundColor = '#ff9800'; // オレンジ色
+        hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
       }
       
       // UIの英文チェックボックスも同期
@@ -416,7 +416,7 @@ function setupVisibilityControlUI() {
     const initiallyVisible = visibilityState['s']?.['text'] !== false;
     if (!initiallyVisible) {
       hideAllEnglishButton.innerHTML = '👁️ 英語ON';
-      hideAllEnglishButton.style.backgroundColor = '#4CAF50';
+      hideAllEnglishButton.style.backgroundColor = '#757575';
     }
   }
   
