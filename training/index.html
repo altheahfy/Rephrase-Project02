@@ -652,10 +652,10 @@ function handleLogout() {
 /* 🎯 初回ガイド矢印アニメーション */
 @keyframes bounce-arrow {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateX(-10px);
   }
 }
 
@@ -672,9 +672,9 @@ function handleLogout() {
 
 .start-here-arrow {
   position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: -50px;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 10001;
   animation: bounce-arrow 1.5s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
   pointer-events: none;
@@ -688,9 +688,9 @@ function handleLogout() {
 
 .start-here-text {
   position: absolute;
-  top: -100px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: -180px;
+  top: 50%;
+  transform: translateY(-50%);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 8px 16px;
@@ -2496,13 +2496,13 @@ function showStartHereGuide() {
     return;
   }
   
-  // 矢印SVGを作成
+  // 矢印SVGを作成（左向き）
   const arrow = document.createElement('div');
   arrow.className = 'start-here-arrow';
   arrow.innerHTML = `
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M7 10l5 5 5-5H7z"/>
-      <path d="M12 4v11" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M14 7l-5 5 5 5V7z"/>
+      <path d="M20 12H9" stroke="currentColor" stroke-width="2" fill="none"/>
     </svg>
   `;
   
@@ -2517,7 +2517,7 @@ function showStartHereGuide() {
   
   console.log('🎯 初回ガイド矢印を表示しました');
   
-  // 5秒後にフェードアウト
+  // 20秒後にフェードアウト
   setTimeout(() => {
     arrow.classList.add('guide-highlight-fade-out');
     text.classList.add('guide-highlight-fade-out');
@@ -2531,7 +2531,7 @@ function showStartHereGuide() {
     
     // 初回表示済みフラグを保存
     localStorage.setItem('rephrase_has_seen_start_guide', 'true');
-  }, 5000);
+  }, 20000);
 }
 
 function showLoadingOverlay() {
