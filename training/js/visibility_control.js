@@ -450,6 +450,24 @@ function setupVisibilityControlUI() {
       const englishCheckboxes = document.querySelectorAll('.visibility-checkbox[data-type="text"]');
       englishCheckboxes.forEach(cb => {
         cb.checked = !isCurrentlyVisible;
+        
+        // 🆕 チェックボックスのlabel要素の色も同期
+        const labelElement = cb.closest('label');
+        if (labelElement) {
+          if (!isCurrentlyVisible) {
+            // ONにする → 緑色
+            labelElement.style.backgroundColor = '#4CAF50';
+            labelElement.style.color = 'white';
+            labelElement.style.padding = '2px 6px';
+            labelElement.style.borderRadius = '3px';
+          } else {
+            // OFFにする → グレー色
+            labelElement.style.backgroundColor = '#757575';
+            labelElement.style.color = 'white';
+            labelElement.style.padding = '2px 6px';
+            labelElement.style.borderRadius = '3px';
+          }
+        }
       });
     });
     
