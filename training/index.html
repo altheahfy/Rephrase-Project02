@@ -662,43 +662,41 @@ function handleLogout() {
 @keyframes pulse-glow {
   0%, 100% {
     opacity: 1;
-    filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.8));
+    filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.9));
   }
   50% {
-    opacity: 0.7;
-    filter: drop-shadow(0 0 15px rgba(102, 126, 234, 1));
+    opacity: 0.8;
+    filter: drop-shadow(0 0 20px rgba(255, 193, 7, 1));
   }
 }
 
 .start-here-arrow {
   position: absolute;
-  left: -50px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: -65px;
+  top: 0;
   z-index: 10001;
   animation: bounce-arrow 1.5s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
   pointer-events: none;
 }
 
 .start-here-arrow svg {
-  width: 40px;
-  height: 40px;
-  fill: #667eea;
+  width: 60px;
+  height: 60px;
+  fill: #FFC107;
 }
 
 .start-here-text {
   position: absolute;
-  left: -180px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
+  left: -245px;
+  top: 0;
+  background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 16px;
   font-weight: bold;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.5);
   z-index: 10001;
   animation: pulse-glow 2s ease-in-out infinite;
   pointer-events: none;
@@ -773,7 +771,7 @@ function handleLogout() {
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">③</span>
       <span>🔄 シャッフルで練習（一部～全文）</span>
     </span>
-    <span style="color: #6c757d; font-size: 12px; margin-left: 6px;">
+    <span style="color: #FFC107; font-size: 15px; margin-left: 10px; font-weight: bold;">
       <span>※ポインタをかざすと説明が出ます</span>
     </span>
   </div>
@@ -2496,13 +2494,13 @@ function showStartHereGuide() {
     return;
   }
   
-  // 矢印SVGを作成（左向き）
+  // 矢印SVGを作成（右向き）
   const arrow = document.createElement('div');
   arrow.className = 'start-here-arrow';
   arrow.innerHTML = `
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 7l-5 5 5 5V7z"/>
-      <path d="M20 12H9" stroke="currentColor" stroke-width="2" fill="none"/>
+      <path d="M10 17l5-5-5-5v10z"/>
+      <path d="M4 12h11" stroke="currentColor" stroke-width="2" fill="none"/>
     </svg>
   `;
   
