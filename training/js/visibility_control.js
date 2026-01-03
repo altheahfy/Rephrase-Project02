@@ -715,7 +715,7 @@ function hideAllEnglishText() {
     const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
     allSubslotToggleButtons.forEach(button => {
       button.innerHTML = '英語<br>ON';
-      button.style.backgroundColor = '#ff9800';
+      button.style.backgroundColor = '#757575';
       button.title = '英語を表示';
     });
     console.log(`🔄 ${allSubslotToggleButtons.length}個のサブスロット個別ボタンを「英語ON」に同期しました`);
@@ -724,7 +724,7 @@ function hideAllEnglishText() {
     const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
     allUpperSlotToggleButtons.forEach(button => {
       button.innerHTML = '英語<br>ON';
-      button.style.backgroundColor = '#ff9800';
+      button.style.backgroundColor = '#757575';
       button.title = '英語を表示';
     });
     console.log(`🔄 ${allUpperSlotToggleButtons.length}個の親スロット個別ボタンを「英語ON」に同期しました`);
