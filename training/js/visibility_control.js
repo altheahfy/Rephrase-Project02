@@ -822,10 +822,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const isCurrentlyVisible = visibilityState['s']['text'] !== false;
       if (!isCurrentlyVisible) {
         hideAllEnglishButton.innerHTML = '👁️ 英語ON';
-        hideAllEnglishButton.style.backgroundColor = '#4CAF50';
+        hideAllEnglishButton.style.backgroundColor = '#757575'; // グレー色
       } else {
         hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
-        hideAllEnglishButton.style.backgroundColor = '#ff9800';
+        hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
       }
       console.log('🔄 ボタンラベルを同期しました:', isCurrentlyVisible ? '表示中' : '非表示');
     }
