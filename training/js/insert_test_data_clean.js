@@ -1,4 +1,4 @@
-﻿// insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
+// insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
 // 
 // ⚠️⚠️⚠️【重要警告】⚠️⚠️⚠️
 // 動的記載エリア(dynamic-slot-area)は絶対に変更禁止！
@@ -533,7 +533,7 @@ function syncDynamicToStatic() {
                 currentPhraseElement.style.opacity = '0';
                 currentPhraseElement.style.visibility = 'hidden';
                 toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '英語を表示';
                 console.log(`🙈 ${container.id}: 英語を非表示`);
                 
@@ -573,7 +573,7 @@ function syncDynamicToStatic() {
             if (toggleButton) {
               if (!isTextVisible) {
                 toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '英語を表示';
               } else {
                 toggleButton.innerHTML = '英語<br>OFF';
@@ -684,7 +684,7 @@ function syncDynamicToStatic() {
                 currentTextElement.style.opacity = '0';
                 currentTextElement.style.visibility = 'hidden';
                 toggleButton.innerHTML = 'ヒント<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '日本語補助を表示';
                 console.log(`🙈 ${container.id}: 日本語補助を非表示`);
               }
@@ -719,7 +719,7 @@ function syncDynamicToStatic() {
             if (toggleButton) {
               if (!isAuxtextVisible) {
                 toggleButton.innerHTML = 'ヒント<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '日本語補助を表示';
               } else {
                 toggleButton.innerHTML = 'ヒント<br>OFF';
@@ -1010,7 +1010,7 @@ function displayTopQuestionWord() {
           auxtextEl.style.visibility = 'hidden';
         }
         auxTextToggleBtn.innerHTML = 'ヒント<br>ON';
-        auxTextToggleBtn.style.backgroundColor = '#ff9800';
+        auxTextToggleBtn.style.backgroundColor = '#757575';
         console.log('🙈 疑問詞日本語補助を非表示');
       }
     });
@@ -1044,7 +1044,7 @@ function displayTopQuestionWord() {
           textEl.style.visibility = 'hidden';
         }
         textToggleBtn.innerHTML = '英語<br>ON';
-        textToggleBtn.style.backgroundColor = '#ff9800';
+        textToggleBtn.style.backgroundColor = '#757575';
         console.log('🙈 疑問詞英語を非表示');
         
         // 💡 イラストヒントトーストを表示
@@ -1066,14 +1066,14 @@ function displayTopQuestionWord() {
           auxtextEl.style.opacity = '0';
           auxtextEl.style.visibility = 'hidden';
           auxTextToggleBtn.innerHTML = 'ヒント<br>ON';
-          auxTextToggleBtn.style.backgroundColor = '#ff9800';
+          auxTextToggleBtn.style.backgroundColor = '#757575';
         }
         
         if (state.text === false && textEl) {
           textEl.style.opacity = '0';
           textEl.style.visibility = 'hidden';
           textToggleBtn.innerHTML = '英語<br>ON';
-          textToggleBtn.style.backgroundColor = '#ff9800';
+          textToggleBtn.style.backgroundColor = '#757575';
         }
       }
     } catch (error) {
@@ -1316,7 +1316,7 @@ function syncUpperSlotsFromJson(data) {
                 currentPhraseElement.style.opacity = '0';
                 currentPhraseElement.style.visibility = 'hidden';
                 toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '英語を表示';
                 console.log(`🙈 ${container.id}: 英語を非表示`);
                 
@@ -1356,7 +1356,7 @@ function syncUpperSlotsFromJson(data) {
             if (toggleButton) {
               if (!isTextVisible) {
                 toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#ff9800';
+                toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '英語を表示';
               } else {
                 toggleButton.innerHTML = '英語<br>OFF';
@@ -1469,7 +1469,7 @@ function syncUpperSlotsFromJson(data) {
                   currentTextElement.style.opacity = '0';
                   currentTextElement.style.visibility = 'hidden';
                   toggleButton.innerHTML = 'ヒント<br>ON';
-                  toggleButton.style.backgroundColor = '#ff9800';
+                  toggleButton.style.backgroundColor = '#757575';
                   toggleButton.title = '日本語補助を表示';
                   console.log(`🙈 ${container.id}: 日本語補助を非表示`);
                 }
@@ -1504,7 +1504,7 @@ function syncUpperSlotsFromJson(data) {
               if (toggleButton) {
                 if (!isAuxtextVisible) {
                   toggleButton.innerHTML = 'ヒント<br>ON';
-                  toggleButton.style.backgroundColor = '#ff9800';
+                  toggleButton.style.backgroundColor = '#757575';
                   toggleButton.title = '日本語補助を表示';
                 } else {
                   toggleButton.innerHTML = 'ヒント<br>OFF';
@@ -1918,7 +1918,7 @@ function syncSubslotsFromJson(data) {
           phraseElement.style.opacity = '0';
           phraseElement.style.visibility = 'hidden';
           toggleButton.innerHTML = '英語<br>ON';
-          toggleButton.style.backgroundColor = '#ff9800';
+          toggleButton.style.backgroundColor = '#757575';
           toggleButton.title = '英語を表示';
           console.log(`🙈 ${fullSlotId}: 英語を非表示`);
           
@@ -1990,7 +1990,7 @@ function syncSubslotsFromJson(data) {
             textElement.style.visibility = 'hidden';
           }
           auxTextToggleButton.innerHTML = 'ヒント<br>ON';
-          auxTextToggleButton.style.backgroundColor = '#ff9800';
+          auxTextToggleButton.style.backgroundColor = '#757575';
           auxTextToggleButton.title = '日本語補助を表示';
           console.log(`🙈 ${fullSlotId}: 日本語補助を非表示`);
         }
@@ -2065,7 +2065,7 @@ function syncSubslotsFromJson(data) {
               phraseElement.style.visibility = 'hidden';
               // 🆕 ボタンの状態も同期
               toggleButton.innerHTML = '英語<br>ON';
-              toggleButton.style.backgroundColor = '#ff9800';
+              toggleButton.style.backgroundColor = '#757575';
               toggleButton.title = '英語を表示';
               console.log(`🙈 ${fullSlotId} に hidden-subslot-text クラスとインラインスタイルを追加（英語例文テキスト非表示）`);
             } else {
@@ -2082,7 +2082,7 @@ function syncSubslotsFromJson(data) {
               textElement.style.visibility = 'hidden';
               // 🆕 日本語補助ボタンの状態も同期
               auxTextToggleButton.innerHTML = 'ヒント<br>ON';
-              auxTextToggleButton.style.backgroundColor = '#ff9800';
+              auxTextToggleButton.style.backgroundColor = '#757575';
               auxTextToggleButton.title = '日本語補助を表示';
               console.log(`🙈 ${fullSlotId} に hidden-subslot-auxtext クラスを追加（日本語補助テキスト非表示）`);
             } else {
