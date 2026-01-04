@@ -675,7 +675,7 @@ function handleLogout() {
 
 .start-here-arrow {
   position: absolute;
-  left: -50px;
+  left: -20px;
   top: -10px;
   z-index: 10002;
   animation: bounce-arrow 1.5s ease-in-out infinite, pulse-glow 2s ease-in-out infinite;
@@ -2490,10 +2490,10 @@ function hideLoadingOverlay() {
 
 // 🎯 初回ガイド矢印表示関数
 function showStartHereGuide() {
-  // localStorageで初回判定
-  const hasSeenGuide = localStorage.getItem('rephrase_has_seen_start_guide');
-  if (hasSeenGuide === 'true') {
-    console.log('🎯 ガイドは既に表示済みのためスキップ');
+  // ×ボタンで閉じられた場合のみスキップ
+  const hasClosedGuide = localStorage.getItem('rephrase_guide_closed_by_user');
+  if (hasClosedGuide === 'true') {
+    console.log('🎯 ガイドはユーザーが×ボタンで閉じたためスキップ');
     return;
   }
   
@@ -2513,19 +2513,42 @@ function showStartHereGuide() {
     </svg>
   `;
   
-  // テキストを作成
+  // テキストと×ボタンを含むコンテナを作成
   const text = document.createElement('div');
   text.className = 'start-here-text';
-  text.textContent = 'ポインタをかざすと説明が出ます';
+  text.style.cssText = 'display: inline-flex; align-items: center; gap: 8px;';
   
-  // 要素を追加
-  guideStep1.appendChild(arrow);
-  guideStep1.appendChild(text);
+  // テキスト部分
+  const textSpan = document.createElement('span');
+  textSpan.textContent = 'ポインタをかざすと説明が出ます';
   
-  console.log('🎯 初回ガイド矢印を表示しました');
+  // ×ボタンを作成
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'start-here-close-btn';
+  closeBtn.innerHTML = '×';
+  closeBtn.title = 'このガイドを非表示にする';
+  closeBtn.style.cssText = `
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  `;
   
-  // 20秒後にフェードアウト
-  setTimeout(() => {
+  // ×ボタンのクリックイベント
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    // フェードアウト
     arrow.classList.add('guide-highlight-fade-out');
     text.classList.add('guide-highlight-fade-out');
     
@@ -2533,12 +2556,22 @@ function showStartHereGuide() {
     setTimeout(() => {
       arrow.remove();
       text.remove();
-      console.log('🎯 初回ガイド矢印を削除しました');
+      console.log('🎯 ユーザーが×ボタンでガイドを閉じました');
     }, 1000);
     
-    // 初回表示済みフラグを保存
-    localStorage.setItem('rephrase_has_seen_start_guide', 'true');
-  }, 20000);
+    // ユーザーが閉じたフラグを保存（今後表示しない）
+    localStorage.setItem('rephrase_guide_closed_by_user', 'true');
+  });
+  
+  // テキストコンテナに要素を追加
+  text.appendChild(textSpan);
+  text.appendChild(closeBtn);
+  
+  // 要素を追加（元の順番通り）
+  guideStep1.appendChild(arrow);
+  guideStep1.appendChild(text);
+  
+  console.log('🎯 初回ガイド矢印を表示しました（×ボタン付き、時間制限なし）');
 }
 
 function showLoadingOverlay() {
