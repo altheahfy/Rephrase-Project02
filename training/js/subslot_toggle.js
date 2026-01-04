@@ -178,6 +178,12 @@ function toggleExclusiveSubslot(slotId) {
             setTimeout(() => {
               console.log(`🔗 [最終] ズーム後のタブ連結適用: ${slotId}`);
               applyTabConnection(slotId, true);
+              
+              // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
+              if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+                console.log(`📏 ${slotId} サブスロットのテキスト幅調整を実行`);
+                window.adjustSlotWidthsBasedOnText();
+              }
             }, 150); // 50ms → 150msに延長（初回実行時の安定性向上）
           }
         }, 100);
@@ -187,6 +193,12 @@ function toggleExclusiveSubslot(slotId) {
       setTimeout(() => {
         console.log(`🔗 [最終] タブ連結適用: ${slotId}`);
         applyTabConnection(slotId, true);
+        
+        // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
+        if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+          console.log(`📏 ${slotId} サブスロットのテキスト幅調整を実行`);
+          window.adjustSlotWidthsBasedOnText();
+        }
       }, 300); // 50ms → 300msに延長（初回実行時の安定性向上）
     }
 

@@ -3258,7 +3258,8 @@ function adjustSlotWidthsBasedOnTextOptimized() {
   // 視覚的なちらつきを防ぐ
   mainContainer.style.visibility = 'hidden';
   
-  const slotContainers = document.querySelectorAll('.slot-container');
+  // 🎯 親スロットとサブスロットの両方を対象にする
+  const slotContainers = document.querySelectorAll('.slot-container, .subslot-container');
   const measurements = []; // 測定結果をバッチ処理
   
   // Step 1: 全ての測定を一括実行（DOM操作を最小化）
@@ -3313,9 +3314,14 @@ function adjustSlotWidthsBasedOnTextOptimized() {
       targetWidth = maxTextWidth + 80; // より長いテキストには追加の余白
     }
     
-    // 最大幅制限（画面幅の80%程度まで）
-    const maxWidth = Math.min(800, window.innerWidth * 0.8);
-    targetWidth = Math.min(targetWidth, maxWidth);
+    // 🎯 サブスロットの場合はnowrapのため最大幅制限をなくす
+    const isSubslotContainer = container.classList.contains('subslot-container');
+    if (!isSubslotContainer) {
+      // 親スロットの場合のみ最大幅制限（画面幅の80%程度まで）
+      const maxWidth = Math.min(800, window.innerWidth * 0.8);
+      targetWidth = Math.min(targetWidth, maxWidth);
+    }
+    // サブスロットはnowrapでテキスト幅に完全追従するため制限しない
     
     // 測定結果を保存（まだ適用しない）
     measurements.push({

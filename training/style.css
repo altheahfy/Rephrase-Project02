@@ -870,13 +870,13 @@ h1 {
 .slot-wrapper[id$="-sub"] .subslot-container {
   display: inline-grid !important; /* 横並びのためinline-grid使用 */
   vertical-align: top; /* 上揃え */
-  white-space: normal; /* コンテナ内部は通常のテキストフロー */
-  min-width: 250px !important; /* 最小幅を強制設定 */
-  width: 250px !important; /* 固定幅設定を強制 */
-  max-width: 250px !important; /* 最大幅も固定 */
+  white-space: nowrap; /* 🎯 コンテナ内テキストを1行に（改行禁止） */
+  min-width: fit-content; /* 🎯 テキスト幅に応じた最小幅 */
+  width: auto; /* 🎯 自動幅（テキスト長に応じて調整） */
+  max-width: none; /* 🎯 最大幅制限なし */
   flex-shrink: 0 !important; /* 縮小を防止 */
   flex-grow: 0 !important; /* 拡大を防止 */
-  flex-basis: 250px !important; /* フレックスベースを固定 */
+  flex-basis: auto; /* 🎯 フレックスベースを自動に */
   background-color: rgba(0, 255, 0, 0.1) !important; /* デバッグ用：薄い緑背景 */
   border: 2px solid green !important; /* デバッグ用：緑の境界線 */
 }
@@ -1375,9 +1375,9 @@ h1 {
 /* 🎯 サブスロチE��専用の4行CSS GridレイアウチE*/
 .subslot-container {
   /* CSS Gridで4行固定レイアウトを実裁E��詳細・ランダマイズボタンなし！E*/
-  display: grid;
-  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px ↁE180px にさらに拡大 */
-  grid-template-columns: 1fr;
+  display: grid !important;
+  grid-template-rows: 30px 180px 20px 25px !important; /* 画像行を120px ↁE180px にさらに拡大 */
+  grid-template-columns: minmax(120px, max-content) !important; /* 🎯 テキスト幅に応じて自動拡張 */
   gap: 4px; /* 行間の固定間隁E*/
   align-items: center; /* 吁E��ル冁E��の中央揁E�� */
   justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
@@ -1390,10 +1390,10 @@ h1 {
   margin: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
   margin-left: -1px; /* 🎯 Phase 1: 隣接する境界線を重ねる */
   
-  /* 動的幁E��整シスチE�� */
-  min-width: 120px; /* 最小幁E*/
-  width: auto; /* 自動幁E��整 */
-  max-width: 400px; /* 最大幁E*/
+  /* 動的幁E��整シスチE�� - 🎯 max-widthを削除してテキスト幅に応じて拡張 */
+  min-width: 120px !important; /* 最小幁E*/
+  width: fit-content !important; /* 🎯 テキスト幅に応じた幅 */
+  max-width: none !important; /* 🎯 最大幅制限を解除 */
   flex: 0 0 auto; /* flexアイチE��として自動サイズ */
   
   /* アニメーション */
@@ -1465,14 +1465,17 @@ h1 {
   font-weight: 600;
   color: #222;
   text-align: center;
-  width: 100%; /* 🎯 Phase 2修正: スロット内100% */
+  width: max-content !important; /* 🎯 テキスト幅に応じた幅（強制） */
+  min-width: auto !important; /* 🎯 最小幅を自動に */
   margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 2px;
+  padding: 2px 8px; /* 左右パディング追加 */
   line-height: 1.2;
+  white-space: nowrap !important; /* 🎯 テキストを1行で表示（改行禁止・強制） */
+  overflow: visible !important; /* 🎯 はみ出しを許可 */
   
   /* 🎯 Phase 2修正: 背景透明（slot-wrapperの黄色い帯が見える） */
   background: transparent;
