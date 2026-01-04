@@ -2245,4 +2245,6 @@ h1 {
 
 .upper-slot-toggle-btn {
   flex-shrink: 0;
+  position: relative; /* 🎯 z-indexを有効にするためposition必須 */
+  z-index: 1001 !important; /* 🎯 黄色い帯(999)・英語テキスト(1000)より手前 */
 }
