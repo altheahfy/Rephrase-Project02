@@ -787,7 +787,8 @@ function syncDynamicToStatic() {
       phraseElement.textContent = item.SlotPhrase || "";
       
       // 🎯 サブスロットの幅をテキスト長に応じて調整（複数画像と同じ方式）
-      if (item.SlotPhrase && slotElement.classList.contains('subslot-container')) {
+      // サブスロットはIDに'-sub-'を含む（クラスはslot-container）
+      if (item.SlotPhrase && slotElement.id && slotElement.id.includes('-sub-')) {
         const tempSpan = document.createElement('span');
         tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;';
         tempSpan.textContent = item.SlotPhrase;
@@ -2115,6 +2116,24 @@ function syncSubslotsFromJson(data) {
         }
       } catch (error) {
         console.warn('localStorage設定適用エラー:', error);
+      }
+      
+      // 🎯 サブスロットの幅をテキスト長に応じて調整（新規生成時）
+      // サブスロットはIDに'-sub-'を含む（クラスはslot-container）
+      if (item.SubslotElement && slotElement.id && slotElement.id.includes('-sub-')) {
+        const tempSpan = document.createElement('span');
+        tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;';
+        tempSpan.textContent = item.SubslotElement;
+        document.body.appendChild(tempSpan);
+        const textWidth = tempSpan.offsetWidth;
+        document.body.removeChild(tempSpan);
+        
+        // テキスト幅 + パディングで最小幅を設定（最小120px）
+        // ボタン（32px）+ gap（4px）+ 左右パディング（30px）= 約70px追加
+        const requiredWidth = Math.max(120, textWidth + 80);
+        slotElement.style.width = requiredWidth + 'px';
+        slotElement.style.minWidth = requiredWidth + 'px';
+        console.log(`📏 サブスロット幅調整（新規生成）: ${fullSlotId} → ${requiredWidth}px (テキスト: "${item.SubslotElement}")`);
       }
       
       console.log(`✅ サブスロット完全生成（ラベル付き）: ${fullSlotId} | label:"${subslotId.toUpperCase()}" | phrase:"${item.SubslotElement}" | text:"${item.SubslotText}"`);

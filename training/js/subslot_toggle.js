@@ -1,3 +1,46 @@
+/**
+ * 🎯 サブスロット専用の幅調整関数
+ * 展開されたサブスロット内の各サブスロットコンテナの幅をテキスト長に応じて調整
+ */
+function adjustSubslotWidths(slotId) {
+  console.log(`📏 ${slotId} サブスロットの幅調整を開始`);
+  
+  const subslotWrapper = document.getElementById(`slot-${slotId}-sub`);
+  if (!subslotWrapper) {
+    console.warn(`⚠ サブスロットラッパーが見つかりません: slot-${slotId}-sub`);
+    return;
+  }
+  
+  // サブスロット内の各スロットコンテナ（クラスはslot-container、IDに-sub-を含む）
+  const subslotContainers = subslotWrapper.querySelectorAll('.slot-container');
+  console.log(`📏 検出されたサブスロットコンテナ: ${subslotContainers.length}個`);
+  
+  subslotContainers.forEach(container => {
+    const phraseElement = container.querySelector('.slot-phrase');
+    if (!phraseElement) return;
+    
+    const text = phraseElement.textContent.trim();
+    if (!text) return;
+    
+    // テキスト幅を測定
+    const tempSpan = document.createElement('span');
+    tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;';
+    tempSpan.textContent = text;
+    document.body.appendChild(tempSpan);
+    const textWidth = tempSpan.offsetWidth;
+    document.body.removeChild(tempSpan);
+    
+    // ボタン（32px）+ gap（4px）+ 左右パディング（30px）= 約70px追加
+    const requiredWidth = Math.max(120, textWidth + 80);
+    container.style.width = requiredWidth + 'px';
+    container.style.minWidth = requiredWidth + 'px';
+    
+    console.log(`📏 サブスロット幅調整: ${container.id} → ${requiredWidth}px (テキスト: "${text}")`);
+  });
+  
+  console.log(`✅ ${slotId} サブスロットの幅調整完了`);
+}
+
 function toggleExclusiveSubslot(slotId) {
   if (toggleExclusiveSubslot.lock) return;
   toggleExclusiveSubslot.lock = true;
@@ -180,10 +223,7 @@ function toggleExclusiveSubslot(slotId) {
               applyTabConnection(slotId, true);
               
               // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
-              if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
-                console.log(`📏 ${slotId} サブスロットのテキスト幅調整を実行`);
-                window.adjustSlotWidthsBasedOnText();
-              }
+              adjustSubslotWidths(slotId);
             }, 150); // 50ms → 150msに延長（初回実行時の安定性向上）
           }
         }, 100);
@@ -195,10 +235,7 @@ function toggleExclusiveSubslot(slotId) {
         applyTabConnection(slotId, true);
         
         // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
-        if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
-          console.log(`📏 ${slotId} サブスロットのテキスト幅調整を実行`);
-          window.adjustSlotWidthsBasedOnText();
-        }
+        adjustSubslotWidths(slotId);
       }, 300); // 50ms → 300msに延長（初回実行時の安定性向上）
     }
 

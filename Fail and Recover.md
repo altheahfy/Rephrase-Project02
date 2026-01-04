@@ -2322,3 +2322,70 @@ slot.style.minWidth = '';  //  追加
 - 発生日時: 2026-01-04
 - 解決日時: 2026-01-04
 - 所要時間: 約20分
+
+---
+
+## [2026-01-04] サブスロット英語テキストの2行折り返し問題（最終解決）
+
+### 発生した問題
+- サブスロット内の英語テキスト（例: "the engineer who", "much hesitation"）が2行に折り返されて表示される
+- sub-s, sub-o1など複数のサブスロットで発生
+- JS側で幅調整コードを追加しても効果なし
+
+### 試したが効果が限定的だったアプローチ
+1. **JS幅調整コード追加（insert_test_data_clean.js）** - 幅は設定されるがテキストは2行のまま
+2. **universal_image_system.jsでのテキスト幅計測追加** - 幅は設定されるが効果なし
+3. **subslot_toggle.jsにadjustSubslotWidths()関数追加** - 効果限定的
+4. **クラス名の修正（subslot-container  slot-container）** - 効果なし
+
+### Root Cause（根本原因）
+**phraseElementの幅が0pxだった**
+
+DevToolsで確認：
+\\\javascript
+const el = document.querySelector('[id*="sub-o1"] .slot-phrase');
+console.log('phraseElement幅:', el?.offsetWidth);
+// 結果: phraseElement幅: 0 px
+\\\
+
+サブスロットの.subslot-phrase-rowがflexコンテナで、子要素の.slot-phraseが`flex-shrink`により縮小されていた。スロットコンテナに幅を設定しても、内部のphraseElement自体が縮小されるため、テキストが折り返された。
+
+### Solution（解決策）
+**CSSで直接phraseElementのスタイルを制御**（training/style.css）
+
+\\\css
+/* サブスロット内の英語テキスト行：テキストが折り返さないようにする */
+.slot-wrapper[id\$="-sub"] .subslot-phrase-row {
+  flex-wrap: nowrap !important;
+  min-width: max-content !important;
+}
+
+/* サブスロット内の英語テキスト：1行表示を強制 */
+.slot-wrapper[id\$="-sub"] .slot-phrase {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+  width: auto !important;
+}
+\\\
+
+### Design Rationale（設計上の理由）
+1. **CSS優先**: JSでの複雑な幅計算より、CSSで直接制御する方がシンプルで確実
+2. **flex-shrink: 0**: 親コンテナがflexでも子要素が縮小されないようにする
+3. **min-width: max-content**: コンテンツに必要な最小幅を確保
+4. **white-space: nowrap**: 折り返しを禁止
+
+### 教訓
+1. **問題の本質を見極める**: スロット幅ではなく、内部のphraseElement幅が0pxだった
+2. **DevToolsで実際の値を確認**: console.logでoffsetWidthを確認して問題箇所を特定
+3. **flexレイアウトの理解**: flex-shrinkがデフォルトで1のため、子要素が縮小される
+4. **CSS vs JS**: 表示の問題はCSSで解決する方が確実な場合が多い
+
+### 関連する試行錯誤
+- JS側での幅調整コードは残っているが、CSSが主な解決策
+- universal_image_system.jsのテキスト幅計測は複数画像対応で引き続き有効
+
+### タイムスタンプ
+- 発生日時: 2026-01-04
+- 解決日時: 2026-01-04
+- 所要時間: 約2時間（多数のJSアプローチを試行後、CSSで解決）

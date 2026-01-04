@@ -1647,20 +1647,32 @@ function applyMultipleImagesToSubslot(subslotId, phraseText, forceRefresh = fals
   const maxImageWidth = 120; // 画像1枚の最大幅
   const gap = 6; // 画像間の隙間
   
-  // 現在のサブスロット幅を取得
-  const currentSubslotWidth = subslot.offsetWidth || 200;
+  // 🎯 テキスト幅を計測（2行折り返し防止）
+  const phraseElement = subslot.querySelector('.slot-phrase');
+  let textBasedWidth = 120; // デフォルト最小幅
+  if (phraseElement && phraseElement.textContent.trim()) {
+    const tempSpan = document.createElement('span');
+    tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;';
+    tempSpan.textContent = phraseElement.textContent.trim();
+    document.body.appendChild(tempSpan);
+    const textWidth = tempSpan.offsetWidth;
+    document.body.removeChild(tempSpan);
+    // ボタン（32px）+ gap（4px）+ 左右パディング（30px）= 約70px追加
+    textBasedWidth = Math.max(120, textWidth + 80);
+    console.log(`📏 サブスロットテキスト幅計測: "${phraseElement.textContent.trim()}" → ${textWidth}px + 80 = ${textBasedWidth}px`);
+  }
   
   // 複数画像に必要な幅を計算（上位スロットと同じロジック）
   const largerOptimalImageWidth = 120; // 上位スロットと同じ
   const requiredImageWidth = imageCount * largerOptimalImageWidth + (imageCount - 1) * gap + 60; // 余白込み
   
   // テキスト幅と画像幅の大きい方を採用
-  const finalSubslotWidth = Math.max(currentSubslotWidth, requiredImageWidth);
+  const finalSubslotWidth = Math.max(textBasedWidth, requiredImageWidth);
   
   // サブスロット幅を強制的に適用
   subslot.style.width = finalSubslotWidth + 'px';
   subslot.style.minWidth = finalSubslotWidth + 'px';
-  console.log(`📏 サブスロット幅設定: ${currentSubslotWidth}px → ${finalSubslotWidth}px (画像${imageCount}枚対応)`);
+  console.log(`📏 サブスロット幅設定: テキスト${textBasedWidth}px, 画像${requiredImageWidth}px → ${finalSubslotWidth}px (画像${imageCount}枚対応)`);
   
   // 画像幅を計算（拡張されたサブスロット幅を基準）
   const availableWidth = finalSubslotWidth - (imageCount - 1) * gap - 40; // padding等を考慮

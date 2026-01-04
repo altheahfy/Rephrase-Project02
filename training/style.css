@@ -662,6 +662,20 @@ h1 {
   box-sizing: border-box;
 }
 
+/* 🎯 サブスロット内の英語テキスト行：テキストが折り返さないようにする */
+.slot-wrapper[id$="-sub"] .subslot-phrase-row {
+  flex-wrap: nowrap !important;
+  min-width: max-content !important;
+}
+
+/* 🎯 サブスロット内の英語テキスト：1行表示を強制 */
+.slot-wrapper[id$="-sub"] .slot-phrase {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+  width: auto !important;
+}
+
 /* 🎯 サブスロット展開時：親スロットを下に延長してタブ感を演出 */
 .active-parent-slot {
   position: relative;
@@ -1330,6 +1344,8 @@ h1 {
 /* 疑問詞英語テキスト - Grid位置 */
 #display-top-question-word .question-word-text {
   grid-row: 4;
+  position: relative; /* z-indexを有効化 */
+  z-index: 1000; /* 黄色い帯(999)より前面に表示 */
   font-size: 20px; /* 適度なサイズに調整 */
   font-weight: 600; /* スロットの英語テキストと同じ重み */
   color: #222;
@@ -1344,11 +1360,10 @@ h1 {
   line-height: 1.2; /* スロットの英語テキストと同じ行高 */
   
   /* 🎨 新しいデザインシステムに統一 - 例文テキストエリア */
-  background: #FFF9C4;
-  border: var(--border-medium);
-  border-color: #FBC02D;
+  background: transparent; /* 黄色帯を透過させるため透明に */
+  border: none; /* 枠線を削除 */
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none; /* 影を削除 */
   
   /* 長いテキスト対応 */
   word-wrap: break-word;
@@ -1360,6 +1375,8 @@ h1 {
 /* 疑問詞�Eタンプレースホルダー - Grid衁E,6�E�空のスペ�Eス�E�E*/
 #display-top-question-word .question-word-button-placeholder {
   display: block;
+  position: relative; /* z-indexを有効化 */
+  z-index: 1000; /* 黄色い帯(999)より前面に表示 */
   width: 100%;
   height: 100%;
 }
@@ -1370,6 +1387,13 @@ h1 {
 
 #display-top-question-word .question-word-button-placeholder:nth-of-type(6) {
   grid-row: 6;
+}
+
+/* 英語テキスト行とボタンコンテナを帯の前面に */
+#display-top-question-word .question-word-text-row,
+#display-top-question-word .text-toggle-container {
+  position: relative;
+  z-index: 1000; /* 黄色い帯(999)より前面 */
 }
 
 /* 🎯 サブスロチE��専用の4行CSS GridレイアウチE*/
