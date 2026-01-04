@@ -604,9 +604,9 @@ h1 {
   
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
-  border: var(--border-light); /* 新しいカラーシステムの境界線 */
+  border: 1px solid #d0d0d0; /* 🎯 Phase 2修正: 薄い境界線でSVOC構造を見える化 */
   border-radius: 0; /* 🎯 Phase 1: 角丸を削除してスロットをくっつける */
-  background: linear-gradient(180deg, #e8f5e8 0%, #c8e6c8 50%, #a5d6a5 100%); /* � 薄い緑の縦グラデーション */
+  background: linear-gradient(180deg, #e8f5e8 0%, #c8e6c8 50%, #a5d6a5 100%); /* 薄い緑の縦グラデーション */
   box-shadow: none; /* 🎯 Phase 1: シャドウを削除してスロットをくっつける */
   padding: 15px; /* パディングも拡大 */
   margin: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
@@ -639,7 +639,7 @@ h1 {
   
   /* order属性への対応を追加 */
   order: 0; /* デフォルト値 */
-  border: var(--border-light); /* 新しいカラーシステムの境界線 */
+  border: 1px solid #d0d0d0; /* 🎯 薄い境界線でSVOC構造を見える化 */
   border-radius: 0; /* 🎯 Phase 1: 角丸を削除してスロットをくっつける */
   background: linear-gradient(180deg, #e8f5e8 0%, #c8e6c8 50%, #a5d6a5 100%); /* 薄い緑の縦グラデーション */
   box-shadow: none; /* 🎯 Phase 1: シャドウを削除してスロットをくっつける */
@@ -752,13 +752,13 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 100%; /* 🎯 Phase 2修正: スロット内100% */
+  margin: 0;
   height: 100%; /* セル高さを完�Eに使用 */
   font-size: 16px; /* �E フォントサイズを調整 */
   font-weight: 600;
   color: #222;
   text-align: center;
-  margin: 0;
   padding: 2px; /* �E パディングを追加 */
   line-height: 1.2;
   
@@ -768,12 +768,13 @@ h1 {
   hyphens: auto;
   white-space: normal; /* 改行を許可 */
   
-  /* 例文テキストエリアを明確にする新デザイン */
-  background: #FFF9C4;
-  border: var(--border-medium);
-  border-color: #FBC02D;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
+  /* 🎯 Phase 2修正: 背景透明（slot-wrapperの黄色い帯が見える） */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  z-index: 1000; /* テキストを全要素の最前面に */
 }
 
 /* スロチE��頁E��制御用 - JS側でdata-order属性を設定した場合�E優先度 */
@@ -807,6 +808,20 @@ h1 {
   width: 100%; /* 親要素の幅いっぱいに */
   min-height: 350px; /* 最小高さを確保 */
   white-space: nowrap; /* 子要素の改行を防ぐ */
+  position: relative; /* 🎯 Phase 2: 疑似要素の基準位置 */
+}
+
+/* 🎯 Phase 2: 親スロット用の黄色い帯 */
+.slot-wrapper::before {
+  content: '';
+  position: absolute; /* 🎯 slot-wrapper基準の相対位置に戻す */
+  left: -100vw; /* 🎯 左にウインドウ幅分伸ばす */
+  right: -100vw; /* 🎯 右にウインドウ幅分伸ばす */
+  top: 275px; /* 🎯 位置微調整 */
+  height: 30px; /* slot-phraseの高さ */
+  background: #FFF9C4;
+  z-index: 999; /* 🎯 全要素より前、英語テキスト(z-index:1000)より後ろ */
+  pointer-events: none; /* クリックを透過させる */
 }
 
 /* スロットコンテナの幅を内容に応じて可変、ただし縮小は防ぐ */
@@ -831,6 +846,20 @@ h1 {
   box-sizing: border-box; /* ボーダーとパディングを含める */
   background-color: rgba(255, 0, 0, 0.1) !important; /* デバッグ用：薄い赤背景 */
   border: 2px solid red !important; /* デバッグ用：赤い境界線 */
+  position: relative; /* 🎯 Phase 2: 擬似要素の基準位置 */
+}
+
+/* 🎯 Phase 2: サブスロット用の黄色い帯 */
+.slot-wrapper[id$="-sub"]::before {
+  content: '';
+  position: fixed; /* 🎯 ウインドウ全幅にするためfixed */
+  left: 0;
+  right: 0;
+  top: 247px; /* サブスロット用位置調整：30px(ID) + 180px(画像) + 20px(日本語) + 4px(gap) + 10px(padding) + 3px */
+  height: 25px; /* サブslot-phraseの高さ */
+  background: #FFF9C4;
+  z-index: 0; /* 🎯 スロットより後ろ、テキストより前 */
+  pointer-events: none;
 }
 
 .slot-wrapper[id$="-sub"]:active {
@@ -908,6 +937,7 @@ h1 {
   align-items: flex-start;
   justify-content: flex-start; /* 左揁E�� */
   gap: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
+  position: relative; /* 🎯 Phase 2: 擬似要素の基準位置 */
   
   /* 🔍 ズーム対応：横スクロール無効化 */
   overflow-x: visible; /* 横スクロールを無効化してズーム対応 */
@@ -1353,9 +1383,12 @@ h1 {
   justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
   
   /* スタイリング */
-  border: 1px solid #eee; /* 墁E��線を追加 */
+  border: 1px solid #d0d0d0; /* 🎯 薄い境界線でSVOC構造を見える化 */
+  border-radius: 0; /* 🎯 Phase 1: 角丸を削除してスロットをくっつける */
+  box-shadow: none; /* 🎯 Phase 1: シャドウを削除してスロットをくっつける */
   padding: 10px;
-  margin: 4px;
+  margin: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
+  margin-left: -1px; /* 🎯 Phase 1: 隣接する境界線を重ねる */
   
   /* 動的幁E��整シスチE�� */
   min-width: 120px; /* 最小幁E*/
@@ -1432,19 +1465,22 @@ h1 {
   font-weight: 600;
   color: #222;
   text-align: center;
-  width: 100%;
+  width: 100%; /* 🎯 Phase 2修正: スロット内100% */
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  margin: 0;
-  padding: 0;
+  padding: 2px;
   line-height: 1.2;
   
-  /* 上位スロチE��と同じオレンジ背景・上下緁E*/
-  background-color: #ffd6a5;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
+  /* 🎯 Phase 2修正: 背景透明（slot-wrapperの黄色い帯が見える） */
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  z-index: 2; /* テキストを黄色い帯の上に */
 }
 
 /* =================================================================== */
@@ -1689,6 +1725,7 @@ h1 {
 .slot-wrapper {
   transition: transform 0.3s ease;
   transform-origin: top left;
+  position: relative; /* 🎯 Phase 2: 擬似要素の基準位置 */
   /* ズーム時の幅制限を撤去してブラウザ幅に適応 */
   max-width: none;
   width: 100%;
