@@ -1936,7 +1936,7 @@ function syncSubslotsFromJson(data) {
       auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
       auxTextToggleButton.title = '日本語補助表示切替';
       auxTextToggleButton.style.cssText = `
-        background: #2196F3;
+        background: #4CAF50;
         color: white;
         border: none;
         border-radius: 3px;
@@ -1979,7 +1979,7 @@ function syncSubslotsFromJson(data) {
             textElement.style.visibility = 'visible';
           }
           auxTextToggleButton.innerHTML = 'ヒント<br> OFF';
-          auxTextToggleButton.style.backgroundColor = '#2196F3';
+          auxTextToggleButton.style.backgroundColor = '#4CAF50';
           auxTextToggleButton.title = '日本語補助を非表示';
           console.log(`✅ ${fullSlotId}: 日本語補助を表示`);
         } else {

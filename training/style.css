@@ -123,12 +123,12 @@ body {
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   
-  /* 🌅 空のような穏やかなブルーグラデーション */
+  /* � 少し濃いめの青グラデーション（展開時の水色と差別化） */
   background: linear-gradient(135deg, 
-    #e0f2fe 0%,     /* 空色の白に近い薄いブルー */
-    #b3e5fc 25%,    /* ライトスカイブルー */
-    #81d4fa 75%,    /* ソフトブルー */
-    #4fc3f7 100%    /* 優しいスカイブルー */
+    #b3d9f5 0%,     /* 濃いめの空色 */
+    #8ec8ed 25%,    /* ミディアムスカイブルー */
+    #64b5f6 75%,    /* しっかりしたブルー */
+    #42a5f5 100%    /* 濃いスカイブルー */
   );
   background-attachment: fixed; /* スクロール時も背景固定 */
   
@@ -1509,15 +1509,15 @@ h1 {
 
 /* 展開中の上位スロット（親）の基本スタイル */
 .slot-container.active-parent-slot {
-  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 さらに濃い黄色背景 */
-  border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
+  background: rgba(200, 230, 250, 0.95) !important; /* 💧 水色背景（展開中を明確化） */
+  border: 2px solid #4FC3F7 !important; /* 💧 水色系境界線 */
   border-bottom: none !important; /* 下部境界線を除去してサブスロットと連結 */
   border-radius: 8px 8px 0 0 !important; /* 上部のみ角丸 */
   position: relative !important;
   z-index: 3 !important; /* サブスロットエリアの上に表示 */
   margin-bottom: 0 !important; /* 下部マージンを除去 */
   transition: all 0.3s ease !important;
-  box-shadow: 0 -2px 8px rgba(245, 158, 11, 0.5) !important; /* 🌻 より濃い黄色系上部シャドウで浮遊感 */
+  box-shadow: 0 -2px 8px rgba(79, 195, 247, 0.5) !important; /* 💧 水色系上部シャドウで浮遊感 */
 }
 
 /* 🎨 親スロット用の拡張背景（包み込み効果） */
@@ -1538,8 +1538,8 @@ h1 {
 
 /* 展開中のサブスロットエリア全体のスタイル */
 .slot-wrapper.active-subslot-area {
-  background: rgba(254, 243, 199, 0.95) !important; /* 🌻 親と同じ濃い黄色背景 */
-  border: 2px solid #f59e0b !important; /* 🌻 黄色系境界線 */
+  background: rgba(200, 230, 250, 0.95) !important; /* 💧 親と同じ水色背景 */
+  border: 2px solid #4FC3F7 !important; /* 💧 水色系境界線 */
   border-top: none !important; /* 上部境界線を除去して親スロットと連結 */
   border-radius: 0 0 12px 12px !important; /* 下部のみ角丸 */
   position: relative !important;
@@ -1548,7 +1548,7 @@ h1 {
   z-index: 2 !important;
   transition: all 0.3s ease !important;
   box-shadow: 
-    0 -2px 4px rgba(245, 158, 11, 0.5),  /* 🌻 より濃い黄色系上向きの影で連結感を演出 */
+    0 -2px 4px rgba(79, 195, 247, 0.5),  /* 💧 水色系上向きの影で連結感を演出 */
     0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
