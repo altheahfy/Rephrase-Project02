@@ -2248,3 +2248,9 @@ h1 {
   position: relative; /* 🎯 z-indexを有効にするためposition必須 */
   z-index: 1001 !important; /* 🎯 黄色い帯(999)・英語テキスト(1000)より手前 */
 }
+
+/* 🎯 サブスロット個別英語OFFボタン */
+.subslot-toggle-btn {
+  position: relative; /* 🎯 z-indexを有効にするためposition必須 */
+  z-index: 1001 !important; /* 🎯 黄色い帯(999)・英語テキスト(1000)より手前 */
+}
