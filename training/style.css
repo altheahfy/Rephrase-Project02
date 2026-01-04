@@ -797,7 +797,7 @@ h1 {
 .slot-wrapper {
   display: flex;
   flex-wrap: nowrap !important; /* 折り返しを絶対に防ぐ */
-  gap: 16px;
+  gap: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
   margin-bottom: 16px;
   flex-direction: row; /* 横並びに変更 */
   overflow-x: auto; /* 横スクロール有効 */
