@@ -2233,3 +2233,92 @@ CSSã®è©³ç´°åº¦ãŒåŒã˜å ´åˆã€**å¾Œã‹ã‚‰å®šç¾©ã•ã‚ŒãŸãƒ«ãƒ¼ãƒ«ãŒå„ªå…ˆã•
 - è§£æ±ºæ—¥æ™‚: 2026-01-04ï¼ˆã‚³ãƒŸãƒƒãƒˆ af1c8439ï¼‰
 - æ‰€è¦æ™‚é–“: ä¸æ˜Žï¼ˆãƒãƒ£ãƒƒãƒˆå±¥æ­´æ¶ˆå¤±ã®ãŸã‚è©³ç´°ä¸æ˜Žï¼‰
 
+
+---
+
+## [2026-01-04] ƒTƒuƒXƒƒbƒg‚Ì‰pŒêƒeƒLƒXƒg‚ª2s‚ÉÜ‚è•Ô‚³‚ê‚é–â‘è
+
+### ”­¶‚µ‚½–â‘è
+- ƒTƒuƒXƒƒbƒg“à‚Ì‰pŒêƒeƒLƒXƒgi—á: "the teacher who", "the manager who"j‚ª2s‚ÉÜ‚è•Ô‚³‚ê‚Ä•\Ž¦‚³‚ê‚é
+- ƒCƒ‰ƒXƒg‚ª2–‡‚ÌŽž‚ÍƒXƒƒbƒg•‚ª³í‚ÉL‚ª‚é‚ªAƒeƒLƒXƒg‚Ì‚Ý‚Ìê‡‚Í•‚ªL‚ª‚ç‚È‚¢
+- CSS‚Å`white-space: nowrap`‚ðÝ’è‚µ‚Ä‚àŒø‰Ê‚ª‚È‚©‚Á‚½
+
+### ŽŽ‚µ‚½‚ªŒø‰Ê‚ª‚È‚©‚Á‚½ƒAƒvƒ[ƒ`
+1. **CSS `!important`‚Ì’Ç‰Á** - Œø‰Ê‚È‚µ
+2. **CSS `width: fit-content`** - Œø‰Ê‚È‚µ
+3. **CSS `max-width: none`** - Œø‰Ê‚È‚µ
+4. **`grid-template-columns: minmax(120px, max-content)`** - Œø‰Ê‚È‚µ
+
+### Root Causeiª–{Œ´ˆöj
+**JS‚É‚æ‚éƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹Ý’è‚ªCSS‚ðã‘‚«‚µ‚Ä‚¢‚½**
+
+`adjustSlotWidthsBasedOnTextOptimized()`ŠÖ”‚ª`.slot-container`‚Æ`.subslot-container`‚Ì—¼•û‚ð‘ÎÛ‚É‚µ‚Ä‚¨‚èAƒTƒuƒXƒƒbƒg‚É‚àŒÅ’è•‚ðƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‚ÅÝ’è‚µ‚Ä‚¢‚½B
+
+ƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹istyle‘®«j‚ÍCSSƒtƒ@ƒCƒ‹‚ÌÝ’è‚æ‚è—Dæ“x‚ª‚‚¢‚½‚ßA`!important`‚ð•t‚¯‚Ä‚àJS‚ÌÝ’è‚ªŸ‚Á‚Ä‚¢‚½B
+
+### Solutioni‰ðŒˆôj
+**•¡”‰æ‘œ‚Ì•’²®‚Æ“¯‚¶•ûŽ®‚ðÌ—p**: ƒTƒuƒXƒƒbƒg‚ÖƒeƒLƒXƒg‘‚«ž‚ÝŽž‚ÉƒeƒLƒXƒg•‚ðŒv‘ª‚µAƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‚Å’¼ÚÝ’è
+
+#### ŽÀ‘•1: ƒTƒuƒXƒƒbƒg‚ð”Ä—p•’²®‚©‚çœŠOiinsert_test_data_clean.jsj
+- •ÏX‘O: `document.querySelectorAll('.slot-container, .subslot-container')`
+- •ÏXŒã: `document.querySelectorAll('.slot-container')`
+
+#### ŽÀ‘•2: ƒTƒuƒXƒƒbƒgê—p‚Ì•’²®‚ð’Ç‰Áiinsert_test_data_clean.jsj
+ƒTƒuƒXƒƒbƒg‚Ö‚ÌƒeƒLƒXƒg‘‚«ž‚ÝŽž‚ÉAƒeƒLƒXƒg•‚ðŒv‘ª‚µ‚ÄƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‚ÅÝ’è
+
+### Design RationaleiÝŒvã‚Ì——R¡Œã‚Ì•ûjj
+1. **Šù‘¶‚Ì¬Œ÷ƒpƒ^[ƒ“‚ð“¥P**: •¡”‰æ‘œ‚Ì•’²®‚ª³í“®ì‚µ‚Ä‚¢‚½‚Ì‚ÅA“¯‚¶•ûŽ®‚ðÌ—p
+2. **Ó–±‚Ì•ª—£**: eƒXƒƒbƒg‚Í”Ä—pŠÖ”‚ÅAƒTƒuƒXƒƒbƒg‚ÍƒeƒLƒXƒg‘‚«ž‚ÝŽž‚ÉŒÂ•Ê’²®
+3. **CSS vs JS**: ƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‚ªÅ—Dæ‚³‚ê‚éŽd—l‚ð‹t‚ÉŠˆ—p
+4. **`!important`‚Ì‰ñ”ð**: ——p‚Í•ÛŽç«‚ð‰º‚°‚é‚½‚ß”ð‚¯‚½
+
+### ¸“x‰ü‘P
+- **‘O**: "the teacher who"‚ª2s•\Ž¦
+- **Œã**: 1s•\Ž¦AƒXƒƒbƒg•‚àƒeƒLƒXƒg’·‚É‰ž‚¶‚ÄŽ©‘R‚É’²®
+
+### ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+- ”­¶“úŽž: 2026-01-04
+- ‰ðŒˆ“úŽž: 2026-01-04
+- Š—vŽžŠÔ: –ñ1ŽžŠÔi‘½”‚ÌCSSŽŽsöŒë‚ðŒo‚ÄAJSƒAƒvƒ[ƒ`‚Å‰ðŒˆj
+
+---
+
+## [2026-01-04] •¡”‰æ‘œ‚ÅL‚ª‚Á‚½ƒXƒƒbƒg•‚ªƒTƒuƒXƒƒbƒgŽ‚¿—á•¶‚Å–ß‚ç‚È‚¢–â‘è
+
+### ”­¶‚µ‚½–â‘è
+- •¡”‰æ‘œ•\Ž¦‚ÅƒXƒƒbƒg•‚ªL‚ª‚éi³í“®ìj
+- ƒTƒuƒXƒƒbƒgŽ‚¿‚Ì—á•¶ieƒXƒƒbƒg‚ÉƒeƒLƒXƒg‚È‚µj‚Éƒ‰ƒ“ƒ_ƒ}ƒCƒY‚·‚é‚ÆAL‚ª‚Á‚½•‚ª‚»‚Ì‚Ü‚ÜŽc‚é
+- Ä‚Ñ‰pŒêƒeƒLƒXƒg‚ ‚è‚Ì—á•¶‚É•Ï‚í‚é‚Æ•‚ª³‚µ‚­–ß‚é
+
+### Root Causeiª–{Œ´ˆöj
+**minWidth‚ÌƒŠƒZƒbƒg˜R‚ê**
+
+`universal_image_system.js`‚Ì‰æ‘œXVˆ—‚ÅAƒeƒLƒXƒg‚ª‹ó‚Ìê‡‚ÌƒŠƒZƒbƒgˆ—‚É‚¨‚¢‚ÄF
+- `width`‚Æ`maxWidth`‚ÍƒŠƒZƒbƒg‚µ‚Ä‚¢‚½ 
+- `minWidth`‚ðƒŠƒZƒbƒg‚µ‚Ä‚¢‚È‚©‚Á‚½ 
+
+`minWidth`‚ª‘O‚Ì•¡”‰æ‘œ—p‚Ì’li—á: 308pxj‚Ì‚Ü‚ÜŽc‚Á‚Ä‚¢‚½‚½‚ßA•‚ªk‚Ü‚ç‚È‚©‚Á‚½B
+
+### Solutioni‰ðŒˆôj
+`universal_image_system.js` Line 1170•t‹ß‚É`minWidth`ƒŠƒZƒbƒg‚ð’Ç‰ÁF
+
+\\\javascript
+// ƒXƒƒbƒg‘S‘Ì‚Ì‰¡•‚ðƒŠƒZƒbƒgiminWidth‚àŠÜ‚ß‚ÄŠ®‘SƒŠƒZƒbƒgj
+slot.style.maxWidth = '';
+slot.style.width = '';
+slot.style.minWidth = '';  //  ’Ç‰Á
+\\\
+
+### Design RationaleiÝŒvã‚Ì——Rj
+1. **3‚Â‚Ì•ƒvƒƒpƒeƒB‚ÌŠ®‘SƒŠƒZƒbƒg**: width, minWidth, maxWidth‚Íí‚ÉƒZƒbƒg‚Åˆµ‚¤
+2. **ƒeƒLƒXƒg—L–³‚É‚æ‚é•ªŠò**: ƒeƒLƒXƒg‚ ‚è‚Í•ŒvŽZAƒeƒLƒXƒg‚È‚µ‚ÍŠ®‘SƒŠƒZƒbƒg
+3. **CSS‚Ö‚Ì§ŒäˆÚ÷**: ƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‚ð‹ó‚É‚·‚é‚±‚Æ‚ÅACSS‚ÌƒfƒtƒHƒ‹ƒg’l‚ª“K—p‚³‚ê‚é
+
+### ‹³ŒP
+- •ŠÖ˜A‚ÌƒCƒ“ƒ‰ƒCƒ“ƒXƒ^ƒCƒ‹‘€ì‚Í`width`, `minWidth`, `maxWidth`‚Ì3‚Â‚ðí‚ÉƒZƒbƒg‚Ål‚¦‚é
+- uÝ’èv‚ÆuƒŠƒZƒbƒgv‚Å‘ÎÛƒvƒƒpƒeƒB‚ªˆê’v‚µ‚Ä‚¢‚é‚©Šm”F‚·‚é
+
+### ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv
+- ”­¶“úŽž: 2026-01-04
+- ‰ðŒˆ“úŽž: 2026-01-04
+- Š—vŽžŠÔ: –ñ20•ª

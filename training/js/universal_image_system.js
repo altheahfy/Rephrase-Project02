@@ -514,10 +514,16 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // 複数画像コンテナのみクリア（幅は保持）
-    let existingContainer = slot.querySelector('.multi-image-container');
-    if (existingContainer) {
-      existingContainer.remove();
+    // 🎯 スロット幅を完全リセット（複数画像拡張幅をクリア）
+    slot.style.width = '';
+    slot.style.minWidth = '';
+    slot.style.maxWidth = '';
+    
+    // テキスト長による幅調整システムを再実行
+    if (typeof window.adjustSlotWidthsBasedOnText === 'function') {
+      setTimeout(() => {
+        window.adjustSlotWidthsBasedOnText();
+      }, 50);
     }
     
     // 単一画像にplaceholder.pngを設定（空テキスト処理）
@@ -546,7 +552,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット幅をテキストベースの幅に戻す（画像拡張幅をクリア）
+    // 🎯 スロット幅を完全リセット（複数画像拡張幅をクリア）
+    slot.style.width = '';
+    slot.style.minWidth = '';
     slot.style.maxWidth = '';
     
     // テキスト長による幅調整システムを再実行して適切な幅を設定
@@ -578,7 +586,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット幅をテキストベースの幅に戻す（画像拡張幅をクリア）
+    // 🎯 スロット幅を完全リセット（複数画像拡張幅をクリア）
+    slot.style.width = '';
+    slot.style.minWidth = '';
     slot.style.maxWidth = '';
     
     // テキスト長による幅調整システムを再実行して適切な幅を設定
@@ -654,9 +664,9 @@ function applyMultipleImagesToSlot(slotId, phraseText, forceRefresh = false) {
     // テキスト長による適切な幅を最初に確保
     let textBasedWidth = 200; // デフォルト最小幅
     
-    // テキスト内容から適切な幅を計算
-    const phraseElement = slot.querySelector('.slot-phrase');
-    const textElement = slot.querySelector('.slot-text');
+    // 🎯 :scope > で直接の子要素のみを取得（サブスロット内のテキストを除外）
+    const phraseElement = slot.querySelector(':scope > .slot-phrase');
+    const textElement = slot.querySelector(':scope > .slot-text');
     
     if (phraseElement || textElement) {
       const testText = (phraseElement ? phraseElement.textContent : '') + 
@@ -797,8 +807,9 @@ function clearMultiImageContainer(slotId) {
   
   // スロット幅を適切に調整（テキスト長システムとの協調）
   // 完全リセットではなく、テキスト長による最適幅を再計算
-  const phraseElement = slot.querySelector('.slot-phrase');
-  const textElement = slot.querySelector('.slot-text');
+  // 🎯 :scope > で直接の子要素のみを取得（サブスロット内のテキストを除外）
+  const phraseElement = slot.querySelector(':scope > .slot-phrase');
+  const textElement = slot.querySelector(':scope > .slot-text');
   
   if (phraseElement || textElement) {
     // テキスト内容から適切な幅を計算
@@ -1153,9 +1164,10 @@ function updateSlotImage(slotId, forceRefresh = false) {
       singleImg.style.opacity = '1';
     }
     
-    // スロット全体の横幅をリセット
+    // スロット全体の横幅をリセット（minWidthも含めて完全リセット）
     slot.style.maxWidth = '';
     slot.style.width = '';
+    slot.style.minWidth = '';
     
     // 従来の処理（insert_test_data_clean.jsのbutton.png制御等）に任せるため、ここで処理終了
     console.log('✅ 空テキスト時の複数画像クリア完了、従来処理に移行:', slotId);

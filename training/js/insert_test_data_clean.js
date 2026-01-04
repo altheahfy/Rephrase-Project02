@@ -786,6 +786,22 @@ function syncDynamicToStatic() {
       
       phraseElement.textContent = item.SlotPhrase || "";
       
+      // 🎯 サブスロットの幅をテキスト長に応じて調整（複数画像と同じ方式）
+      if (item.SlotPhrase && slotElement.classList.contains('subslot-container')) {
+        const tempSpan = document.createElement('span');
+        tempSpan.style.cssText = 'visibility:hidden;position:absolute;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;';
+        tempSpan.textContent = item.SlotPhrase;
+        document.body.appendChild(tempSpan);
+        const textWidth = tempSpan.offsetWidth;
+        document.body.removeChild(tempSpan);
+        
+        // テキスト幅 + パディングで最小幅を設定（最小120px）
+        const requiredWidth = Math.max(120, textWidth + 40);
+        slotElement.style.width = requiredWidth + 'px';
+        slotElement.style.minWidth = requiredWidth + 'px';
+        console.log(`📏 サブスロット幅調整: ${item.Slot} → ${requiredWidth}px (テキスト: "${item.SlotPhrase}")`);
+      }
+      
       if (!isTextVisible) {
         // 非表示設定の場合、透明化
         phraseElement.style.opacity = '0';
@@ -3258,8 +3274,15 @@ function adjustSlotWidthsBasedOnTextOptimized() {
   // 視覚的なちらつきを防ぐ
   mainContainer.style.visibility = 'hidden';
   
-  // 🎯 親スロットとサブスロットの両方を対象にする
-  const slotContainers = document.querySelectorAll('.slot-container, .subslot-container');
+  // 🎯 親スロットのみを対象にする（サブスロットはCSSのみで制御）
+  const slotContainers = document.querySelectorAll('.slot-container');
+  
+  // 🔄 既存のインラインスタイル幅をリセット（ランダマイズ時に前の値が残らないように）
+  slotContainers.forEach(container => {
+    container.style.width = '';
+    container.style.minWidth = '';
+    container.style.maxWidth = '';
+  });
   const measurements = []; // 測定結果をバッチ処理
   
   // Step 1: 全ての測定を一括実行（DOM操作を最小化）
@@ -3274,8 +3297,10 @@ function adjustSlotWidthsBasedOnTextOptimized() {
       return;
     }
     
-    const phraseElement = container.querySelector('.slot-phrase');
-    const textElement = container.querySelector('.slot-text');
+    // 🎯 親スロット直下の.slot-phraseのみを取得（サブスロット内のテキストを除外）
+    // :scope > で直接の子要素のみを選択
+    const phraseElement = container.querySelector(':scope > .slot-phrase');
+    const textElement = container.querySelector(':scope > .slot-text');
     
     if (!phraseElement && !textElement) return;
     
@@ -3314,14 +3339,9 @@ function adjustSlotWidthsBasedOnTextOptimized() {
       targetWidth = maxTextWidth + 80; // より長いテキストには追加の余白
     }
     
-    // 🎯 サブスロットの場合はnowrapのため最大幅制限をなくす
-    const isSubslotContainer = container.classList.contains('subslot-container');
-    if (!isSubslotContainer) {
-      // 親スロットの場合のみ最大幅制限（画面幅の80%程度まで）
-      const maxWidth = Math.min(800, window.innerWidth * 0.8);
-      targetWidth = Math.min(targetWidth, maxWidth);
-    }
-    // サブスロットはnowrapでテキスト幅に完全追従するため制限しない
+    // 最大幅制限（画面幅の80%程度まで）
+    const maxWidth = Math.min(800, window.innerWidth * 0.8);
+    targetWidth = Math.min(targetWidth, maxWidth);
     
     // 測定結果を保存（まだ適用しない）
     measurements.push({

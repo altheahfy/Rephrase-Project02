@@ -1375,9 +1375,9 @@ h1 {
 /* 🎯 サブスロチE��専用の4行CSS GridレイアウチE*/
 .subslot-container {
   /* CSS Gridで4行固定レイアウトを実裁E��詳細・ランダマイズボタンなし！E*/
-  display: grid !important;
-  grid-template-rows: 30px 180px 20px 25px !important; /* 画像行を120px ↁE180px にさらに拡大 */
-  grid-template-columns: minmax(120px, max-content) !important; /* 🎯 テキスト幅に応じて自動拡張 */
+  display: grid;
+  grid-template-rows: 30px 180px 20px 25px; /* 画像行を120px ↁE180px にさらに拡大 */
+  grid-template-columns: minmax(120px, max-content); /* 🎯 テキスト幅に応じて自動拡張 */
   gap: 4px; /* 行間の固定間隁E*/
   align-items: center; /* 吁E��ル冁E��の中央揁E�� */
   justify-items: center; /* 吁E��ル冁E��の中央揁E�� */
@@ -1390,10 +1390,10 @@ h1 {
   margin: 0; /* 🎯 Phase 1: スロット間の隙間を0に */
   margin-left: -1px; /* 🎯 Phase 1: 隣接する境界線を重ねる */
   
-  /* 動的幁E��整シスチE�� - 🎯 max-widthを削除してテキスト幅に応じて拡張 */
-  min-width: 120px !important; /* 最小幁E*/
-  width: fit-content !important; /* 🎯 テキスト幅に応じた幅 */
-  max-width: none !important; /* 🎯 最大幅制限を解除 */
+  /* 動的幁E��整シスチE�� - 🎯 JSで幅調整しないのでCSSのみで制御 */
+  min-width: 120px; /* 最小幁E*/
+  width: fit-content; /* 🎯 テキスト幅に応じた幅 */
+  max-width: none; /* 🎯 最大幅制限を解除 */
   flex: 0 0 auto; /* flexアイチE��として自動サイズ */
   
   /* アニメーション */
@@ -1465,8 +1465,8 @@ h1 {
   font-weight: 600;
   color: #222;
   text-align: center;
-  width: max-content !important; /* 🎯 テキスト幅に応じた幅（強制） */
-  min-width: auto !important; /* 🎯 最小幅を自動に */
+  width: max-content; /* 🎯 テキスト幅に応じた幅 */
+  min-width: auto; /* 🎯 最小幅を自動に */
   margin: 0;
   display: flex;
   align-items: center;
@@ -1474,8 +1474,8 @@ h1 {
   height: 100%;
   padding: 2px 8px; /* 左右パディング追加 */
   line-height: 1.2;
-  white-space: nowrap !important; /* 🎯 テキストを1行で表示（改行禁止・強制） */
-  overflow: visible !important; /* 🎯 はみ出しを許可 */
+  white-space: nowrap; /* 🎯 テキストを1行で表示（改行禁止） */
+  overflow: visible; /* 🎯 はみ出しを許可 */
   
   /* 🎯 Phase 2修正: 背景透明（slot-wrapperの黄色い帯が見える） */
   background: transparent;
