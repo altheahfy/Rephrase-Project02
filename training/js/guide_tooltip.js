@@ -11,12 +11,17 @@
   // ツールチップ設定
   const tooltipConfig = {
     'guide-step-1': {
-      content: '例文全シャッフル（<span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">🎲 例文全シャッフル</span>）を押すと、様々な例文が表示されます。<br><br>そこに表示される「英語とイラストのセット」を見て、イラストだけを見て英語が思い出せるようにしましょう'
+      content: '全シャッフル（<span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">🎲 全シャッフル</span>）を押すと、様々な例文が表示されます。<br><br>そこに表示される「英語とイラストのセット」を見て、イラストだけを見て英語が思い出せるようにしましょう'
     },
     'guide-step-2': {
       content: '「<span style="display: inline-flex; align-items: center; justify-content: center; background: #4CAF50; color: white; border: none; padding: 2px 4px; border-radius: 3px; font-size: 9px; font-weight: bold; line-height: 1.2;">英語<br>OFF</span>」を押すと、そこの英語が消えます。<br><br>これによって、自分が練習したい箇所をテストできるようになります。'
+    },
+    'guide-step-3': {
+      content: '「<span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">🎲 例文全シャッフル</span>」をクリックすると、例文全体が違うものに入れ替わります。<br><br>「<span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">🎲</span>」をクリックすると、その部分だけが入れ替わります。<br><br>自由にシャッフルし、イラストをヒントに「英語を消した部分を含めた全文」を口に出して言ってください。<br><br>英語の「フォーム」が自然と身に付きます。'
+    },
+    'guide-step-4': {
+      content: '主語の中にまた主語・動詞がある。<br>目的語の中にまた主語・動詞がある、など。<br><br>このような形にできるのが「言語」です。<br><br>例: I know <span style="background: #FFF59D; padding: 2px 4px; font-weight: bold;">that he loves me</span>.<br><br>こうした「中に入っている文」は、「<span style="display: inline-flex; align-items: center; justify-content: center; background: #2196f3; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin: 0 4px;">▼ 詳細</span>」で取り出すことができます。<br><br><img src="images/guide/subslot-detail-example.png" style="width: 100%; max-width: 300px; margin-top: 10px; border: 2px solid #ddd; border-radius: 4px;">'
     }
-    // ③④の設定は後で追加
   };
 
   // ツールチップ要素を生成
