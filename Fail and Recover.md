@@ -1,4 +1,4 @@
-# Fail and Recover - RephraseUI開発記録
+﻿# Fail and Recover - RephraseUI開発記録
 
 ## 目的
 K-MAD以前に開発されたRephraseUIは構造が混沌としているため、試行錯誤で判明した構造・仕様を記録し、今後の開発で参照できるようにする。
@@ -2234,158 +2234,159 @@ CSSの詳細度が同じ場合、**後から定義されたルールが優先さ
 - 所要時間: 不明（チャット履歴消失のため詳細不明）
 
 
----
-
-## [2026-01-04] �T�u�X���b�g�̉p��e�L�X�g��2�s�ɐ܂�Ԃ������
-
-### �����������
-- �T�u�X���b�g���̉p��e�L�X�g�i��: "the teacher who", "the manager who"�j��2�s�ɐ܂�Ԃ���ĕ\�������
-- �C���X�g��2���̎��̓X���b�g��������ɍL���邪�A�e�L�X�g�݂̂̏ꍇ�͕����L����Ȃ�
-- CSS��`white-space: nowrap`��ݒ肵�Ă����ʂ��Ȃ�����
-
-### �����������ʂ��Ȃ������A�v���[�`
-1. **CSS `!important`�̒ǉ�** - ���ʂȂ�
-2. **CSS `width: fit-content`** - ���ʂȂ�
-3. **CSS `max-width: none`** - ���ʂȂ�
-4. **`grid-template-columns: minmax(120px, max-content)`** - ���ʂȂ�
-
-### Root Cause�i���{�����j
-**JS�ɂ��C�����C���X�^�C���ݒ肪CSS���㏑�����Ă���**
-
-`adjustSlotWidthsBasedOnTextOptimized()`�֐���`.slot-container`��`.subslot-container`�̗�����Ώۂɂ��Ă���A�T�u�X���b�g�ɂ��Œ蕝���C�����C���X�^�C���Őݒ肵�Ă����B
-
-�C�����C���X�^�C���istyle�����j��CSS�t�@�C���̐ݒ���D��x���������߁A`!important`��t���Ă�JS�̐ݒ肪�����Ă����B
-
-### Solution�i������j
-**�����摜�̕������Ɠ����������̗p**: �T�u�X���b�g�փe�L�X�g�������ݎ��Ƀe�L�X�g�����v�����A�C�����C���X�^�C���Œ��ڐݒ�
-
-#### ����1: �T�u�X���b�g��ėp���������珜�O�iinsert_test_data_clean.js�j
-- �ύX�O: `document.querySelectorAll('.slot-container, .subslot-container')`
-- �ύX��: `document.querySelectorAll('.slot-container')`
-
-#### ����2: �T�u�X���b�g��p�̕�������ǉ��iinsert_test_data_clean.js�j
-�T�u�X���b�g�ւ̃e�L�X�g�������ݎ��ɁA�e�L�X�g�����v�����ăC�����C���X�^�C���Őݒ�
-
-### Design Rationale�i�݌v��̗��R����̕��j�j
-1. **�����̐����p�^�[���𓥏P**: �����摜�̕����������퓮�삵�Ă����̂ŁA�����������̗p
-2. **�Ӗ��̕���**: �e�X���b�g�͔ėp�֐��ŁA�T�u�X���b�g�̓e�L�X�g�������ݎ��Ɍʒ���
-3. **CSS vs JS**: �C�����C���X�^�C�����ŗD�悳���d�l���t�Ɋ��p
-4. **`!important`�̉��**: ���p�͕ێ琫�������邽�ߔ�����
-
-### ���x���P
-- **�O**: "the teacher who"��2�s�\��
-- **��**: 1�s�\���A�X���b�g�����e�L�X�g���ɉ����Ď��R�ɒ���
-
-### �^�C���X�^���v
-- ��������: 2026-01-04
-- ��������: 2026-01-04
-- ���v����: ��1���ԁi������CSS���s������o�āAJS�A�v���[�`�ŉ����j
 
 ---
 
-## [2026-01-04] �����摜�ōL�������X���b�g�����T�u�X���b�g�����ᕶ�Ŗ߂�Ȃ����
+## [2026-01-04] サブスロットの英語テキストが2行に折り返される問題
 
-### �����������
-- �����摜�\���ŃX���b�g�����L����i���퓮��j
-- �T�u�X���b�g�����̗ᕶ�i�e�X���b�g�Ƀe�L�X�g�Ȃ��j�Ƀ����_�}�C�Y����ƁA�L�������������̂܂܎c��
-- �Ăщp��e�L�X�g����̗ᕶ�ɕς��ƕ����������߂�
+### 発生した問題
+- サブスロット内の英語テキスト（例: "the teacher who", "the manager who"）が2行に折り返されて表示される
+- イラスト2枚の時はスロットが自動的に広がるが、テキストのみの場合は不自然に広がらない
+- CSSで`white-space: nowrap`を設定しても効果がなかった
 
-### Root Cause�i���{�����j
-**minWidth�̃��Z�b�g�R��**
+### 試したが効果がなかったアプローチ
+1. **CSS `!important`の追加** - 効果なし
+2. **CSS `width: fit-content`** - 効果なし
+3. **CSS `max-width: none`** - 効果なし
+4. **`grid-template-columns: minmax(120px, max-content)`** - 効果なし
 
-`universal_image_system.js`�̉摜�X�V�����ŁA�e�L�X�g����̏ꍇ�̃��Z�b�g�����ɂ����āF
-- `width`��`maxWidth`�̓��Z�b�g���Ă��� 
-- `minWidth`�����Z�b�g���Ă��Ȃ����� 
+### Root Cause（根本原因）
+**JSによるインラインスタイル設定がCSSを上書きしていた**
 
-`minWidth`���O�̕����摜�p�̒l�i��: 308px�j�̂܂܎c���Ă������߁A�����k�܂�Ȃ������B
+`adjustSlotWidthsBasedOnTextOptimized()`関数が`.slot-container`と`.subslot-container`の両方を対象にしており、サブスロットにも固定幅をインラインスタイルで設定していた。
 
-### Solution�i������j
-`universal_image_system.js` Line 1170�t�߂�`minWidth`���Z�b�g��ǉ��F
+インラインスタイル(style属性)はCSSファイルの設定より優先度が高いため、`!important`を付けてもJSの設定が勝っていた。
 
-\\\javascript
-// �X���b�g�S�̂̉��������Z�b�g�iminWidth���܂߂Ċ��S���Z�b�g�j
+### Solution（解決策）
+**複数画像の幅調整と同じ仕組みの利用**: サブスロットへテキスト書き込み時にテキスト幅を計測し、インラインスタイルで直接設定
+
+#### 対応1: サブスロット向け幅調整関数から除外（insert_test_data_clean.js）
+- 変更前: `document.querySelectorAll('.slot-container, .subslot-container')`
+- 変更後: `document.querySelectorAll('.slot-container')`
+
+#### 対応2: サブスロット用の幅計測を追加（insert_test_data_clean.js）
+サブスロットへのテキスト書き込み時に、テキスト幅を計測してインラインスタイルで設定
+
+### Design Rationale（設計上の理由今後の方針）
+1. **既存の成功パターンを踏襲**: 複数画像の幅調整が正常動作していたので、同じ仕組みの利用
+2. **責務の分離**: 親スロットは幅調整関数で、サブスロットはテキスト書き込み時に個別処理
+3. **CSS vs JS**: インラインスタイルが常に優先される仕様を逆に活用
+4. **`!important`の回避**: 濫用は保守性を下げるため回避
+
+### 精度改善
+- **前**: "the teacher who"が2行表示
+- **後**: 1行表示、スロット幅がテキスト量に応じて自然に調整
+
+### タイムスタンプ
+- 発生日時: 2026-01-04
+- 解決日時: 2026-01-04
+- 所要時間: 約1時間（最初はCSS試行を繰り返したが、JSアプローチで解決）
+
+---
+
+## [2026-01-04] 複数画像で広がったスロット幅がサブスロット個別ランダマイズ後に戻らない問題
+
+### 発生した問題
+- 複数画像表示でスロット幅が広がる（正常動作）
+- サブスロット個別ランダマイズ後の単画像（親スロットにテキストなし）時に広がった幅のまま残る
+- 親の英語テキストを単画像に変えると幅が正しく戻る
+
+### Root Cause（根本原因）
+**minWidthのリセット漏れ**
+
+`universal_image_system.js`の画像更新処理で、テキストなしの場合のリセット処理において：
+- `width`と`maxWidth`はリセットされていた 
+- `minWidth`がリセットされていなかった 
+
+`minWidth`が前の複数画像用の値（例: 308px）のまま残っていたため、幅が縮まらなかった。
+
+### Solution（解決策）
+`universal_image_system.js` Line 1170付近に`minWidth`リセットを追加：
+
+```javascript
+// スロット全体の幅を完全にリセット（minWidthを含めて完全リセット）
 slot.style.maxWidth = '';
 slot.style.width = '';
-slot.style.minWidth = '';  //  �ǉ�
-\\\
+slot.style.minWidth = '';  //  追加
+```
 
-### Design Rationale�i�݌v��̗��R�j
-1. **3�̕��v���p�e�B�̊��S���Z�b�g**: width, minWidth, maxWidth�͏�ɃZ�b�g�ň���
-2. **�e�L�X�g�L���ɂ�镪��**: �e�L�X�g����͕��v�Z�A�e�L�X�g�Ȃ��͊��S���Z�b�g
-3. **CSS�ւ̐���ڏ�**: �C�����C���X�^�C������ɂ��邱�ƂŁACSS�̃f�t�H���g�l���K�p�����
+### Design Rationale（設計上の理由）
+1. **3つの幅プロパティの完全リセット**: width, minWidth, maxWidthは常にセットで扱う
+2. **テキスト有無による分岐**: テキストありは幅計算、テキストなしは完全リセット
+3. **CSSへの信頼移譲**: インラインスタイルを空にすることで、CSSのデフォルト値が適用される
 
-### ���P
-- ���֘A�̃C�����C���X�^�C�������`width`, `minWidth`, `maxWidth`��3����ɃZ�b�g�ōl����
-- �u�ݒ�v�Ɓu���Z�b�g�v�őΏۃv���p�e�B����v���Ă��邩�m�F����
+### 教訓
+- 幅関連のインラインスタイルは常に`width`, `minWidth`, `maxWidth`の3つ同時にセットで考える
+- 「設定」と「リセット」で対象プロパティが揃っているか確認する
 
-### �^�C���X�^���v
-- ��������: 2026-01-04
-- ��������: 2026-01-04
-- ���v����: ��20��
+### タイムスタンプ
+- 発生日時: 2026-01-04
+- 解決日時: 2026-01-04
+- 所要時間: 約20分
 
 ---
 
-## [2026-01-04] �T�u�X���b�g�p��e�L�X�g��2�s�܂�Ԃ����i�ŏI�����j
+## [2026-01-04] サブスロット英語テキストの2行折り返し問題（最終解決）
 
-### �����������
-- �T�u�X���b�g���̉p��e�L�X�g�i��: "the engineer who", "much hesitation"�j��2�s�ɐ܂�Ԃ���ĕ\�������
-- sub-s, sub-o1�ȂǕ����̃T�u�X���b�g�Ŕ���
-- JS���ŕ������R�[�h��ǉ����Ă����ʂȂ�
+### 発生した問題
+- サブスロット内の英語テキスト（例: "the engineer who", "much hesitation"）が2行に折り返されて表示される
+- sub-s, sub-o1など複数のサブスロットで発生
+- JS側で幅調整コードを追加しても効果なし
 
-### �����������ʂ�����I�������A�v���[�`
-1. **JS�������R�[�h�ǉ��iinsert_test_data_clean.js�j** - ���͐ݒ肳��邪�e�L�X�g��2�s�̂܂�
-2. **universal_image_system.js�ł̃e�L�X�g���v���ǉ�** - ���͐ݒ肳��邪���ʂȂ�
-3. **subslot_toggle.js��adjustSubslotWidths()�֐��ǉ�** - ���ʌ���I
-4. **�N���X���̏C���isubslot-container  slot-container�j** - ���ʂȂ�
+### 試したが効果が限定的だったアプローチ
+1. **JS幅調整コード追加（insert_test_data_clean.js）** - 幅は設定されるがテキストは2行のまま
+2. **universal_image_system.jsでのテキスト幅計測追加** - 幅は設定されるが効果なし
+3. **subslot_toggle.jsにadjustSubslotWidths()関数追加** - 効果限定的
+4. **クラス名の修正（subslot-container  slot-container）** - 効果なし
 
-### Root Cause�i���{�����j
-**phraseElement�̕���0px������**
+### Root Cause（根本原因）
+**phraseElementの幅が0pxだった**
 
-DevTools�Ŋm�F�F
-\\\javascript
+DevToolsで確認：
+```javascript
 const el = document.querySelector('[id*="sub-o1"] .slot-phrase');
-console.log('phraseElement��:', el?.offsetWidth);
-// ����: phraseElement��: 0 px
-\\\
+console.log('phraseElement幅:', el?.offsetWidth);
+// 結果: phraseElement幅: 0 px
+```
 
-�T�u�X���b�g��.subslot-phrase-row��flex�R���e�i�ŁA�q�v�f��.slot-phrase��`flex-shrink`�ɂ��k������Ă����B�X���b�g�R���e�i�ɕ���ݒ肵�Ă��A������phraseElement���̂��k������邽�߁A�e�L�X�g���܂�Ԃ��ꂽ�B
+サブスロットの`.subslot-phrase-row`がflexコンテナで、子要素の`.slot-phrase`が`flex-shrink`により縮小されていた。スロットコンテナに幅を設定しても、内部のphraseElement自体が縮小されるため、テキストが折り返された。
 
-### Solution�i������j
-**CSS�Œ���phraseElement�̃X�^�C���𐧌�**�itraining/style.css�j
+### Solution（解決策）
+**CSSで直接phraseElementのスタイルを制御**（training/style.css）
 
-\\\css
-/* �T�u�X���b�g���̉p��e�L�X�g�s�F�e�L�X�g���܂�Ԃ��Ȃ��悤�ɂ��� */
-.slot-wrapper[id\$="-sub"] .subslot-phrase-row {
+```css
+/* サブスロット内の英語テキスト行：テキストが折り返さないようにする */
+.slot-wrapper[id$="-sub"] .subslot-phrase-row {
   flex-wrap: nowrap !important;
   min-width: max-content !important;
 }
 
-/* �T�u�X���b�g���̉p��e�L�X�g�F1�s�\�������� */
-.slot-wrapper[id\$="-sub"] .slot-phrase {
+/* サブスロット内の英語テキスト：1行表示を強制 */
+.slot-wrapper[id$="-sub"] .slot-phrase {
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   min-width: max-content !important;
   width: auto !important;
 }
-\\\
+```
 
-### Design Rationale�i�݌v��̗��R�j
-1. **CSS�D��**: JS�ł̕��G�ȕ��v�Z���ACSS�Œ��ڐ��䂷������V���v���Ŋm��
-2. **flex-shrink: 0**: �e�R���e�i��flex�ł��q�v�f���k������Ȃ��悤�ɂ���
-3. **min-width: max-content**: �R���e���c�ɕK�v�ȍŏ������m��
-4. **white-space: nowrap**: �܂�Ԃ����֎~
+### Design Rationale（設計上の理由）
+1. **CSS優先**: JSでの複雑な幅計算より、CSSで直接制御する方がシンプルで確実
+2. **flex-shrink: 0**: 親コンテナがflexでも子要素が縮小されないようにする
+3. **min-width: max-content**: コンテンツに必要な最小幅を確保
+4. **white-space: nowrap**: 折り返しを禁止
 
-### ���P
-1. **���̖{�������ɂ߂�**: �X���b�g���ł͂Ȃ��A������phraseElement����0px������
-2. **DevTools�Ŏ��ۂ̒l���m�F**: console.log��offsetWidth���m�F���Ė��ӏ������
-3. **flex���C�A�E�g�̗���**: flex-shrink���f�t�H���g��1�̂��߁A�q�v�f���k�������
-4. **CSS vs JS**: �\���̖���CSS�ŉ�����������m���ȏꍇ������
+### 教訓
+1. **問題の本質を見極める**: スロット幅ではなく、内部のphraseElement幅が0pxだった
+2. **DevToolsで実際の値を確認**: console.logでoffsetWidthを確認して問題箇所を特定
+3. **flexレイアウトの理解**: flex-shrinkがデフォルトで1のため、子要素が縮小される
+4. **CSS vs JS**: 表示の問題はCSSで解決する方が確実な場合が多い
 
-### �֘A���鎎�s����
-- JS���ł̕������R�[�h�͎c���Ă��邪�ACSS����ȉ�����
-- universal_image_system.js�̃e�L�X�g���v���͕����摜�Ή��ň��������L��
+### 関連する試行錯誤
+- JS側での幅調整コードは残っているが、CSSが主な解決策
+- universal_image_system.jsのテキスト幅計測は複数画像対応で引き続き有効
 
-### �^�C���X�^���v
-- ��������: 2026-01-04
-- ��������: 2026-01-04
-- ���v����: ��2���ԁi������JS�A�v���[�`�����s��ACSS�ŉ����j
+### タイムスタンプ
+- 発生日時: 2026-01-04
+- 解決日時: 2026-01-04
+- 所要時間: 約2時間（多数のJSアプローチを試行後、CSSで解決）
