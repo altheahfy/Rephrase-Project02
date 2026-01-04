@@ -852,13 +852,13 @@ h1 {
 /* 🎯 Phase 2: サブスロット用の黄色い帯 */
 .slot-wrapper[id$="-sub"]::before {
   content: '';
-  position: fixed; /* 🎯 ウインドウ全幅にするためfixed */
-  left: 0;
-  right: 0;
-  top: 247px; /* サブスロット用位置調整：30px(ID) + 180px(画像) + 20px(日本語) + 4px(gap) + 10px(padding) + 3px */
-  height: 25px; /* サブslot-phraseの高さ */
+  position: absolute; /* 🎯 slot-wrapper基準の相対位置 */
+  left: -100vw; /* 🎯 左にウインドウ幅分伸ばす */
+  right: -100vw; /* 🎯 右にウインドウ幅分伸ばす */
+  top: 355px; /* 🎯 英語テキストの位置 */
+  height: 30px; /* サブslot-phraseの高さ */
   background: #FFF9C4;
-  z-index: 0; /* 🎯 スロットより後ろ、テキストより前 */
+  z-index: 999; /* 🎯 親スロットと同じく全要素より前、テキスト(1000)より後ろ */
   pointer-events: none;
 }
 
@@ -1480,7 +1480,7 @@ h1 {
   border-radius: 0;
   box-shadow: none;
   position: relative;
-  z-index: 2; /* テキストを黄色い帯の上に */
+  z-index: 1000; /* 🎯 黄色い帯(999)より手前にテキストを表示 */
 }
 
 /* =================================================================== */
@@ -1553,18 +1553,18 @@ h1 {
 }
 
 /* 🎨 サブスロットエリア用の拡張背景（包み込み効果の続き） */
+/* ⚠️ 2026-01-04: 青い影の原因だった水色系を黄色い帯に置き換え */
 .slot-wrapper.active-subslot-area::before {
   content: '' !important;
-  position: absolute !important;
-  top: -2px !important;
-  left: -5px !important;
-  right: -5px !important;
-  bottom: -5px !important;
-  background: linear-gradient(180deg, rgba(173, 216, 230, 0.1) 0%, rgba(173, 216, 230, 0.3) 100%) !important;
-  border: 2px solid rgba(135, 206, 235, 0.6) !important;
-  border-top: none !important;
-  border-radius: 0 0 16px 16px !important;
-  z-index: -1 !important;
+  position: absolute !important; /* 🎯 slot-wrapper基準の相対位置 */
+  left: -100vw !important; /* 🎯 左にウインドウ幅分伸ばす */
+  right: -100vw !important; /* 🎯 右にウインドウ幅分伸ばす */
+  top: 355px !important; /* 🎯 英語テキストの位置 */
+  height: 30px !important; /* サブslot-phraseの高さ */
+  background: #FFF9C4 !important; /* 🎯 黄色い帯 */
+  border: none !important; /* 水色系borderを無効化 */
+  border-radius: 0 !important;
+  z-index: 999 !important; /* 🎯 全要素より前、テキスト(1000)より後ろ */
   pointer-events: none !important;
 }
 
