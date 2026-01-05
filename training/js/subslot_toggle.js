@@ -431,10 +431,61 @@ function bindSubslotToggleButtons() {
       button.addEventListener("click", () => {
         console.log(`🚀 Event listener triggered for slotId: ${slotId}`);
         toggleExclusiveSubslot(slotId);
+        
+        // 🎯 サブスロット展開時の自動スクロール処理
+        setTimeout(() => {
+          scrollToExpandedSubslot(slotId);
+        }, 300); // アニメーション完了後にスクロール
       });
       console.log(`✅ Event listener rebound for slotId: ${slotId}`);
     }
   });
+}
+
+/**
+ * 🎯 サブスロット展開時に該当箇所へ自動スクロール
+ * @param {string} slotId - スロットID (例: 'm1', 'o2')
+ */
+function scrollToExpandedSubslot(slotId) {
+  console.log(`🎯 自動スクロール処理開始: ${slotId}`);
+  
+  // サブスロットコンテナを取得
+  const subslotContainer = document.querySelector(`#slot-${slotId}-sub`);
+  
+  if (!subslotContainer) {
+    console.warn(`⚠️ サブスロットコンテナが見つかりません: #slot-${slotId}-sub`);
+    return;
+  }
+  
+  // 展開状態を確認
+  const isExpanded = subslotContainer.closest('.slot-wrapper')?.classList.contains('active-subslot-area');
+  
+  if (!isExpanded) {
+    console.log(`ℹ️ サブスロットが閉じられたため、スクロール処理をスキップ`);
+    return;
+  }
+  
+  // サブスロットコンテナの位置を取得
+  const rect = subslotContainer.getBoundingClientRect();
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  
+  // ビューポートの高さ
+  const viewportHeight = window.innerHeight;
+  
+  // サブスロットの絶対位置（ページ上部からの距離）
+  const elementTop = rect.top + scrollTop;
+  
+  // サブスロットをビューポートの中央に表示するために必要なスクロール量
+  // ただし、上部に余裕を持たせる（ビューポート高さの30%の位置）
+  const targetScrollPosition = elementTop - (viewportHeight * 0.3);
+  
+  // スムーズスクロール実行
+  window.scrollTo({
+    top: Math.max(0, targetScrollPosition), // 負の値にならないように
+    behavior: 'smooth'
+  });
+  
+  console.log(`✅ 自動スクロール実行: ${targetScrollPosition}px へ移動`);
 }
 
 /**

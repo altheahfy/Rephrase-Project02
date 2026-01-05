@@ -116,6 +116,50 @@
   font-size: 10px;
 }
 
+/* ========================================= */
+/* 🎯 UI全体の表示サイズ自動調整システム       */
+/* ========================================= */
+
+/* UI全体のコンテナに自動スケール調整を適用 */
+#main-ui-container {
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+}
+
+/* ビューポート高さに応じた段階的スケール調整 */
+/* 1080px以下（1K）: 85%に縮小 */
+@media (max-height: 1080px) {
+  #main-ui-container {
+    transform: scale(0.85);
+  }
+}
+
+/* 900px以下: 75%に縮小 */
+@media (max-height: 900px) {
+  #main-ui-container {
+    transform: scale(0.75);
+  }
+}
+
+/* 768px以下: 65%に縮小 */
+@media (max-height: 768px) {
+  #main-ui-container {
+    transform: scale(0.65);
+  }
+}
+
+/* 600px以下: 55%に縮小 */
+@media (max-height: 600px) {
+  #main-ui-container {
+    transform: scale(0.55);
+  }
+}
+
+/* モバイルデバイスはスケール調整を無効化（別のシステムで対応） */
+.mobile-device #main-ui-container {
+  transform: none !important;
+}
+
 /* 基本レイアウト設定 */
 body {
   min-height: 100vh;
