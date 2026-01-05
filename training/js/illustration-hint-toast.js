@@ -4,6 +4,22 @@
 (function() {
   'use strict';
   
+  // 🌐 軽量版t()関数 - 現在の言語に応じてテキストを返す
+  function t(key) {
+    const lang = localStorage.getItem('rephrase_language') || 'ja';
+    const dict = {
+      ja: {
+        'hint-message': 'イラストをヒントに<br>英語を考えましょう',
+        'hint-dismiss': '今後表示しない'
+      },
+      en: {
+        'hint-message': 'Use the illustration as a hint<br>to think of the English',
+        'hint-dismiss': "Don't show again"
+      }
+    };
+    return dict[lang]?.[key] || key;
+  }
+  
   /**
    * トーストを表示してイラストをハイライト
    * @param {HTMLElement} triggerButton - クリックされたボタン要素
@@ -100,11 +116,11 @@
     
     toast.innerHTML = `
       <div style="font-size: 16px; font-weight: bold; color: #333; margin-bottom: 10px; line-height: 1.4;">
-        イラストをヒントに<br>英語を考えましょう
+        ${t('hint-message')}
       </div>
       <label style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 10px; cursor: pointer;">
         <input type="checkbox" id="dismiss-illustration-hint" style="width: 16px; height: 16px; cursor: pointer;">
-        <span style="font-size: 12px; color: #555;">今後表示しない</span>
+        <span style="font-size: 12px; color: #555;">${t('hint-dismiss')}</span>
       </label>
       <button id="close-illustration-hint" style="
         background: #4CAF50;
