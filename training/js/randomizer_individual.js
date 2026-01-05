@@ -280,7 +280,7 @@ function randomizeSlotSIndividual() {
     }, 100);
   }
   
-  // 🖼️ Sサブスロット画像更新（個別ランダム化後）
+  // ️ Sサブスロット画像更新（個別ランダム化後）
   // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
   // if (typeof window.updateSubslotImages === "function") {
   //   setTimeout(() => {
@@ -435,7 +435,7 @@ function randomizeSlotM1Individual() {
     }, 100);
   }
   
-  // 🖼️ M1サブスロット画像更新（個別ランダム化後）
+  // ️ M1サブスロット画像更新（個別ランダム化後）
   // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
   // if (typeof window.updateSubslotImages === "function") {
   //   setTimeout(() => {
@@ -580,6 +580,13 @@ function randomizeSlotM2Individual() {
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
+  }
+  
+  // 🔹 全スロットのOFFボタン表示・非表示を更新
+  if (typeof window.updateAllSlotToggleButtons === "function") {
+    setTimeout(() => {
+      window.updateAllSlotToggleButtons();
+    }, 50);
   }
   
   // 全スロット画像更新
@@ -737,6 +744,13 @@ function randomizeSlotC1Individual() {
     console.log("🔄 サブスロット同期完了");
   }
   
+  // 🔹 全スロットのOFFボタン表示・非表示を更新
+  if (typeof window.updateAllSlotToggleButtons === "function") {
+    setTimeout(() => {
+      window.updateAllSlotToggleButtons();
+    }, 50);
+  }
+  
   // 全スロット画像更新
   if (typeof window.updateAllSlotImagesAfterDataChange === "function") {
     setTimeout(() => {
@@ -890,6 +904,13 @@ function randomizeSlotO1Individual() {
   if (typeof syncSubslotsFromJson === "function") {
     syncSubslotsFromJson(data);
     console.log("🔄 サブスロット同期完了");
+  }
+  
+  // 🔹 全スロットのOFFボタン表示・非表示を更新
+  if (typeof window.updateAllSlotToggleButtons === "function") {
+    setTimeout(() => {
+      window.updateAllSlotToggleButtons();
+    }, 50);
   }
   
   // 全スロット画像更新
@@ -1057,7 +1078,14 @@ function randomizeSlotO2Individual() {
     }, 100);
   }
   
-  // 🖼️ O2サブスロット画像更新（個別ランダム化後）
+  // � 全スロットのOFFボタン表示・非表示を更新（画像更新後に実行）
+  if (typeof window.updateAllSlotToggleButtons === "function") {
+    setTimeout(() => {
+      window.updateAllSlotToggleButtons();
+    }, 150);
+  }
+  
+  // �🖼️ O2サブスロット画像更新（個別ランダム化後）
   // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
   // if (typeof window.updateSubslotImages === "function") {
   //   setTimeout(() => {
@@ -1214,7 +1242,14 @@ function randomizeSlotC2Individual() {
     }, 100);
   }
   
-  // 🖼️ C2サブスロット画像更新（個別ランダム化後）
+  // � 全スロットのOFFボタン表示・非表示を更新（画像更新後に実行）
+  if (typeof window.updateAllSlotToggleButtons === "function") {
+    setTimeout(() => {
+      window.updateAllSlotToggleButtons();
+    }, 150);
+  }
+  
+  // �🖼️ C2サブスロット画像更新（個別ランダム化後）
   // � コメントアウト: syncSubslotsFromJson内のrestoreSubslotLabels()で画像処理が実行されるため不要（競合回避）
   // if (typeof window.updateSubslotImages === "function") {
   //   setTimeout(() => {

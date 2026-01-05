@@ -1,4 +1,5 @@
 // insert_test_data.js をベースにした動的記載エリアから静的DOM同期用スクリプト
+console.log("🔵 insert_test_data_clean.js 読み込み開始");
 // 
 // ⚠️⚠️⚠️【重要警告】⚠️⚠️⚠️
 // 動的記載エリア(dynamic-slot-area)は絶対に変更禁止！
@@ -461,24 +462,30 @@ function syncDynamicToStatic() {
               height: 100%;
             `;
             
-            // トグルボタンを作成
-            const toggleButton = document.createElement('button');
-            toggleButton.className = 'upper-slot-toggle-btn';
-            toggleButton.dataset.slotId = container.id;
-            toggleButton.innerHTML = '英語<br>OFF';
-            toggleButton.title = '英語表示切替';
-            toggleButton.style.cssText = `
-              background: #4CAF50;
-              color: white;
-              border: none;
-              border-radius: 3px;
-              padding: 2px 4px;
-              font-size: 9px;
-              cursor: pointer;
-              line-height: 1.1;
-              min-width: 32px;
-              text-align: center;
-            `;
+            // 🔹 英語テキストが空の場合（サブスロットのみの親）はボタンを作成しない
+            const hasEnglishText = item.SlotPhrase && item.SlotPhrase.trim() !== '';
+            
+            // トグルボタンを作成（英語テキストがある場合のみ）
+            let toggleButton = null;
+            if (hasEnglishText) {
+              toggleButton = document.createElement('button');
+              toggleButton.className = 'upper-slot-toggle-btn';
+              toggleButton.dataset.slotId = container.id;
+              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.title = '英語表示切替';
+              toggleButton.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                padding: 2px 4px;
+                font-size: 9px;
+                cursor: pointer;
+                line-height: 1.1;
+                min-width: 32px;
+                text-align: center;
+              `;
+            }
             
             // 新しいphraseElementを作成（サブスロットと同じ方式）
             const newPhraseElement = document.createElement('div');
@@ -494,58 +501,60 @@ function syncDynamicToStatic() {
               newPhraseElement.style.visibility = 'visible';
             }
             
-            // ボタンクリックでトグル
-            toggleButton.addEventListener('click', (e) => {
-              e.stopPropagation();
-              
-              console.log(`🔄 親スロット個別トグルボタンクリック: ${container.id}`);
-              
-              // 毎回phraseRowから.slot-phraseを取得（ランダマイズ対応）
-              const currentPhraseRow = container.querySelector('.upper-slot-phrase-row');
-              const currentPhraseElement = currentPhraseRow?.querySelector('.slot-phrase');
-              
-              if (!currentPhraseElement) {
-                console.error(`❌ .slot-phrase要素が見つかりません: ${container.id}`);
-                return;
-              }
-              
-              // 現在の状態を取得
-              if (!window.visibilityState) window.visibilityState = {};
-              if (!window.visibilityState[slotKey]) {
-                window.visibilityState[slotKey] = { text: true, auxtext: true };
-              }
-              
-              // 状態を反転
-              const currentVisible = window.visibilityState[slotKey]['text'] !== false;
-              window.visibilityState[slotKey]['text'] = !currentVisible;
-              
-              // UIを更新
-              if (!currentVisible) {
-                // 表示する
-                currentPhraseElement.style.opacity = '1';
-                currentPhraseElement.style.visibility = 'visible';
-                toggleButton.innerHTML = '英語<br>OFF';
-                toggleButton.style.backgroundColor = '#4CAF50';
-                toggleButton.title = '英語を非表示';
-                console.log(`✅ ${container.id}: 英語を表示`);
-              } else {
-                // 非表示にする
-                currentPhraseElement.style.opacity = '0';
-                currentPhraseElement.style.visibility = 'hidden';
-                toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#757575';
-                toggleButton.title = '英語を表示';
-                console.log(`🙈 ${container.id}: 英語を非表示`);
+            // ボタンクリックでトグル（ボタンがある場合のみ）
+            if (toggleButton) {
+              toggleButton.addEventListener('click', (e) => {
+                e.stopPropagation();
                 
-                //  イラストヒントトーストを表示
-                if (typeof window.showIllustrationHintToast === 'function') {
-                  window.showIllustrationHintToast(toggleButton);
+                console.log(`🔄 親スロット個別トグルボタンクリック: ${container.id}`);
+                
+                // 毎回phraseRowから.slot-phraseを取得（ランダマイズ対応）
+                const currentPhraseRow = container.querySelector('.upper-slot-phrase-row');
+                const currentPhraseElement = currentPhraseRow?.querySelector('.slot-phrase');
+                
+                if (!currentPhraseElement) {
+                  console.error(`❌ .slot-phrase要素が見つかりません: ${container.id}`);
+                  return;
                 }
-              }
-            });
+                
+                // 現在の状態を取得
+                if (!window.visibilityState) window.visibilityState = {};
+                if (!window.visibilityState[slotKey]) {
+                  window.visibilityState[slotKey] = { text: true, auxtext: true };
+                }
+                
+                // 状態を反転
+                const currentVisible = window.visibilityState[slotKey]['text'] !== false;
+                window.visibilityState[slotKey]['text'] = !currentVisible;
+                
+                // UIを更新
+                if (!currentVisible) {
+                  // 表示する
+                  currentPhraseElement.style.opacity = '1';
+                  currentPhraseElement.style.visibility = 'visible';
+                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.style.backgroundColor = '#4CAF50';
+                  toggleButton.title = '英語を非表示';
+                  console.log(`✅ ${container.id}: 英語を表示`);
+                } else {
+                  // 非表示にする
+                  currentPhraseElement.style.opacity = '0';
+                  currentPhraseElement.style.visibility = 'hidden';
+                  toggleButton.innerHTML = '英語<br>ON';
+                  toggleButton.style.backgroundColor = '#757575';
+                  toggleButton.title = '英語を表示';
+                  console.log(`🙈 ${container.id}: 英語を非表示`);
+                  
+                  //  イラストヒントトーストを表示
+                  if (typeof window.showIllustrationHintToast === 'function') {
+                    window.showIllustrationHintToast(toggleButton);
+                  }
+                }
+              });
+            }
             
             // phraseRowに新規DOMを追加
-            phraseRow.appendChild(toggleButton);
+            if (toggleButton) phraseRow.appendChild(toggleButton);
             phraseRow.appendChild(newPhraseElement);
             
             // 古いphraseDivを削除してphraseRowを挿入
@@ -568,17 +577,28 @@ function syncDynamicToStatic() {
               }
             }
             
-            // ボタンの状態を同期
+            // 🔹 英語テキストが空の場合、ボタンを非表示にする
+            const hasEnglishText = item.SlotPhrase && item.SlotPhrase.trim() !== '';
+            console.log(`🔍 [既存phraseRow更新] ${container.id}: SlotPhrase="${item.SlotPhrase}", hasEnglishText=${hasEnglishText}`);
             const toggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
             if (toggleButton) {
-              if (!isTextVisible) {
-                toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#757575';
-                toggleButton.title = '英語を表示';
+              if (!hasEnglishText) {
+                // 英語テキストがない場合、ボタンを非表示
+                toggleButton.style.display = 'none';
+                console.log(`🙈 親スロットOFFボタンを非表示: ${container.id} (英語テキストなし)`);
               } else {
-                toggleButton.innerHTML = '英語<br>OFF';
-                toggleButton.style.backgroundColor = '#4CAF50';
-                toggleButton.title = '英語を非表示';
+                // 英語テキストがある場合、ボタンを表示して状態を同期
+                toggleButton.style.display = '';
+                console.log(`👁️ 親スロットOFFボタンを表示: ${container.id} (英語テキストあり)`);
+                if (!isTextVisible) {
+                  toggleButton.innerHTML = '英語<br>ON';
+                  toggleButton.style.backgroundColor = '#757575';
+                  toggleButton.title = '英語を表示';
+                } else {
+                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.style.backgroundColor = '#4CAF50';
+                  toggleButton.title = '英語を非表示';
+                }
               }
             }
             console.log(`✅ phrase書き込み成功: ${item.Slot} (parent) | 値: "${item.SlotPhrase}"`);
@@ -1256,25 +1276,31 @@ function syncUpperSlotsFromJson(data) {
               height: 100%;
             `;
             
-            // トグルボタンを作成
-            const toggleButton = document.createElement('button');
-            toggleButton.className = 'upper-slot-toggle-btn';
-            toggleButton.dataset.slotId = container.id;
-            toggleButton.innerHTML = '英語<br>OFF';
-            toggleButton.title = '英語表示切替';
-            toggleButton.style.cssText = `
-              background: #4CAF50;
-              color: white;
-              border: none;
-              border-radius: 3px;
-              padding: 2px 4px;
-              font-size: 9px;
-              cursor: pointer;
-              line-height: 1.1;
-              min-width: 32px;
-              text-align: center;
-              flex-shrink: 0;
-            `;
+            // 🔹 英語テキストが空の場合（サブスロットのみの親）はボタンを作成しない
+            const hasEnglishText = item.SlotPhrase && item.SlotPhrase.trim() !== '';
+            
+            // トグルボタンを作成（英語テキストがある場合のみ）
+            let toggleButton = null;
+            if (hasEnglishText) {
+              toggleButton = document.createElement('button');
+              toggleButton.className = 'upper-slot-toggle-btn';
+              toggleButton.dataset.slotId = container.id;
+              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.title = '英語表示切替';
+              toggleButton.style.cssText = `
+                background: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                padding: 2px 4px;
+                font-size: 9px;
+                cursor: pointer;
+                line-height: 1.1;
+                min-width: 32px;
+                text-align: center;
+                flex-shrink: 0;
+              `;
+            }
             
             // 新しいphraseElementを作成（サブスロットと同じ方式）
             const newPhraseElement = document.createElement('div');
@@ -1294,58 +1320,60 @@ function syncUpperSlotsFromJson(data) {
             }
             console.log(`🎨 [syncUpperSlots] ${slotKey}: DOM作成直後 opacity=${newPhraseElement.style.opacity}, visibility=${newPhraseElement.style.visibility}`);
             
-            // ボタンクリックでトグル
-            toggleButton.addEventListener('click', (e) => {
-              e.stopPropagation();
-              
-              console.log(`🔄 親スロット個別トグルボタンクリック: ${container.id}`);
-              
-              // 毎回phraseRowから.slot-phraseを取得（ランダマイズ対応）
-              const currentPhraseRow = container.querySelector('.upper-slot-phrase-row');
-              const currentPhraseElement = currentPhraseRow?.querySelector('.slot-phrase');
-              
-              if (!currentPhraseElement) {
-                console.error(`❌ .slot-phrase要素が見つかりません: ${container.id}`);
-                return;
-              }
-              
-              // 現在の状態を取得
-              if (!window.visibilityState) window.visibilityState = {};
-              if (!window.visibilityState[slotKey]) {
-                window.visibilityState[slotKey] = { text: true, auxtext: true };
-              }
-              
-              // 状態を反転
-              const currentVisible = window.visibilityState[slotKey]['text'] !== false;
-              window.visibilityState[slotKey]['text'] = !currentVisible;
-              
-              // UIを更新
-              if (!currentVisible) {
-                // 表示する
-                currentPhraseElement.style.opacity = '1';
-                currentPhraseElement.style.visibility = 'visible';
-                toggleButton.innerHTML = '英語<br>OFF';
-                toggleButton.style.backgroundColor = '#4CAF50';
-                toggleButton.title = '英語を非表示';
-                console.log(`✅ ${container.id}: 英語を表示`);
-              } else {
-                // 非表示にする
-                currentPhraseElement.style.opacity = '0';
-                currentPhraseElement.style.visibility = 'hidden';
-                toggleButton.innerHTML = '英語<br>ON';
-                toggleButton.style.backgroundColor = '#757575';
-                toggleButton.title = '英語を表示';
-                console.log(`🙈 ${container.id}: 英語を非表示`);
+            // ボタンクリックでトグル（ボタンがある場合のみ）
+            if (toggleButton) {
+              toggleButton.addEventListener('click', (e) => {
+                e.stopPropagation();
                 
-                //  イラストヒントトーストを表示
-                if (typeof window.showIllustrationHintToast === 'function') {
-                  window.showIllustrationHintToast(toggleButton);
+                console.log(`🔄 親スロット個別トグルボタンクリック: ${container.id}`);
+                
+                // 毎回phraseRowから.slot-phraseを取得（ランダマイズ対応）
+                const currentPhraseRow = container.querySelector('.upper-slot-phrase-row');
+                const currentPhraseElement = currentPhraseRow?.querySelector('.slot-phrase');
+                
+                if (!currentPhraseElement) {
+                  console.error(`❌ .slot-phrase要素が見つかりません: ${container.id}`);
+                  return;
                 }
-              }
-            });
+                
+                // 現在の状態を取得
+                if (!window.visibilityState) window.visibilityState = {};
+                if (!window.visibilityState[slotKey]) {
+                  window.visibilityState[slotKey] = { text: true, auxtext: true };
+                }
+                
+                // 状態を反転
+                const currentVisible = window.visibilityState[slotKey]['text'] !== false;
+                window.visibilityState[slotKey]['text'] = !currentVisible;
+                
+                // UIを更新
+                if (!currentVisible) {
+                  // 表示する
+                  currentPhraseElement.style.opacity = '1';
+                  currentPhraseElement.style.visibility = 'visible';
+                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.style.backgroundColor = '#4CAF50';
+                  toggleButton.title = '英語を非表示';
+                  console.log(`✅ ${container.id}: 英語を表示`);
+                } else {
+                  // 非表示にする
+                  currentPhraseElement.style.opacity = '0';
+                  currentPhraseElement.style.visibility = 'hidden';
+                  toggleButton.innerHTML = '英語<br>ON';
+                  toggleButton.style.backgroundColor = '#757575';
+                  toggleButton.title = '英語を表示';
+                  console.log(`🙈 ${container.id}: 英語を非表示`);
+                  
+                  //  イラストヒントトーストを表示
+                  if (typeof window.showIllustrationHintToast === 'function') {
+                    window.showIllustrationHintToast(toggleButton);
+                  }
+                }
+              });
+            }
             
             // phraseRowに新規DOMを追加
-            phraseRow.appendChild(toggleButton);
+            if (toggleButton) phraseRow.appendChild(toggleButton);
             phraseRow.appendChild(newPhraseElement);
             
             // 古いphraseDivを削除してphraseRowを挿入
@@ -1368,9 +1396,13 @@ function syncUpperSlotsFromJson(data) {
               }
             }
             
-            // ボタンの状態を同期
+            // 🔹 OFFボタンの表示・非表示は updateAllSlotToggleButtons() に任せる
+            // （ランダマイズ後に150ms遅延で実行されるため、ここでは処理しない）
+            
+            // ボタンのラベル・色の状態だけを同期
             const toggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
             if (toggleButton) {
+              // isTextVisibleに基づいてボタンの見た目を更新
               if (!isTextVisible) {
                 toggleButton.innerHTML = '英語<br>ON';
                 toggleButton.style.backgroundColor = '#757575';
@@ -1737,6 +1769,11 @@ function syncUpperSlotsFromJson(data) {
     window.currentDisplayedSentence = data.map(slot => ({ ...slot }));
     console.log(`🎤 音声用データ更新完了（上位スロット同期後）: ${window.currentDisplayedSentence.length}件`);
     console.log(`🎤 音声用データ詳細:`, window.currentDisplayedSentence.map(s => `${s.Slot}: ${s.SlotPhrase || s.SubslotElement}`));
+    
+    // 🔹 OFFボタンの表示・非表示を更新（DOM更新完了後に実行）
+    if (typeof window.updateAllSlotToggleButtons === 'function') {
+      window.updateAllSlotToggleButtons();
+    }
   }, 200);
 }
 
@@ -2694,6 +2731,47 @@ function applyDisplayOrder(data) {
 
   console.log("✅ 表示順序の適用が完了しました");
 }
+
+console.log("🚀 Line 2736到達: updateAllSlotToggleButtons関数を定義します");
+
+// 🔹 全スロットのOFFボタン表示・非表示を更新（ランダマイズ後に呼び出す）
+window.updateAllSlotToggleButtons = function() {
+  console.log("🔄 全スロットのOFFボタン表示・非表示を更新");
+  
+  // 全スロットコンテナを取得
+  const allSlotContainers = document.querySelectorAll('[id^="slot-"]');
+  
+  allSlotContainers.forEach(container => {
+    // サブスロットコンテナ（id="slot-xxx-sub"）はスキップ
+    if (container.id.endsWith('-sub')) return;
+    
+    // phraseRowを取得
+    const phraseRow = container.querySelector('.upper-slot-phrase-row');
+    if (!phraseRow) return;
+    
+    // .slot-phraseの内容を取得
+    const phraseElement = phraseRow.querySelector('.slot-phrase');
+    if (!phraseElement) return;
+    
+    const phraseText = phraseElement.textContent?.trim() || '';
+    const hasEnglishText = phraseText !== '';
+    
+    // OFFボタンを取得
+    const toggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
+    if (!toggleButton) return;
+    
+    // 英語テキストがない場合、ボタンを非表示
+    if (!hasEnglishText) {
+      toggleButton.style.display = 'none';
+      console.log(`🙈 OFFボタン非表示: ${container.id} (英語テキストなし)`);
+    } else {
+      toggleButton.style.display = '';
+      console.log(`👁️ OFFボタン表示: ${container.id} (英語テキストあり: "${phraseText}")`);
+    }
+  });
+  
+  console.log("✅ 全スロットのOFFボタン更新完了");
+};
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
 window.safeJsonSync = function(data) {
