@@ -2048,6 +2048,138 @@ allUpperSlotToggleButtons.forEach(button => {
 ### 影響範囲
 - 変更時間: 15分
 - 影響ファイル: 1ファイル（visibility_control.js）、2関数
+
+---
+
+## [2026-01-02] 親スロットのOFFボタン（英語・ヒント）がランダマイズ後も表示される問題（続編：ヒント対応）
+
+### 発生した問題（続編）
+- 英語OFFボタンの問題を修正後、**ヒントOFFボタンも同じ問題が発生**
+- サブスロットを持つ親スロットで、ヒントテキスト（SlotText）が空の場合でもヒントOFFボタンが表示される
+- ランダマイズ後、ヒントのない親スロットにヒントOFFボタンが残り続ける
+
+### Root Cause（根本原因）
+**英語OFFボタンと同じ構造的問題**（前回の修正を水平展開する必要）
+
+#### 問題の詳細
+1. **updateAllSlotToggleButtons()が英語OFFボタンのみ処理**
+   - `.upper-slot-toggle-btn`（英語OFFボタン）はチェック
+   - `.upper-slot-auxtext-toggle-btn`（ヒントOFFボタン）はチェックなし
+   
+2. **ヒントOFFボタンの判定基準**
+   - 英語：`SlotPhrase`の有無
+   - ヒント：`SlotText`の有無
+   
+3. **タイミング問題は既に解決済み**
+   - `syncUpperSlotsFromJson()`の200ms後に`updateAllSlotToggleButtons()`を呼び出す設計
+   - → ヒントOFFボタンも同じ場所で処理すればOK
+
+### Solution（解決策）
+**updateAllSlotToggleButtons()を拡張し、英語・ヒント両方のOFFボタンを処理**
+
+#### 実装（training/js/insert_test_data_clean.js Line 2737-2806）
+
+```javascript
+// 🔹 全スロットのOFFボタン（英語・ヒント）表示・非表示を更新（ランダマイズ後に呼び出す）
+window.updateAllSlotToggleButtons = function() {
+  console.log("🔄 全スロットのOFFボタン（英語・ヒント）表示・非表示を更新");
+  
+  const allSlotContainers = document.querySelectorAll('[id^="slot-"]');
+  
+  allSlotContainers.forEach(container => {
+    if (container.id.endsWith('-sub')) return;
+    
+    // === 英語OFFボタンの処理 ===
+    const phraseRow = container.querySelector('.upper-slot-phrase-row');
+    if (phraseRow) {
+      const phraseElement = phraseRow.querySelector('.slot-phrase');
+      if (phraseElement) {
+        const phraseText = phraseElement.textContent?.trim() || '';
+        const hasEnglishText = phraseText !== '';
+        
+        const englishToggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
+        if (englishToggleButton) {
+          if (!hasEnglishText) {
+            englishToggleButton.style.display = 'none';
+            console.log(`🙈 英語OFFボタン非表示: ${container.id} (英語テキストなし)`);
+          } else {
+            englishToggleButton.style.display = '';
+            console.log(`👁️ 英語OFFボタン表示: ${container.id} (英語テキストあり: "${phraseText.substring(0, 30)}...")`);
+          }
+        }
+      }
+    }
+    
+    // === ヒントOFFボタンの処理 === 🆕
+    const textRow = container.querySelector('.upper-slot-text-row');
+    if (textRow) {
+      const textElement = textRow.querySelector('.slot-text');
+      if (textElement) {
+        const hintText = textElement.textContent?.trim() || '';
+        const hasHintText = hintText !== '';
+        
+        const hintToggleButton = textRow.querySelector('.upper-slot-auxtext-toggle-btn');
+        if (hintToggleButton) {
+          if (!hasHintText) {
+            hintToggleButton.style.display = 'none';
+            console.log(`🙈 ヒントOFFボタン非表示: ${container.id} (ヒントテキストなし)`);
+          } else {
+            hintToggleButton.style.display = '';
+            console.log(`👁️ ヒントOFFボタン表示: ${container.id} (ヒントテキストあり: "${hintText.substring(0, 30)}...")`);
+          }
+        }
+      }
+    }
+  });
+  
+  console.log("✅ 全スロットのOFFボタン（英語・ヒント）更新完了");
+};
+```
+
+### Design Rationale（設計根拠）
+
+#### 同じパターンを水平展開
+```
+英語OFFボタン          ヒントOFFボタン
+├─ phraseRow          ├─ textRow
+├─ .slot-phrase       ├─ .slot-text
+├─ .upper-slot-toggle-btn  ├─ .upper-slot-auxtext-toggle-btn
+└─ SlotPhrase有無     └─ SlotText有無
+```
+
+#### タイミング解決策の再利用
+- **既存の解決策**：`syncUpperSlotsFromJson()`内でDOM更新完了後200msで`updateAllSlotToggleButtons()`
+- **今回の修正**：同じタイミングで英語・ヒント両方を処理
+- **追加コスト**：0（同じループ内で処理）
+
+### Lessons Learned（教訓）
+
+1. **パターンの水平展開**
+   - 英語OFFボタンで確立したパターンをヒントOFFボタンにも適用
+   - 同じ問題は同じ解決策で対応可能
+
+2. **関数の責務拡張**
+   - `updateAllSlotToggleButtons()`の名前は既に「全スロットのOFFボタン」
+   - 英語だけでなく、全てのOFFボタン（英語・ヒント）を担当するのが自然
+
+3. **コード重複の回避**
+   - 英語用とヒント用で別々の関数を作らない
+   - 1つの関数で両方を処理 → メンテナンス性向上
+
+4. **ユーザー視点の一貫性**
+   - 英語OFFボタンが正しく動くのに、ヒントOFFボタンが動かない → UX不整合
+   - 全てのOFFボタンが同じロジックで動作 → 予測可能なUI
+
+### 影響範囲
+- **変更時間**: 10分
+- **影響ファイル**: 1ファイル（insert_test_data_clean.js）、1関数拡張
+- **副作用**: なし（既存機能に影響なし）
+- **関連修正**: 前回の英語OFFボタン修正（2026-01-02）の水平展開
+
+### 実装日時
+2026-01-02
+
+---
 - 修正行数: 約30行追加
 
 ### Git Diff
@@ -2390,3 +2522,123 @@ console.log('phraseElement幅:', el?.offsetWidth);
 - 発生日時: 2026-01-04
 - 解決日時: 2026-01-04
 - 所要時間: 約2時間（多数のJSアプローチを試行後、CSSで解決）
+
+---
+
+## [2026-01-05] 親スロットOFFボタンが英語テキスト空でも表示される問題
+
+### 発生した問題
+- サブスロットを持つ親スロット（S, O1, M1, M3など）で、英語テキストが空なのにOFFボタンが表示される
+- ランダマイズを繰り返すと、前回の状態を引き継ぐ（前回英語テキストあり→今回空でもボタン表示）
+- 逆に前回空だった場合、今回英語テキストありでもボタンが非表示のまま
+- 最初は正しく動作するが、ランダマイズ後に問題発生
+
+### Root Cause（根本原因）
+**タイミングと処理の競合により、古いDOM状態を参照していた**
+
+#### 問題の実行順序
+```javascript
+// ランダマイズボタンクリック後の処理順序
+1. syncUpperSlotsFromJson(data) 開始
+   ├─ DOM更新処理中...
+   └─ Line 1411: 既存のOFFボタン表示処理（英語テキストの有無を判定してdisplay設定）
+2. randomizer_individual.js: setTimeout(updateAllSlotToggleButtons, 150ms)
+   └─ DOM更新完了前の古い状態を見てボタン表示・非表示を設定
+3. syncUpperSlotsFromJson()のDOM更新完了
+4. Line 1411の処理が再びボタンを表示（せっかく非表示にしたのに上書き）
+```
+
+#### なぜ「前回の状態」を引き継ぐのか
+- `updateAllSlotToggleButtons()`が150ms後に実行されるが、DOM更新前の状態を見る
+- その後、`syncUpperSlotsFromJson()`内のLine 1411処理が実行され、ボタン状態を上書き
+- 結果として、「DOM更新前の古い英語テキスト」に基づいてボタンが表示・非表示される
+
+#### ログで判明した競合
+```
+insert_test_data_clean.js:2741 🔄 全スロットのOFFボタン表示・非表示を更新
+insert_test_data_clean.js:2768 🙈 OFFボタン非表示: slot-s (英語テキストなし)  ← 正しく設定
+insert_test_data_clean.js:2775 ✅ 全スロットのOFFボタン更新完了
+insert_test_data_clean.js:1411 👁️ 親スロットOFFボタンを表示: slot-m1 (英語テキストあり)  ← 後から上書き！
+```
+
+### Solution（解決策）
+**処理の一本化とタイミングの最適化**
+
+#### 実装変更
+1. **`updateAllSlotToggleButtons()`関数を作成**（insert_test_data_clean.js Line 2737）
+   - 全スロットをスキャンして、英語テキストの有無でOFFボタンを表示・非表示
+   - DOM状態を直接参照（phraseElement.textContent）
+
+2. **`syncUpperSlotsFromJson()`内のOFFボタン処理を削除**（Line 1395-1417）
+   - 重複処理を排除
+   - ボタンのラベル・色の更新のみ残す（ON/OFF状態の見た目）
+
+3. **`syncUpperSlotsFromJson()`の最後に`updateAllSlotToggleButtons()`を呼び出し**（Line 1772）
+   - DOM更新完了後（200ms後）に確実に実行
+   - 最新のDOM状態を反映
+
+4. **randomizer_individual.jsからの重複呼び出しを削除**
+   - 8箇所全ての個別ランダマイズ関数から削除
+   - タイミングの競合を解消
+
+#### コード例
+```javascript
+// insert_test_data_clean.js Line 2737
+window.updateAllSlotToggleButtons = function() {
+  const allSlotContainers = document.querySelectorAll('[id^="slot-"]');
+  
+  allSlotContainers.forEach(container => {
+    if (container.id.endsWith('-sub')) return;
+    
+    const phraseRow = container.querySelector('.upper-slot-phrase-row');
+    const phraseElement = phraseRow?.querySelector('.slot-phrase');
+    const toggleButton = phraseRow?.querySelector('.upper-slot-toggle-btn');
+    
+    if (!phraseElement || !toggleButton) return;
+    
+    const phraseText = phraseElement.textContent?.trim() || '';
+    const hasEnglishText = phraseText !== '';
+    
+    if (!hasEnglishText) {
+      toggleButton.style.display = 'none';
+      console.log(`🙈 OFFボタン非表示: ${container.id} (英語テキストなし)`);
+    } else {
+      toggleButton.style.display = '';
+      console.log(`👁️ OFFボタン表示: ${container.id} (英語テキストあり: "${phraseText}")`);
+    }
+  });
+};
+
+// syncUpperSlotsFromJson()の最後
+setTimeout(() => {
+  window.currentDisplayedSentence = data.map(slot => ({ ...slot }));
+  
+  // OFFボタンの表示・非表示を更新（DOM更新完了後に実行）
+  if (typeof window.updateAllSlotToggleButtons === 'function') {
+    window.updateAllSlotToggleButtons();
+  }
+}, 200);
+```
+
+### Design Rationale（設計根拠）
+1. **単一責任の原則**: OFFボタンの表示・非表示は`updateAllSlotToggleButtons()`のみが担当
+2. **タイミングの確実性**: DOM更新完了後に実行（200ms後）
+3. **DOM直接参照**: データではなく実際のDOM状態を見る（確実性）
+4. **重複排除**: `syncUpperSlotsFromJson()`内の処理を削除してシンプル化
+
+### 学んだ教訓
+1. **タイミングの問題は根が深い**: setTimeoutの遅延時間だけでは解決しない
+2. **処理の競合を避ける**: 同じ責務を複数箇所で処理しない
+3. **ログで実行順序を追跡**: Console出力の時系列が問題解明の鍵
+4. **DOM直接参照の重要性**: データとDOMの同期を信用せず、DOMを直接確認
+
+### 関連する試行錯誤
+- 最初は`insertTestData()`と`syncUpperSlotsFromJson()`の既存phraseRow更新パスにhasEnglishTextチェックを追加
+- しかしランダマイズ後にコードが実行されない（ログが出ない）問題に直面
+- 原因調査で、タイミングと処理の競合が判明
+- 最終的に処理を一本化することで解決
+
+### タイムスタンプ
+- 発生日時: 2026-01-05
+- 解決日時: 2026-01-05
+- 所要時間: 約3時間（キャッシュ問題、タイミング調査、競合解消）

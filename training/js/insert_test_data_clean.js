@@ -2734,9 +2734,9 @@ function applyDisplayOrder(data) {
 
 console.log("🚀 Line 2736到達: updateAllSlotToggleButtons関数を定義します");
 
-// 🔹 全スロットのOFFボタン表示・非表示を更新（ランダマイズ後に呼び出す）
+// 🔹 全スロットのOFFボタン（英語・ヒント）表示・非表示を更新（ランダマイズ後に呼び出す）
 window.updateAllSlotToggleButtons = function() {
-  console.log("🔄 全スロットのOFFボタン表示・非表示を更新");
+  console.log("🔄 全スロットのOFFボタン（英語・ヒント）表示・非表示を更新");
   
   // 全スロットコンテナを取得
   const allSlotContainers = document.querySelectorAll('[id^="slot-"]');
@@ -2745,32 +2745,58 @@ window.updateAllSlotToggleButtons = function() {
     // サブスロットコンテナ（id="slot-xxx-sub"）はスキップ
     if (container.id.endsWith('-sub')) return;
     
+    // === 英語OFFボタンの処理 ===
     // phraseRowを取得
     const phraseRow = container.querySelector('.upper-slot-phrase-row');
-    if (!phraseRow) return;
+    if (phraseRow) {
+      // .slot-phraseの内容を取得
+      const phraseElement = phraseRow.querySelector('.slot-phrase');
+      if (phraseElement) {
+        const phraseText = phraseElement.textContent?.trim() || '';
+        const hasEnglishText = phraseText !== '';
+        
+        // 英語OFFボタンを取得
+        const englishToggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
+        if (englishToggleButton) {
+          // 英語テキストがない場合、ボタンを非表示
+          if (!hasEnglishText) {
+            englishToggleButton.style.display = 'none';
+            console.log(`🙈 英語OFFボタン非表示: ${container.id} (英語テキストなし)`);
+          } else {
+            englishToggleButton.style.display = '';
+            console.log(`👁️ 英語OFFボタン表示: ${container.id} (英語テキストあり: "${phraseText.substring(0, 30)}...")`);
+          }
+        }
+      }
+    }
     
-    // .slot-phraseの内容を取得
-    const phraseElement = phraseRow.querySelector('.slot-phrase');
-    if (!phraseElement) return;
-    
-    const phraseText = phraseElement.textContent?.trim() || '';
-    const hasEnglishText = phraseText !== '';
-    
-    // OFFボタンを取得
-    const toggleButton = phraseRow.querySelector('.upper-slot-toggle-btn');
-    if (!toggleButton) return;
-    
-    // 英語テキストがない場合、ボタンを非表示
-    if (!hasEnglishText) {
-      toggleButton.style.display = 'none';
-      console.log(`🙈 OFFボタン非表示: ${container.id} (英語テキストなし)`);
-    } else {
-      toggleButton.style.display = '';
-      console.log(`👁️ OFFボタン表示: ${container.id} (英語テキストあり: "${phraseText}")`);
+    // === ヒントOFFボタンの処理 ===
+    // textRowを取得
+    const textRow = container.querySelector('.upper-slot-text-row');
+    if (textRow) {
+      // .slot-textの内容を取得
+      const textElement = textRow.querySelector('.slot-text');
+      if (textElement) {
+        const hintText = textElement.textContent?.trim() || '';
+        const hasHintText = hintText !== '';
+        
+        // ヒントOFFボタンを取得
+        const hintToggleButton = textRow.querySelector('.upper-slot-auxtext-toggle-btn');
+        if (hintToggleButton) {
+          // ヒントテキストがない場合、ボタンを非表示
+          if (!hasHintText) {
+            hintToggleButton.style.display = 'none';
+            console.log(`🙈 ヒントOFFボタン非表示: ${container.id} (ヒントテキストなし)`);
+          } else {
+            hintToggleButton.style.display = '';
+            console.log(`👁️ ヒントOFFボタン表示: ${container.id} (ヒントテキストあり: "${hintText.substring(0, 30)}...")`);
+          }
+        }
+      }
     }
   });
   
-  console.log("✅ 全スロットのOFFボタン更新完了");
+  console.log("✅ 全スロットのOFFボタン（英語・ヒント）更新完了");
 };
 
 // JSONロードエラー対策：try-catchで囲んでエラーを詳細にログ出力
