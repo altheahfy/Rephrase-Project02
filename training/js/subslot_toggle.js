@@ -431,11 +431,6 @@ function bindSubslotToggleButtons() {
       button.addEventListener("click", () => {
         console.log(`🚀 Event listener triggered for slotId: ${slotId}`);
         toggleExclusiveSubslot(slotId);
-        
-        // 🎯 サブスロット展開時の自動スクロール処理
-        setTimeout(() => {
-          scrollToExpandedSubslot(slotId);
-        }, 300); // アニメーション完了後にスクロール
       });
       console.log(`✅ Event listener rebound for slotId: ${slotId}`);
     }
@@ -457,35 +452,59 @@ function scrollToExpandedSubslot(slotId) {
     return;
   }
   
+  // 親スロット（.slot-wrapper）を取得
+  const parentWrapper = subslotContainer.closest('.slot-wrapper');
+  
+  if (!parentWrapper) {
+    console.warn(`⚠️ 親スロット（.slot-wrapper）が見つかりません`);
+    return;
+  }
+  
   // 展開状態を確認
-  const isExpanded = subslotContainer.closest('.slot-wrapper')?.classList.contains('active-subslot-area');
+  const isExpanded = parentWrapper.classList.contains('active-subslot-area');
   
   if (!isExpanded) {
     console.log(`ℹ️ サブスロットが閉じられたため、スクロール処理をスキップ`);
     return;
   }
   
-  // サブスロットコンテナの位置を取得
-  const rect = subslotContainer.getBoundingClientRect();
+  // 🔑 親スロット全体の位置を取得（親スロットとサブスロット両方が見えるように）
+  const rect = parentWrapper.getBoundingClientRect();
   const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
   
   // ビューポートの高さ
   const viewportHeight = window.innerHeight;
   
-  // サブスロットの絶対位置（ページ上部からの距離）
+  // 親スロット全体の絶対位置（ページ上部からの距離）
   const elementTop = rect.top + scrollTop;
   
-  // サブスロットをビューポートの中央に表示するために必要なスクロール量
-  // ただし、上部に余裕を持たせる（ビューポート高さの30%の位置）
-  const targetScrollPosition = elementTop - (viewportHeight * 0.3);
+  // 親スロット全体の高さ
+  const elementHeight = rect.height;
   
-  // スムーズスクロール実行
-  window.scrollTo({
-    top: Math.max(0, targetScrollPosition), // 負の値にならないように
-    behavior: 'smooth'
-  });
+  console.log(`📊 親スロット情報: 位置=${elementTop}px, 高さ=${elementHeight}px, ビューポート=${viewportHeight}px`);
   
-  console.log(`✅ 自動スクロール実行: ${targetScrollPosition}px へ移動`);
+  // 🎯 親スロット全体がビューポート内に収まるかチェック
+  if (elementHeight > viewportHeight * 0.8) {
+    // 親スロット＋サブスロットが大きすぎる場合：親スロットの上端をビューポート上部10%の位置に
+    const targetScrollPosition = elementTop - (viewportHeight * 0.1);
+    console.log(`📏 大きなスロット: 上部10%の位置にスクロール (${targetScrollPosition}px)`);
+    
+    window.scrollTo({
+      top: Math.max(0, targetScrollPosition),
+      behavior: 'smooth'
+    });
+  } else {
+    // 親スロット＋サブスロットが収まる場合：親スロットの上端をビューポート上部20%の位置に
+    const targetScrollPosition = elementTop - (viewportHeight * 0.2);
+    console.log(`📏 通常サイズ: 上部20%の位置にスクロール (${targetScrollPosition}px)`);
+    
+    window.scrollTo({
+      top: Math.max(0, targetScrollPosition),
+      behavior: 'smooth'
+    });
+  }
+  
+  console.log(`✅ 自動スクロール実行完了（親スロット全体を基準）`);
 }
 
 /**
