@@ -5,6 +5,98 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-05] 多言語対応（JP/EN切り替え）でボタンが日本語のまま表示される問題
+
+### 発生した問題
+- **英語全OFF/ONボタン**: ENでロードしても日本語「🙈 英語全OFF」のまま。クリックすると「btn-hide-all」というキー名が表示される
+- **個別英語OFF/ONボタン**: 初期表示が日本語、クリックしても日本語「英語ON」に戻る
+- 他のUI要素はJP/EN切り替えで正常に動作
+
+### Root Cause（根本原因）
+**3つの問題が複合していた**
+
+#### 問題1: t()関数の辞書が2ファイルで不一致
+- `visibility_control.js`と`insert_test_data_clean.js`に別々のt()関数が存在
+- 後から読み込まれる`insert_test_data_clean.js`のt()が優先される
+- そのt()の辞書に`'btn-hide-all'`と`'btn-show-all'`がなかった
+- 結果: `dict[lang]?.[key] || key`のフォールバックでキー名がそのまま返された
+
+#### 問題2: localStorageのキー名の不一致
+- t()関数が`localStorage.getItem('user-language')`を参照
+- 実際の言語設定は`'rephrase_language'`というキーに保存されていた
+- 結果: 常に`null`が返され、デフォルトの`'ja'`が使用された
+
+#### 問題3: ハードコードされた日本語テキスト
+- `visibility_control.js`の複数箇所でボタンテキストがハードコード
+  - 初期化時のsetTimeout内（Line 862-865）
+  - `hideAllEnglishText()`と`showAllEnglishText()`内（4箇所）
+- これらがt()関数を使わず直接日本語を設定していた
+
+### Solution（解決策）
+
+#### 1. t()関数の辞書を統合
+**insert_test_data_clean.js**に全キーを追加：
+```javascript
+function t(key) {
+  const lang = localStorage.getItem('rephrase_language') || 'ja';
+  const dict = {
+    ja: {
+      'btn-english-off': '英語<br>OFF',
+      'btn-english-on': '英語<br>ON',
+      'btn-hide-all': '🙈 英語全OFF',
+      'btn-show-all': '👁️ 英語全ON'
+    },
+    en: {
+      'btn-english-off': 'EN<br>OFF',
+      'btn-english-on': 'EN<br>ON',
+      'btn-hide-all': '🙈 Hide All English',
+      'btn-show-all': '👁️ Show All English'
+    }
+  };
+  return dict[lang]?.[key] || key;
+}
+```
+
+#### 2. localStorageキーを統一
+- `visibility_control.js`、`insert_test_data_clean.js`のt()関数: `'user-language'` → `'rephrase_language'`
+- `language_switcher.js`のrefreshAllButtons(): `'user-language'` → `'rephrase_language'`
+
+#### 3. ハードコードをt()関数呼び出しに変更
+- `visibility_control.js` Line 862-865: `'👁️ 英語ON'` → `t('btn-show-all')`、`'🙈 英語全OFF'` → `t('btn-hide-all')`
+- `hideAllEnglishText()`内: `'英語<br>ON'` → `window.getEnglishOnButtonText()`
+- `showAllEnglishText()`内: `'EN<br>OFF'` → `window.getEnglishOffButtonText()`
+
+### Design Rationale（設計根拠）
+- **ChatGPTのセカンドオピニオン**: 「言語を表示の後処理ではなくレンダリングの入力にする」
+- すべてのUI文字列はt(key)経由で出力し、DOM直書き翻訳を完全排除
+- 状態判定は背景色ベース（テキスト内容ではなく）
+
+### 修正ファイル
+1. `training/js/insert_test_data_clean.js` - t()関数の辞書統合、localStorageキー修正
+2. `training/js/visibility_control.js` - localStorageキー修正、ハードコード削除
+3. `training/js/language_switcher.js` - refreshAllButtons()のlocalStorageキー修正
+
+### デバッグ手法
+```javascript
+// 1. t()関数の中身を確認
+t.toString()
+
+// 2. 言語設定のキーを確認
+Object.keys(localStorage)  // → 'rephrase_language'を発見
+
+// 3. t()関数のテスト
+localStorage.getItem('rephrase_language')  // → 'en'
+t('btn-hide-all')  // → '🙈 Hide All English'
+```
+
+### 教訓
+1. **localStorageのキー名は統一すべき**: プロジェクト内で複数のキー名（`user-language`、`rephrase_language`）が混在していた
+2. **同名関数の上書きに注意**: 複数ファイルで同名のt()関数を定義すると、読み込み順で最後のものが優先される
+3. **ハードコードは全箇所洗い出しが必要**: grepで`innerHTML = '`を検索して全箇所を特定
+4. **コンソールでの直接テスト**: `t.toString()`、`t('key')`で関数の動作を即座に確認できる
+
+---
+
 ## [2026-01-05] サブスロット展開時にタブ接続が動かない問題（setTimeout内エラーの中断）
 
 ### 発生した問題

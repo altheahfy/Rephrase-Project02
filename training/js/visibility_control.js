@@ -1,5 +1,23 @@
-// 3要素表示制御システム - 全10スロット対応
+﻿// 3要素表示制御システム - 全10スロット対応
 // S, Aux, V, M1, M2, C1, O1, O2, C2, M3スロットの画像・補助テキスト・例文テキストの個別表示制御
+
+// 🌐 軽量版t()関数
+function t(key) {
+  const lang = localStorage.getItem('rephrase_language') || 'ja';
+  const dict = {
+    ja: {
+      'btn-hide-all': '🙈 英語全OFF',
+      'btn-show-all': '👁️ 英語全ON'
+    },
+    en: {
+      'btn-hide-all': '🙈 Hide All English',
+      'btn-show-all': '👁️ Show All English'
+    }
+  };
+  const result = dict[lang]?.[key] || key;
+  console.log(`🌐 t("${key}") → lang=${lang}, result="${result}"`);
+  return result;
+}
 
 // 🎯 スロット定義
 const ALL_SLOTS = ['s', 'aux', 'v', 'm1', 'm2', 'c1', 'o1', 'o2', 'c2', 'm3'];
@@ -423,7 +441,7 @@ function setupVisibilityControlUI() {
   if (hideAllEnglishButton) {
     // 🆕 最初に強制的に緑色を設定（HTMLの初期値を上書き）
     hideAllEnglishButton.style.backgroundColor = '#4CAF50';
-    hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+    hideAllEnglishButton.innerHTML = t('btn-hide-all');
     console.log("🎨 英語全OFFボタンの初期色を緑色に設定しました");
     
     hideAllEnglishButton.addEventListener('click', function() {
@@ -436,13 +454,13 @@ function setupVisibilityControlUI() {
         // 非表示にする
         console.log("🔒 全英文を非表示にします");
         hideAllEnglishText();
-        hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+        hideAllEnglishButton.innerHTML = t('btn-show-all');
         hideAllEnglishButton.style.backgroundColor = '#757575'; // グレー色
       } else {
         // 表示にする
         console.log("👁️ 全英文を表示します");
         showAllEnglishText();
-        hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+        hideAllEnglishButton.innerHTML = t('btn-hide-all');
         hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
       }
       
@@ -474,11 +492,11 @@ function setupVisibilityControlUI() {
     // 初期状態のボタンラベルと色を設定
     const initiallyVisible = visibilityState['s']?.['text'] !== false;
     if (!initiallyVisible) {
-      hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+      hideAllEnglishButton.innerHTML = t('btn-show-all');
       hideAllEnglishButton.style.backgroundColor = '#757575';
     } else {
       // 初期状態が表示中の場合も明示的に緑色を設定
-      hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+      hideAllEnglishButton.innerHTML = t('btn-hide-all');
       hideAllEnglishButton.style.backgroundColor = '#4CAF50';
     }
   }
@@ -714,7 +732,7 @@ function hideAllEnglishText() {
     // 🆕 画面上の個別ボタンも同期（サブスロット）
     const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
     allSubslotToggleButtons.forEach(button => {
-      button.innerHTML = '英語<br>ON';
+      button.innerHTML = window.getEnglishOnButtonText();
       button.style.backgroundColor = '#757575';
       button.title = '英語を表示';
     });
@@ -723,7 +741,7 @@ function hideAllEnglishText() {
     // 🆕 画面上の個別ボタンも同期（親スロット）
     const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
     allUpperSlotToggleButtons.forEach(button => {
-      button.innerHTML = '英語<br>ON';
+      button.innerHTML = window.getEnglishOnButtonText();
       button.style.backgroundColor = '#757575';
       button.title = '英語を表示';
     });
@@ -784,7 +802,7 @@ function showAllEnglishText() {
     // 🆕 画面上の個別ボタンも同期（サブスロット）
     const allSubslotToggleButtons = document.querySelectorAll('.subslot-toggle-btn');
     allSubslotToggleButtons.forEach(button => {
-      button.innerHTML = 'EN<br>OFF';
+      button.innerHTML = window.getEnglishOffButtonText();
       button.style.backgroundColor = '#4CAF50';
       button.title = '英語を非表示';
     });
@@ -793,7 +811,7 @@ function showAllEnglishText() {
     // 🆕 画面上の個別ボタンも同期（親スロット）
     const allUpperSlotToggleButtons = document.querySelectorAll('.upper-slot-toggle-btn');
     allUpperSlotToggleButtons.forEach(button => {
-      button.innerHTML = 'EN<br>OFF';
+      button.innerHTML = window.getEnglishOffButtonText();
       button.style.backgroundColor = '#4CAF50';
       button.title = '英語を非表示';
     });
@@ -834,15 +852,15 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     setupVisibilityControlUI();
     
-    // 🆕 ボタンラベルを現在の状態に同期
+    // 🆕 ボタンラベルを現在の状態に同期（t()関数で言語対応）
     const hideAllEnglishButton = document.getElementById('hide-all-english-visibility');
     if (hideAllEnglishButton && visibilityState['s']) {
       const isCurrentlyVisible = visibilityState['s']['text'] !== false;
       if (!isCurrentlyVisible) {
-        hideAllEnglishButton.innerHTML = '👁️ 英語ON';
+        hideAllEnglishButton.innerHTML = t('btn-show-all');
         hideAllEnglishButton.style.backgroundColor = '#757575'; // グレー色
       } else {
-        hideAllEnglishButton.innerHTML = '🙈 英語全OFF';
+        hideAllEnglishButton.innerHTML = t('btn-hide-all');
         hideAllEnglishButton.style.backgroundColor = '#4CAF50'; // 緑色
       }
       console.log('🔄 ボタンラベルを同期しました:', isCurrentlyVisible ? '表示中' : '非表示');

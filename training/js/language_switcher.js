@@ -167,8 +167,49 @@ function applyTranslations() {
     }
   });
   
+  // 🆕 言語切り替え時に既存ボタンを再描画
+  refreshAllButtons();
+  
   console.log(`✅ 翻訳適用完了: ${Object.keys(dict).length}件`);
 }
+
+/**
+ * 全ボタンを再描画（t()経由で正しい言語を取得）
+ */
+function refreshAllButtons() {
+  // 個別英語OFF/ONボタン（背景色で状態を判定）
+  document.querySelectorAll('.upper-slot-toggle-btn').forEach(btn => {
+    const bgColor = btn.style.backgroundColor;
+    const isOff = bgColor === 'rgb(76, 175, 80)' || bgColor === '#4CAF50'; // 緑色=OFF状態
+    
+    if (isOff) {
+      if (window.getEnglishOffButtonText) {
+        btn.innerHTML = window.getEnglishOffButtonText();
+      }
+    } else {
+      if (window.getEnglishOnButtonText) {
+        btn.innerHTML = window.getEnglishOnButtonText();
+      }
+    }
+  });
+  
+  // 全体英語OFF/ONボタンも再描画
+  const hideAllBtn = document.getElementById('hide-all-english-visibility');
+  if (hideAllBtn) {
+    const bgColor = hideAllBtn.style.backgroundColor;
+    const isOff = bgColor === 'rgb(76, 175, 80)' || bgColor === '#4CAF50';
+    
+    const lang = localStorage.getItem('rephrase_language') || 'ja';
+    if (isOff) {
+      hideAllBtn.innerHTML = lang === 'ja' ? '🙈 英語全OFF' : '🙈 Hide All English';
+    } else {
+      hideAllBtn.innerHTML = lang === 'ja' ? '👁️ 英語全ON' : '👁️ Show All English';
+    }
+  }
+}
+
+// 🌐 refreshAllButtonsをグローバルに公開
+window.refreshAllButtons = refreshAllButtons;
 
 /**
  * 言語ボタンの状態を更新
