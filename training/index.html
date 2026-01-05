@@ -156,6 +156,9 @@
   
   <!-- 🎯 スムーズレンダリング制御システム -->
   <script src="js/smooth_render_controller.js"></script>
+  
+  <!-- 🌐 言語切り替えシステム -->
+  <script src="js/language_switcher.js"></script>
 
   <!-- エラーハンドリング関数の確実な定義 -->
   <script>
@@ -518,22 +521,42 @@ function handleLogout() {
   
   <!-- サンプルデータ選択 -->
   <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-    <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;">📋 データ</label>
+    <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;" data-i18n="data-label">📋 データ</label>
     <select id="presetSelect" style="width: 120px; padding: 2px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; height: 20px;">
-      <option value="">-- 選択 --</option>
-      <option value="data/slot_order_data.json">🎯 メイン</option>
-      <option value="data/slot_order_data2.json">📚 例文2</option>
-      <option value="data/V自動詞第1文型.json">📝 自動詞第1文型</option>
+      <option value="" data-i18n="data-select-placeholder">-- 選択 --</option>
+      <option value="data/slot_order_data.json" data-i18n="data-option-main">🎯 メイン</option>
+      <option value="data/slot_order_data2.json" data-i18n="data-option-2">📚 例文2</option>
+      <option value="data/V自動詞第1文型.json" data-i18n="data-option-intransitive">📝 自動詞第1文型</option>
     </select>
-    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 20px;">読込</button>
+    <button id="loadPresetButton" style="background-color: #4CAF50; color: white; border: none; padding: 2px 6px; font-size: 11px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 20px;" data-i18n="btn-load">読込</button>
   </div>
   
-  <!-- ズームコントローラー -->
-  <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-    <label style="font-size: 12px; font-weight: bold; color: #333; white-space: nowrap;">🔍 ズーム</label>
-    <input type="range" id="zoomSlider" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 80px; height: 18px; cursor: pointer; flex-shrink: 0;">
-    <span id="zoomValue" style="font-size: 11px; color: #666; min-width: 35px; text-align: left; white-space: nowrap; flex-shrink: 0;">100%</span>
-    <button id="zoomResetButton" style="background-color: #FF9800; color: white; border: none; padding: 2px 6px; font-size: 10px; cursor: pointer; border-radius: 3px; font-weight: bold; white-space: nowrap; flex-shrink: 0; height: 18px;">リセット</button>
+  <!-- 🌐 言語切り替えボタン -->
+  <div style="display: flex; gap: 0; border: 2px solid #4CAF50; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+    <button id="lang-btn-ja" class="lang-btn active" style="
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 3px 12px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      height: 20px;
+      line-height: 1;
+    ">JP</button>
+    <button id="lang-btn-en" class="lang-btn" style="
+      background: white;
+      color: #4CAF50;
+      border: none;
+      padding: 3px 12px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      height: 20px;
+      line-height: 1;
+    ">EN</button>
   </div>
 </div>
 
@@ -541,6 +564,22 @@ function handleLogout() {
 /* フロートメニューのスクロールバーを隠す */
 #navigation-float-menu::-webkit-scrollbar {
   display: none;
+}
+
+/* 言語切り替えボタンのスタイル */
+.lang-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.lang-btn.active {
+  background: #4CAF50 !important;
+  color: white !important;
+}
+
+.lang-btn:not(.active) {
+  background: white !important;
+  color: #4CAF50 !important;
 }
 </style>
 
@@ -756,32 +795,32 @@ function handleLogout() {
 
 <!-- タイトル（常に表示） -->
 <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px; margin-top: 20px; position: relative; z-index: 10000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); gap: 20px;">
-  <h1 style="margin: 0; color: #333; font-size: 28px; font-weight: bold; flex-shrink: 0;">
+  <h1 style="margin: 0; color: #333; font-size: 28px; font-weight: bold; flex-shrink: 0;" data-i18n="app-title">
    🔄 Rephrase 例文トレーニング
   </h1>
   
   <!-- 使い方ガイド（コンパクト版） -->
   <div style="display: flex; gap: 10px; font-size: 13px; color: #495057; align-items: center; flex-wrap: wrap; margin-left: 20px;">
-    <span id="guide-step-1" style="display: flex; align-items: center; gap: 4px; position: relative;">
+    <span id="guide-step-1" style="display: flex; align-items: center; gap: 4px; position: relative;" title="全シャッフルボタンを押して、ランダムな英語とイラストの組み合わせを表示します" data-i18n-title="tooltip-step-1">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">①</span>
-      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;">🎲 全シャッフル</span>
-      <span>を押して出てくる英語とイラストのセットを覚えよう</span>
+      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;" data-i18n="btn-shuffle-all">🎲 全シャッフル</span>
+      <span data-i18n="guide-text-1">を押して出てくる英語とイラストのセットを覚えよう</span>
     </span>
-    <span id="guide-step-2" style="display: flex; align-items: center; gap: 4px; position: relative;">
+    <span id="guide-step-2" style="display: flex; align-items: center; gap: 4px; position: relative;" title="英語OFFボタンを押して、練習したい部分の英語を隠すことができます" data-i18n-title="tooltip-step-2">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">②</span>
-      <span style="display: inline-flex; align-items: center; justify-content: center; background: #4CAF50; color: white; border: none; padding: 2px 4px; border-radius: 3px; font-size: 9px; font-weight: bold; margin-right: 4px; line-height: 1.2;">英語<br>OFF</span>
-      <span>を押して練習したい場所の英語を消そう</span>
+      <span style="display: inline-flex; align-items: center; justify-content: center; background: #4CAF50; color: white; border: none; padding: 2px 4px; border-radius: 3px; font-size: 9px; font-weight: bold; margin-right: 4px; line-height: 1.2;" class="allow-html" data-i18n="btn-english-off">英語<br>OFF</span>
+      <span data-i18n="guide-text-2">を押して練習したい場所の英語を消そう</span>
     </span>
-    <span id="guide-step-3" style="display: flex; align-items: center; gap: 4px; position: relative;">
+    <span id="guide-step-3" style="display: flex; align-items: center; gap: 4px; position: relative;" title="全シャッフルまたは個別シャッフルボタンで、一部または全部の練習ができます" data-i18n-title="tooltip-step-3">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">③</span>
-      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;">🎲 全シャッフル</span>
-      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;">🎲</span>
-      <span>で練習（一部～全部）</span>
+      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;" data-i18n="btn-shuffle-all">🎲 全シャッフル</span>
+      <span style="display: inline-flex; align-items: center; justify-content: center; background: #ff9800; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;" data-i18n="btn-shuffle">🎲</span>
+      <span data-i18n="guide-text-3">で練習（一部～全部）</span>
     </span>
-    <span id="guide-step-4" style="display: flex; align-items: center; gap: 4px; position: relative;">
+    <span id="guide-step-4" style="display: flex; align-items: center; gap: 4px; position: relative;" title="詳細ボタンを押すと、隠れている英語が表示されます" data-i18n-title="tooltip-step-4">
       <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; font-weight: bold; font-size: 11px;">④</span>
-      <span style="display: inline-flex; align-items: center; justify-content: center; background: #2196f3; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;">▼ 詳細</span>
-      <span>を押すと隠れている英語が出ます</span>
+      <span style="display: inline-flex; align-items: center; justify-content: center; background: #2196f3; color: white; border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px;" data-i18n="btn-detail">▼ 詳細</span>
+      <span data-i18n="guide-text-4">を押すと隠れている英語が出ます</span>
     </span>
   </div>
 </div>
@@ -819,35 +858,10 @@ function handleLogout() {
       font-weight: bold;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: all 0.2s ease;
-    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="btn-control-panel">
       📝 制御パネル
     </button>
   </div>
-  
-  <!-- 音声学習ボタン（右上固定） -->
-  <button id="voice-panel-open-btn" style="
-    position: fixed;
-    top: 60px;
-    right: 10px;
-    z-index: 15500;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
-    min-width: 80px;
-    min-height: 44px;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
-    🎤 音声学習
-  </button>
   
   <!-- 🎯 上位スロット表示制御パネル（デフォルト非表示） -->
   <div id="visibility-control-panel-inline" style="display: none; background: rgba(255, 255, 255, 0.95); padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 15px;">
@@ -953,7 +967,7 @@ function handleLogout() {
         </div>
         
         <!-- 全表示ボタン -->
-        <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;">全表示</button>
+        <button id="reset-all-visibility" style="background-color: #4CAF50; color: white; border: none; padding: 6px 10px; font-size: 11px; cursor: pointer; border-radius: 3px; margin-left: 8px;" data-i18n="btn-reset-visibility">全表示</button>
         
         <!-- 全英文非表示ボタンは上部に移動しました -->
       </div>
@@ -1155,7 +1169,7 @@ function handleLogout() {
        font-weight: bold;
        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
        transition: all 0.2s ease;
-     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="shuffle-all-text">
       🎲 例文全シャッフル
      </button>
      
@@ -1171,12 +1185,29 @@ function handleLogout() {
        font-weight: bold;
        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
        transition: all 0.2s ease;
-     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="btn-hide-all-english">
       🙈 英語全OFF
      </button>
      
      <!-- 💡 例文解説ボタンは explanation-manager.js が hide-all-english-visibility の直後に動的追加 -->
-     <!-- 最終順序: シャッフル → 英語OFF/ON → 解説(JS) -->
+     <!-- 🎤 音声学習ボタンは解説ボタンの直後に動的追加（または下記の静的ボタンを使用） -->
+     <button id="voice-panel-open-btn" style="
+       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       color: white;
+       border: none;
+       padding: 12px 20px;
+       border-radius: 5px;
+       cursor: pointer;
+       font-size: 16px;
+       font-weight: bold;
+       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+       transition: all 0.2s ease;
+       margin-left: 0;
+     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" data-i18n="btn-voice-learning">
+      🎤 音声学習
+     </button>
+     
+     <!-- 最終順序: シャッフル → 英語OFF/ON → 解説(JS) → 音声学習 -->
    </div>
 
    <div class="slot-wrapper">
@@ -2428,20 +2459,25 @@ async function loadPresetConfig() {
     const presetSelect = document.getElementById('presetSelect');
     
     if (presetSelect && config.presets) {
+      // 現在の言語を取得
+      const currentLang = localStorage.getItem('rephrase_language') || 'ja';
+      
       // 既存のオプションをクリア（最初のデフォルトオプションは保持)
       const defaultOption = presetSelect.querySelector('option[value=""]');
       presetSelect.innerHTML = '';
       if (defaultOption) {
         presetSelect.appendChild(defaultOption);
       } else {
-        presetSelect.innerHTML = '<option value="">-- データを選択 --</option>';
+        const placeholderText = currentLang === 'ja' ? '-- データを選択 --' : '-- Select Data --';
+        presetSelect.innerHTML = `<option value="">${placeholderText}</option>`;
       }
       
       // 設定ファイルからプリセットを追加
       config.presets.forEach(preset => {
         const option = document.createElement('option');
         option.value = preset.file;
-        option.textContent = preset.name;
+        // 言語に応じて表示名を切り替え
+        option.textContent = currentLang === 'en' && preset.nameEn ? preset.nameEn : preset.name;
         option.title = preset.description;
         presetSelect.appendChild(option);
       });
@@ -2455,6 +2491,12 @@ async function loadPresetConfig() {
 
 // DOMContentLoadedでプリセット設定を読み込み
 document.addEventListener('DOMContentLoaded', loadPresetConfig);
+
+// 🌐 言語切り替え時にプリセットを再読み込み
+window.addEventListener('languageChanged', () => {
+  console.log('🌐 言語変更検出 - プリセット選択を更新');
+  loadPresetConfig();
+});
 
 
 
@@ -2525,13 +2567,18 @@ function showStartHereGuide() {
   
   // テキスト部分
   const textSpan = document.createElement('span');
-  textSpan.textContent = 'ポインタをかざすと説明が出ます';
+  textSpan.setAttribute('data-i18n', 'guide-hover-text');
+  // 現在の言語に応じて初期テキストを設定
+  const currentLang = localStorage.getItem('rephrase_language') || 'ja';
+  textSpan.textContent = currentLang === 'ja' ? 'ポインタをかざすと説明が出ます' : 'Hover to see instructions';
   
   // ×ボタンを作成
   const closeBtn = document.createElement('button');
   closeBtn.className = 'start-here-close-btn';
   closeBtn.innerHTML = '×';
-  closeBtn.title = 'このガイドを非表示にする';
+  closeBtn.setAttribute('data-i18n-title', 'guide-close-hint');
+  // 現在の言語に応じて初期titleを設定
+  closeBtn.title = currentLang === 'ja' ? 'このガイドを非表示にする' : 'Hide this guide';
   closeBtn.style.cssText = `
     background: #f44336;
     color: white;
@@ -2833,6 +2880,28 @@ window.clearRandomizeHistory = function() {
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🧪 ExplanationManager統合版初期化開始');
   
+  // 🎤 音声学習ボタンを正しい位置に移動（最優先実行）
+  setTimeout(() => {
+    const voiceBtn = document.getElementById('voice-panel-open-btn');
+    const explanationBtn = document.getElementById('explanation-btn');
+    const hideEnglishBtn = document.getElementById('hide-all-english-visibility');
+    
+    if (voiceBtn && hideEnglishBtn) {
+      console.log('🔧 音声学習ボタンを移動中...');
+      
+      // 解説ボタンがある場合はその後ろに、なければ英語OFFボタンの後ろに配置
+      if (explanationBtn) {
+        explanationBtn.insertAdjacentElement('afterend', voiceBtn);
+        console.log('✅ 音声学習ボタンを解説ボタンの右横に移動');
+      } else {
+        hideEnglishBtn.insertAdjacentElement('afterend', voiceBtn);
+        console.log('✅ 音声学習ボタンを英語OFFボタンの右横に移動（解説ボタン待機中）');
+      }
+      
+      voiceBtn.style.marginLeft = '10px';
+    }
+  }, 100);
+  
   // RephraseStateManagerの確認
   if (typeof window.RephraseState !== 'undefined') {
     console.log('✅ RephraseState利用可能');
@@ -2848,6 +2917,18 @@ document.addEventListener('DOMContentLoaded', function() {
     window.explanationManager.initialize().then(success => {
       if (success) {
         console.log('✅ ExplanationManager初期化成功');
+        
+        // 解説ボタンが追加された後、音声学習ボタンを再度移動
+        setTimeout(() => {
+          const voiceBtn = document.getElementById('voice-panel-open-btn');
+          const explanationBtn = document.getElementById('explanation-btn');
+          
+          if (voiceBtn && explanationBtn) {
+            explanationBtn.insertAdjacentElement('afterend', voiceBtn);
+            voiceBtn.style.marginLeft = '10px';
+            console.log('✅ 音声学習ボタンを最終位置に移動（解説ボタンの右横）');
+          }
+        }, 200);
       } else {
         console.error('❌ ExplanationManager初期化失敗');
       }

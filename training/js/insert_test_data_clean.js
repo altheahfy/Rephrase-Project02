@@ -9,6 +9,12 @@ console.log("🔵 insert_test_data_clean.js 読み込み開始");
 // - 読み取り専用でのみ使用可能
 // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
 
+// 🌐 言語に応じた英語OFFボタンテキストを取得
+function getEnglishOffButtonText() {
+  const currentLang = localStorage.getItem('rephrase_language') || 'ja';
+  return currentLang === 'ja' ? '英語<br>OFF' : 'EN<br>OFF';
+}
+
 // 🎯 データ挿入時のスムーズレンダリング制御を有効化
 let isDataInsertionInProgress = false;
 
@@ -471,7 +477,7 @@ function syncDynamicToStatic() {
               toggleButton = document.createElement('button');
               toggleButton.className = 'upper-slot-toggle-btn';
               toggleButton.dataset.slotId = container.id;
-              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.innerHTML = getEnglishOffButtonText();
               toggleButton.title = '英語表示切替';
               toggleButton.style.cssText = `
                 background: #4CAF50;
@@ -532,7 +538,7 @@ function syncDynamicToStatic() {
                   // 表示する
                   currentPhraseElement.style.opacity = '1';
                   currentPhraseElement.style.visibility = 'visible';
-                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.innerHTML = getEnglishOffButtonText();
                   toggleButton.style.backgroundColor = '#4CAF50';
                   toggleButton.title = '英語を非表示';
                   console.log(`✅ ${container.id}: 英語を表示`);
@@ -595,7 +601,7 @@ function syncDynamicToStatic() {
                   toggleButton.style.backgroundColor = '#757575';
                   toggleButton.title = '英語を表示';
                 } else {
-                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.innerHTML = getEnglishOffButtonText();
                   toggleButton.style.backgroundColor = '#4CAF50';
                   toggleButton.title = '英語を非表示';
                 }
@@ -982,7 +988,7 @@ function displayTopQuestionWord() {
     // 🆕 英語テキスト個別ボタンを作成
     const textToggleBtn = document.createElement('button');
     textToggleBtn.className = 'question-word-text-toggle-btn';
-    textToggleBtn.innerHTML = '英語<br>OFF';
+    textToggleBtn.innerHTML = getEnglishOffButtonText();
     textToggleBtn.title = '英語表示切替';
     textToggleBtn.style.cssText = `
       background: #4CAF50;
@@ -1072,7 +1078,7 @@ function displayTopQuestionWord() {
           textEl.style.opacity = '1';
           textEl.style.visibility = 'visible';
         }
-        textToggleBtn.innerHTML = '英語<br>OFF';
+        textToggleBtn.innerHTML = getEnglishOffButtonText();
         textToggleBtn.style.backgroundColor = '#4CAF50';
         console.log('✅ 疑問詞英語を表示');
       } else {
@@ -1285,7 +1291,7 @@ function syncUpperSlotsFromJson(data) {
               toggleButton = document.createElement('button');
               toggleButton.className = 'upper-slot-toggle-btn';
               toggleButton.dataset.slotId = container.id;
-              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.innerHTML = getEnglishOffButtonText();
               toggleButton.title = '英語表示切替';
               toggleButton.style.cssText = `
                 background: #4CAF50;
@@ -1351,7 +1357,7 @@ function syncUpperSlotsFromJson(data) {
                   // 表示する
                   currentPhraseElement.style.opacity = '1';
                   currentPhraseElement.style.visibility = 'visible';
-                  toggleButton.innerHTML = '英語<br>OFF';
+                  toggleButton.innerHTML = getEnglishOffButtonText();
                   toggleButton.style.backgroundColor = '#4CAF50';
                   toggleButton.title = '英語を非表示';
                   console.log(`✅ ${container.id}: 英語を表示`);
@@ -1408,7 +1414,7 @@ function syncUpperSlotsFromJson(data) {
                 toggleButton.style.backgroundColor = '#757575';
                 toggleButton.title = '英語を表示';
               } else {
-                toggleButton.innerHTML = '英語<br>OFF';
+                toggleButton.innerHTML = getEnglishOffButtonText();
                 toggleButton.style.backgroundColor = '#4CAF50';
                 toggleButton.title = '英語を非表示';
               }
@@ -1918,7 +1924,7 @@ function syncSubslotsFromJson(data) {
       const toggleButton = document.createElement('button');
       toggleButton.className = 'subslot-toggle-btn';
       toggleButton.dataset.slotId = fullSlotId;
-      toggleButton.innerHTML = '英語<br>OFF';
+      toggleButton.innerHTML = getEnglishOffButtonText();
       toggleButton.title = '英語表示切替';
       toggleButton.style.cssText = `
         background: #4CAF50;
@@ -1962,7 +1968,7 @@ function syncSubslotsFromJson(data) {
           slotElement.classList.remove('hidden-subslot-text');
           phraseElement.style.opacity = '1';
           phraseElement.style.visibility = 'visible';
-          toggleButton.innerHTML = '英語<br>OFF';
+          toggleButton.innerHTML = getEnglishOffButtonText();
           toggleButton.style.backgroundColor = '#4CAF50';
           toggleButton.title = '英語を非表示';
           console.log(`✅ ${fullSlotId}: 英語を表示`);
@@ -2124,7 +2130,7 @@ function syncSubslotsFromJson(data) {
               console.log(`🙈 ${fullSlotId} に hidden-subslot-text クラスとインラインスタイルを追加（英語例文テキスト非表示）`);
             } else {
               // 表示状態の場合
-              toggleButton.innerHTML = '英語<br>OFF';
+              toggleButton.innerHTML = getEnglishOffButtonText();
               toggleButton.style.backgroundColor = '#4CAF50';
               toggleButton.title = '英語を非表示';
             }

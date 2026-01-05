@@ -141,22 +141,22 @@
     }
 }
 
-/* パネル開くボタン - 元の横長デザインを維持 */
+/* パネル開くボタン - control-bar内に配置されるため固定位置は不要 */
 #voice-panel-open-btn {
-    /* HTMLの元のスタイルを優先 - 位置のみモバイル調整 */
-    position: fixed !important;
-    top: 60px !important;
-    right: 20px !important;
-    z-index: 15500 !important;
+    /* 位置はcontrol-bar内で自動決定されるため、固定位置を削除 */
+    /* position: fixed !important; */
+    /* top: 60px !important; */
+    /* right: 20px !important; */
+    /* z-index: 15500 !important; */
     
     /* 元のデザインを維持 */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     color: white !important;
     border: none !important;
-    padding: 8px 16px !important;
+    padding: 12px 20px !important;
     border-radius: 5px !important;
     cursor: pointer !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     font-weight: bold !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
     transition: all 0.2s ease !important;

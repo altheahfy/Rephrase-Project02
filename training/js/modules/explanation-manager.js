@@ -102,6 +102,12 @@ class ExplanationManager {
       this.stateManager.setState(this.STATE_PATHS.INITIALIZATION_STATUS, true);
       this.isInitialized = true;
       
+      // 言語切り替えイベントをリッスン
+      window.addEventListener('languageChanged', () => {
+        console.log('🌐 言語変更検出 - 解説ボタンを更新');
+        this.updateExplanationButtons();
+      });
+      
       console.log('✅ ExplanationManager初期化完了');
       return true;
       
@@ -430,6 +436,8 @@ class ExplanationManager {
       explanationBtn.className = 'explanation-btn';
       explanationBtn.textContent = '💡 例文解説';
       explanationBtn.title = '文法解説を表示';
+      explanationBtn.setAttribute('data-i18n', 'btn-explanation-full');
+      explanationBtn.setAttribute('data-i18n-title', 'tooltip-explanation');
       
       // スタイルを例文シャッフルボタンと調和させる
       explanationBtn.style.cssText = `
@@ -461,8 +469,24 @@ class ExplanationManager {
         this.showContextualExplanation();
       });
 
-      // 英語ON/OFFボタンの右横に配置（希望順序: シャッフル → 英語ON/OFF → 解説）
+      // 英語ON/OFFボタンの右横に配置（希望順序: シャッフル → 英語ON/OFF → 解説 → 音声学習）
       hideEnglishBtn.insertAdjacentElement('afterend', explanationBtn);
+      console.log('✅ 例文解説ボタンを配置しました');
+      
+      // 🎤 音声学習ボタンを解説ボタンの後ろに移動（既存ボタンを活用）
+      const voiceBtn = document.getElementById('voice-panel-open-btn');
+      if (voiceBtn) {
+        // 解説ボタンの直後に移動
+        explanationBtn.insertAdjacentElement('afterend', voiceBtn);
+        // スタイル調整
+        voiceBtn.style.marginLeft = '10px';
+        console.log('✅ 音声学習ボタンを解説ボタンの右横に移動しました');
+      }
+      
+      // 🌐 翻訳を適用（language_switcher.jsのapplyTranslations()を呼び出す）
+      if (typeof applyTranslations === 'function') {
+        applyTranslations();
+      }
       
       // 状態に保存
       this.stateManager.setState(this.STATE_PATHS.BUTTON_VISIBLE, true);

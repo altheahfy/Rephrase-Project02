@@ -3,24 +3,21 @@
     {
       "id": "dataset1",
       "name": "フルセット",
+      "nameEn": "Full Set",
       "file": "data/slot_order_data.json",
       "description": "スロットを極限までテストするためのデータセット"
     },
     {
-      "id": "dataset2",
-      "name": "第4文型と極性活用",
-      "file": "data/slot_order_data_第4文型と極性.json",
-      "description": "1とは逆にシンプルな上位スロット主体のデータセット"
-    },
-    {
       "id": "dataset001",
       "name": "V_自動詞第1文型",
+      "nameEn": "Intransitive Verbs Type 1",
       "file": "data/V自動詞第1文型.json",
       "description": "V自動詞第1文型"
     },
     {
       "id": "dataset002",
       "name": "他動詞第3,4文型",
+      "nameEn": "Transitive Verbs Type 3/4",
       "file": "data/第3,4文型.json",
       "description": "第3文型、第4文型を作る「他動詞」の学習データセット"
     }
