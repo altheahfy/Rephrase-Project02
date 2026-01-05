@@ -376,13 +376,20 @@ class ZoomControllerManager {
         container.element.style.setProperty('transform', `scale(${zoomLevel})`, 'important');
         container.element.style.setProperty('transform-origin', 'top left', 'important');
         
-        // 垂直位置補正（設計仕様書の補正計算式）
-        if (zoomLevel < 1.0) {
-          const verticalCorrection = (1 - zoomLevel) * 600;
-          container.element.style.setProperty('margin-top', `-${verticalCorrection}px`, 'important');
-          console.log(`  🔧 S/C1垂直補正: ${container.id} → margin-top: -${verticalCorrection}px`);
+        // 🔗 タブ接続中の場合はmargin-top補正をスキップ（タブ接続のmargin-top: -80pxを保持）
+        const hasTabConnection = container.element.classList.contains('active-subslot-area');
+        
+        if (hasTabConnection) {
+          console.log(`  🔗 タブ接続中のため垂直補正をスキップ: ${container.id}`);
         } else {
-          container.element.style.removeProperty('margin-top');
+          // 垂直位置補正（設計仕様書の補正計算式）
+          if (zoomLevel < 1.0) {
+            const verticalCorrection = (1 - zoomLevel) * 600;
+            container.element.style.setProperty('margin-top', `-${verticalCorrection}px`, 'important');
+            console.log(`  🔧 S/C1垂直補正: ${container.id} → margin-top: -${verticalCorrection}px`);
+          } else {
+            container.element.style.removeProperty('margin-top');
+          }
         }
         
         console.log(`  🆘 S/C1個別scale適用: ${container.id} → ${zoomLevel}`);

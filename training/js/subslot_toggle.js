@@ -200,11 +200,18 @@ function toggleExclusiveSubslot(slotId) {
     if (window.forceSubslotDetection) {
       setTimeout(() => {
         console.log(`🔍 ${slotId} サブスロット展開完了 - ズーム適用`);
-        window.forceSubslotDetection();
+        
+        try {
+          window.forceSubslotDetection();
+          console.log(`✅ forceSubslotDetection() 実行成功`);
+        } catch (error) {
+          console.error(`❌ forceSubslotDetection() エラー:`, error);
+        }
         
         // 🆕 追加：ズーム適用の即座確認
         setTimeout(() => {
           const expandedSubslot = document.getElementById(`slot-${slotId}-sub`);
+          
           if (expandedSubslot) {
             const currentTransform = expandedSubslot.style.transform;
             console.log(`🔍 ${slotId} サブスロット最終確認: transform="${currentTransform}"`);
@@ -222,6 +229,25 @@ function toggleExclusiveSubslot(slotId) {
               console.log(`🔗 [最終] ズーム後のタブ連結適用: ${slotId}`);
               applyTabConnection(slotId, true);
               
+              // 🔗 タブ連結が確実に適用されたか確認し、必要に応じて再適用
+              setTimeout(() => {
+                const subslotArea = document.getElementById(`slot-${slotId}-sub`);
+                if (subslotArea) {
+                  const currentMarginTop = window.getComputedStyle(subslotArea).marginTop;
+                  console.log(`🔍 タブ連結確認: ${slotId} margin-top = ${currentMarginTop}`);
+                  
+                  // margin-topが-80pxでない場合は強制再適用
+                  if (currentMarginTop !== '-80px') {
+                    console.warn(`⚠️ タブ連結が上書きされた可能性: ${slotId} (現在: ${currentMarginTop})`);
+                    subslotArea.style.setProperty('margin-top', '-80px', 'important');
+                    subslotArea.style.setProperty('padding-top', '80px', 'important');
+                    subslotArea.style.setProperty('z-index', '2', 'important');
+                    subslotArea.classList.add('active-subslot-area');
+                    console.log(`🔧 タブ連結を強制再適用: ${slotId}`);
+                  }
+                }
+              }, 100);
+              
               // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
               adjustSubslotWidths(slotId);
             }, 150); // 50ms → 150msに延長（初回実行時の安定性向上）
@@ -233,6 +259,25 @@ function toggleExclusiveSubslot(slotId) {
       setTimeout(() => {
         console.log(`🔗 [最終] タブ連結適用: ${slotId}`);
         applyTabConnection(slotId, true);
+        
+        // 🔗 タブ連結が確実に適用されたか確認し、必要に応じて再適用
+        setTimeout(() => {
+          const subslotArea = document.getElementById(`slot-${slotId}-sub`);
+          if (subslotArea) {
+            const currentMarginTop = window.getComputedStyle(subslotArea).marginTop;
+            console.log(`🔍 タブ連結確認: ${slotId} margin-top = ${currentMarginTop}`);
+            
+            // margin-topが-80pxでない場合は強制再適用
+            if (currentMarginTop !== '-80px') {
+              console.warn(`⚠️ タブ連結が上書きされた可能性: ${slotId} (現在: ${currentMarginTop})`);
+              subslotArea.style.setProperty('margin-top', '-80px', 'important');
+              subslotArea.style.setProperty('padding-top', '80px', 'important');
+              subslotArea.style.setProperty('z-index', '2', 'important');
+              subslotArea.classList.add('active-subslot-area');
+              console.log(`🔧 タブ連結を強制再適用: ${slotId}`);
+            }
+          }
+        }, 100);
         
         // 🎯 サブスロット展開後、テキスト幅に基づいてスロット幅を調整
         adjustSubslotWidths(slotId);

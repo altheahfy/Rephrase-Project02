@@ -5,6 +5,168 @@ K-MAD以前に開発されたRephraseUIは構造が混沌としているため�
 
 ---
 
+## [2026-01-05] サブスロット展開時にタブ接続が動かない問題（setTimeout内エラーの中断）
+
+### 発生した問題
+- サブスロットを展開しても、親スロットと接続（タブ風接合）されない
+- 以前は展開時にサブスロットが上に移動（margin-top: -80px）して接合していたが、全く動かない
+- ズーム処理のログは出るが、タブ接続のログ（「🔗 [最終] ズーム後のタブ連結適用」）が出ない
+
+### Root Cause（根本原因）
+**`forceSubslotDetection()`内のエラーがsetTimeoutチェーンを中断させていた**
+
+#### エラーの伝播問題
+```javascript
+// 問題のあったコード
+setTimeout(() => {
+  window.forceSubslotDetection();  // ← ここでエラー発生
+  
+  setTimeout(() => {
+    applyTabConnection(slotId, true);  // ← この処理が一切実行されない
+  }, 100);
+}, 100);
+```
+
+#### なぜsetTimeoutチェーンが中断したか
+- `forceSubslotDetection()`内でエラーが発生
+- setTimeout内のエラーは外側のtry-catchではキャッチできない（非同期処理のため）
+- エラー発生時点でJavaScriptの実行が中断
+- 後続のsetTimeout（タブ接続処理）が一切実行されなかった
+- エラーがコンソールに赤く表示されなかったため、原因特定が困難
+
+### Solution（解決策）
+**`forceSubslotDetection()`をtry-catchで囲み、エラーが発生しても後続処理を継続**
+
+#### 実装（training/js/subslot_toggle.js Line 205-212）
+```javascript
+setTimeout(() => {
+  console.log(`🔍 ${slotId} サブスロット展開完了 - ズーム適用`);
+  
+  try {
+    window.forceSubslotDetection();
+    console.log(`✅ forceSubslotDetection() 実行成功`);
+  } catch (error) {
+    console.error(`❌ forceSubslotDetection() エラー:`, error);
+  }
+  
+  // ✅ エラーが発生しても、この部分は確実に実行される
+  setTimeout(() => {
+    const expandedSubslot = document.getElementById(`slot-${slotId}-sub`);
+    if (expandedSubslot) {
+      // タブ接続処理
+      applyTabConnection(slotId, true);
+    }
+  }, 100);
+}, 100);
+```
+
+### Design Rationale（設計判断）
+**なぜtry-catchで解決したか**:
+- エラーをキャッチして、JavaScript実行を継続
+- ズーム機能にエラーがあっても、タブ接続は正常に動作
+- エラーログで問題箇所を明確化（デバッグしやすい）
+
+**setTimeout内のエラー処理の重要性**:
+- 非同期処理（setTimeout, Promise）内のエラーは外側でキャッチできない
+- 各非同期処理内で個別にtry-catchが必要
+- エラーハンドリングなしだと、無音で失敗する（サイレントエラー）
+
+### 教訓
+1. **setTimeout/Promise内は必ずtry-catchで囲む**（特に外部関数呼び出し時）
+2. **エラーがコンソールに出ない場合、setTimeoutチェーンの中断を疑う**
+3. **デバッグ時は各段階でログを出し、どこまで実行されたか確認する**
+4. **非同期処理の依存関係は最小限にする**（A→B→Cのチェーンは脆弱）
+
+### 検索コマンド（再発防止）
+```bash
+# setTimeout内でtry-catchがない外部関数呼び出しを検索
+grep -r "setTimeout.*window\." training/js/ | grep -v "try"
+
+# 非同期処理のチェーンを検索
+grep -r "setTimeout.*setTimeout" training/js/
+```
+
+---
+
+## [2026-01-05] 音声学習ボタンの配置が動かない問題（CSS !importantの優先度）
+
+### 発生した問題
+- 音声学習ボタンを例文解説ボタンの右横（control-bar内）に移動したい
+- HTMLで正しく配置し、JavaScriptでも移動処理を追加したが、画面右側に固定表示されたまま動かない
+- index.htmlの変更、explanation-manager.jsでの動的移動、DOMContentLoadedでの強制移動など、複数の方法を試すも効果なし
+
+### Root Cause（根本原因）
+**CSS（voice-panel-mobile.css）で`position: fixed !important`が設定されており、HTML/JavaScriptの配置を上書きしていた**
+
+#### CSS優先度の問題
+```css
+/* voice-panel-mobile.css Line 145-151 */
+#voice-panel-open-btn {
+    position: fixed !important;  /* ← これがHTML/JSを上書き */
+    top: 60px !important;
+    right: 20px !important;
+    z-index: 15500 !important;
+    /* ... */
+}
+```
+
+#### なぜHTMLやJavaScriptでの移動が無効だったか
+- `!important`は最高優先度のCSS宣言
+- HTMLのインラインスタイルも、JavaScriptの`style.position`も、`!important`には勝てない
+- `insertAdjacentElement()`でDOMツリー上は移動しても、視覚的位置は`position: fixed`で固定される
+
+### Solution（解決策）
+**voice-panel-mobile.cssの固定位置指定を削除**
+
+#### 実装（training/css/voice-panel-mobile.css Line 145-167）
+```css
+/* パネル開くボタン - control-bar内に配置されるため固定位置は不要 */
+#voice-panel-open-btn {
+    /* 位置はcontrol-bar内で自動決定されるため、固定位置を削除 */
+    /* position: fixed !important; */  /* ← コメントアウト */
+    /* top: 60px !important; */
+    /* right: 20px !important; */
+    /* z-index: 15500 !important; */
+    
+    /* デザインスタイルは維持 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    /* ... */
+}
+```
+
+### Design Rationale（設計判断）
+**なぜ元々fixed配置だったか**:
+- モバイル対応時に、ボタンを画面右上に固定表示する仕様だった
+- その後、control-bar内に統合する設計変更が行われた
+- しかし、voice-panel-mobile.cssの`!important`指定が残っていた
+
+**!importantの危険性**:
+- 後からの変更を困難にする（今回のケース）
+- デバッグが困難（HTMLやJSでは原因が見つからない）
+- CSSファイル内を全検索しないと発見できない
+
+### 教訓
+1. **HTMLやJSで配置が動かない場合、CSSの`!important`を疑う**
+2. **`position: fixed`は必ず複数のCSSファイルを横断検索する**
+3. **モバイル用CSSファイル（voice-panel-mobile.css等）も必ずチェック**
+4. **`!important`は最小限に使用し、使用箇所を文書化する**
+
+### 検索コマンド（再発防止）
+```bash
+# position: fixed を全検索
+grep -r "position.*fixed" training/**/*.css
+
+# !important を全検索
+grep -r "!important" training/**/*.css
+
+# 特定IDのCSS定義を全検索
+grep -r "#voice-panel-open-btn" training/**/*.css
+```
+
+---
+
 ## [2026-01-02] Sスロットだけサブスロット展開時にタブ接続が一瞬で消える問題
 
 ### 発生した問題
