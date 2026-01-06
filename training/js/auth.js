@@ -28,7 +28,7 @@ class AuthSystem {
      */
     async ensureDefaultUser() {
         const DEFAULT_USERNAME = 'demo';
-        const DEFAULT_PASSWORD = 'demo123';
+        const DEFAULT_PASSWORD = 'demo1234'; // 8文字以上必須
         const DEFAULT_EMAIL = 'demo@rephrase.local';
         
         console.log('🔐 デフォルトユーザーチェック開始...');
@@ -49,7 +49,7 @@ class AuthSystem {
                 const result = await this.register(DEFAULT_USERNAME, DEFAULT_PASSWORD, DEFAULT_EMAIL);
                 if (result.success) {
                     console.log('✅ デフォルトユーザー作成完了');
-                    console.log('📝 ログイン情報: username="demo", password="demo123"');
+                    console.log('📝 ログイン情報: username="demo", password="demo1234"');
                 } else {
                     console.error('❌ デフォルトユーザー作成失敗:', result.message);
                 }
