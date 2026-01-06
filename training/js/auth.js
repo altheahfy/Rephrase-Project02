@@ -31,16 +31,33 @@ class AuthSystem {
         const DEFAULT_PASSWORD = 'demo123';
         const DEFAULT_EMAIL = 'demo@rephrase.local';
         
+        console.log('🔐 デフォルトユーザーチェック開始...');
+        
+        // securityUtilsが読み込まれているか確認
+        if (!window.securityUtils) {
+            console.warn('⚠️ securityUtils未読み込み。デフォルトユーザー作成をスキップします。');
+            return;
+        }
+        
         // すでにユーザーが存在するかチェック
-        if (!this.userExists(DEFAULT_USERNAME)) {
+        const exists = this.userExists(DEFAULT_USERNAME);
+        console.log(`🔍 ユーザー "${DEFAULT_USERNAME}" の存在: ${exists}`);
+        
+        if (!exists) {
             console.log('🔐 デフォルトユーザーを作成中...');
             try {
-                await this.register(DEFAULT_USERNAME, DEFAULT_PASSWORD, DEFAULT_EMAIL);
-                console.log('✅ デフォルトユーザー作成完了');
-                console.log('📝 ログイン情報: username="demo", password="demo123"');
+                const result = await this.register(DEFAULT_USERNAME, DEFAULT_PASSWORD, DEFAULT_EMAIL);
+                if (result.success) {
+                    console.log('✅ デフォルトユーザー作成完了');
+                    console.log('📝 ログイン情報: username="demo", password="demo123"');
+                } else {
+                    console.error('❌ デフォルトユーザー作成失敗:', result.message);
+                }
             } catch (error) {
-                console.error('❌ デフォルトユーザー作成失敗:', error);
+                console.error('❌ デフォルトユーザー作成エラー:', error);
             }
+        } else {
+            console.log('✓ デフォルトユーザーは既に存在します');
         }
     }
 
