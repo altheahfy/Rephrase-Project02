@@ -13,10 +13,35 @@ class AuthSystem {
     }
 
     async init() {
+        // 🆕 初回アクセス時にデフォルトユーザーを作成
+        await this.ensureDefaultUser();
+        
         // ページ読み込み時にセッション復元を試行
         await this.restoreSession();
         this.setupSessionTimeout();
         this.bindEvents();
+    }
+    
+    /**
+     * デフォルトユーザーの存在確認と作成
+     * GitHub Pages等で初回アクセス時にテストユーザーを自動作成
+     */
+    async ensureDefaultUser() {
+        const DEFAULT_USERNAME = 'demo';
+        const DEFAULT_PASSWORD = 'demo123';
+        const DEFAULT_EMAIL = 'demo@rephrase.local';
+        
+        // すでにユーザーが存在するかチェック
+        if (!this.userExists(DEFAULT_USERNAME)) {
+            console.log('🔐 デフォルトユーザーを作成中...');
+            try {
+                await this.register(DEFAULT_USERNAME, DEFAULT_PASSWORD, DEFAULT_EMAIL);
+                console.log('✅ デフォルトユーザー作成完了');
+                console.log('📝 ログイン情報: username="demo", password="demo123"');
+            } catch (error) {
+                console.error('❌ デフォルトユーザー作成失敗:', error);
+            }
+        }
     }
 
     /**
