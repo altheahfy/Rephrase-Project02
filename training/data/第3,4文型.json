@@ -706,7 +706,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "M1",
     "SlotPhrase": "yesterday,",
@@ -721,10 +721,10 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "S",
-    "SlotPhrase": "they",
+    "SlotPhrase": "you",
     "SlotText": "",
     "PhraseType": "word",
     "SubslotID": "",
@@ -736,7 +736,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "Aux",
     "SlotPhrase": "didn't",
@@ -751,7 +751,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "V",
     "SlotPhrase": "give",
@@ -766,7 +766,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "O1",
     "SlotPhrase": "us",
@@ -781,7 +781,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex011",
     "Slot": "O2",
     "SlotPhrase": "a secret",
@@ -886,10 +886,10 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex013",
     "Slot": "S",
-    "SlotPhrase": "he",
+    "SlotPhrase": "you",
     "SlotText": "",
     "PhraseType": "word",
     "SubslotID": "",
@@ -901,7 +901,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex013",
     "Slot": "Aux",
     "SlotPhrase": "didn't",
@@ -916,7 +916,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex013",
     "Slot": "V",
     "SlotPhrase": "show",
@@ -931,7 +931,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex013",
     "Slot": "O1",
     "SlotPhrase": "me",
@@ -946,7 +946,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_3",
     "例文ID": "ex013",
     "Slot": "O2",
     "SlotPhrase": "a message",
@@ -961,7 +961,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "M1",
     "SlotPhrase": "earlier today",
@@ -976,7 +976,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "S",
     "SlotPhrase": "we",
@@ -991,7 +991,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "Aux",
     "SlotPhrase": "didn't",
@@ -1006,7 +1006,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "V",
     "SlotPhrase": "show",
@@ -1021,7 +1021,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "O1",
     "SlotPhrase": "them",
@@ -1036,7 +1036,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex014",
     "Slot": "O2",
     "SlotPhrase": "a warning",
@@ -1216,7 +1216,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "M1",
     "SlotPhrase": "this morning",
@@ -1231,7 +1231,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "S",
     "SlotPhrase": "I",
@@ -1246,7 +1246,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "Aux",
     "SlotPhrase": "didn't",
@@ -1261,7 +1261,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "V",
     "SlotPhrase": "tell",
@@ -1276,7 +1276,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "O1",
     "SlotPhrase": "him",
@@ -1291,7 +1291,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "didn't",
+    "V_group_key": "didn't_2",
     "例文ID": "ex017",
     "Slot": "O2",
     "SlotPhrase": "the truth",
@@ -1471,7 +1471,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "M1",
     "SlotPhrase": "yesterday,",
@@ -1486,7 +1486,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -1501,10 +1501,10 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "S",
-    "SlotPhrase": "they",
+    "SlotPhrase": "you",
     "SlotText": "",
     "PhraseType": "word",
     "SubslotID": "",
@@ -1516,7 +1516,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "V",
     "SlotPhrase": "give",
@@ -1531,7 +1531,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "O1",
     "SlotPhrase": "us",
@@ -1546,7 +1546,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex020",
     "Slot": "O2",
     "SlotPhrase": "a secret",
@@ -1651,7 +1651,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex022",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -1666,10 +1666,10 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex022",
     "Slot": "S",
-    "SlotPhrase": "he",
+    "SlotPhrase": "you",
     "SlotText": "",
     "PhraseType": "word",
     "SubslotID": "",
@@ -1681,7 +1681,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex022",
     "Slot": "V",
     "SlotPhrase": "show",
@@ -1696,7 +1696,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex022",
     "Slot": "O1",
     "SlotPhrase": "me",
@@ -1711,7 +1711,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_3",
     "例文ID": "ex022",
     "Slot": "O2",
     "SlotPhrase": "a message",
@@ -1726,7 +1726,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "M1",
     "SlotPhrase": "earlier today",
@@ -1741,7 +1741,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -1756,7 +1756,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "S",
     "SlotPhrase": "we",
@@ -1771,7 +1771,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "V",
     "SlotPhrase": "show",
@@ -1786,7 +1786,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "O1",
     "SlotPhrase": "them",
@@ -1801,7 +1801,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex023",
     "Slot": "O2",
     "SlotPhrase": "a warning",
@@ -1981,7 +1981,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "M1",
     "SlotPhrase": "this morning",
@@ -1996,7 +1996,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -2011,7 +2011,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "S",
     "SlotPhrase": "I",
@@ -2026,7 +2026,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "V",
     "SlotPhrase": "tell",
@@ -2041,7 +2041,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "O1",
     "SlotPhrase": "him",
@@ -2056,7 +2056,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "did",
+    "V_group_key": "did_2",
     "例文ID": "ex026",
     "Slot": "O2",
     "SlotPhrase": "the truth",
@@ -2236,7 +2236,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "M1",
     "SlotPhrase": "yesterday,",
@@ -2251,7 +2251,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "M3",
     "SlotPhrase": "where",
@@ -2266,7 +2266,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -2281,10 +2281,10 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "S",
-    "SlotPhrase": "they",
+    "SlotPhrase": "you",
     "SlotText": "",
     "PhraseType": "word",
     "SubslotID": "",
@@ -2296,7 +2296,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "V",
     "SlotPhrase": "give",
@@ -2311,7 +2311,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "O1",
     "SlotPhrase": "us",
@@ -2326,7 +2326,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_3",
     "例文ID": "ex029",
     "Slot": "O2",
     "SlotPhrase": "a secret",
@@ -2491,7 +2491,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "M1",
     "SlotPhrase": "earlier today",
@@ -2506,7 +2506,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "M3",
     "SlotPhrase": "where",
@@ -2521,7 +2521,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -2536,7 +2536,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "S",
     "SlotPhrase": "we",
@@ -2551,7 +2551,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "V",
     "SlotPhrase": "show",
@@ -2566,7 +2566,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "O1",
     "SlotPhrase": "them",
@@ -2581,7 +2581,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex032",
     "Slot": "O2",
     "SlotPhrase": "a warning",
@@ -2746,7 +2746,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "M1",
     "SlotPhrase": "this morning",
@@ -2761,7 +2761,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "M3",
     "SlotPhrase": "where",
@@ -2776,7 +2776,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "Aux",
     "SlotPhrase": "did",
@@ -2791,7 +2791,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "S",
     "SlotPhrase": "I",
@@ -2806,7 +2806,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "V",
     "SlotPhrase": "tell",
@@ -2821,7 +2821,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "O1",
     "SlotPhrase": "him",
@@ -2836,7 +2836,7 @@
   },
   {
     "構文ID": "",
-    "V_group_key": "what",
+    "V_group_key": "what_2",
     "例文ID": "ex035",
     "Slot": "O2",
     "SlotPhrase": "the truth",
